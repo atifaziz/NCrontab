@@ -102,6 +102,12 @@ namespace NCrontab
             _daysOfWeek = CrontabField.DaysOfWeek(fields[4]);
         }
 
+        /// <summary>
+        /// Enumerates all the occurrences of this schedule starting with a
+        /// base time and up to an end time limit. The occurrences are
+        /// only calculated as they are enumerated.
+        /// </summary>
+
         public IEnumerable<DateTime> GetNextOccurrences(DateTime baseTime, DateTime endTime)
         {
             for (var occurrence = GetNextOccurrence(baseTime, endTime);
@@ -112,11 +118,20 @@ namespace NCrontab
             }
         }
 
+        /// <summary>
+        /// Gets the next occurrence of this schedule starting with a base time.
+        /// </summary>
+
         public DateTime GetNextOccurrence(DateTime baseTime)
         {
             return GetNextOccurrence(baseTime, DateTime.MaxValue);
         }
 
+        /// <summary>
+        /// Gets the next occurrence of this schedule starting with a base 
+        /// time and up to an end time limit.
+        /// </summary>
+        
         public DateTime GetNextOccurrence(DateTime baseTime, DateTime endTime) 
         {
             const int nil = -1;
@@ -250,6 +265,11 @@ namespace NCrontab
 
             return GetNextOccurrence(new DateTime(year, month, day, 23, 59, 0, 0, baseTime.Kind), endTime);
         }
+
+        /// <summary>
+        /// Returns a string in crontab expression (expanded) that represents 
+        /// this schedule.
+        /// </summary>
 
         public override string ToString()
         {
