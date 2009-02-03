@@ -253,7 +253,7 @@ namespace NCrontab.Tests
 
             worker.Start();
 
-            if (worker.Join(!Debugger.IsAttached ? limit.Milliseconds : Timeout.Infinite))
+            if (worker.Join(!Debugger.IsAttached ? (int) limit.TotalMilliseconds : Timeout.Infinite))
             {
                 if (e != null)
                     throw new Exception(e.Message, e);
