@@ -126,16 +126,16 @@ namespace NCrontabViewer
             var count = 0;
             const int maxCount = 500;
 
-            foreach (var occurance in _crontab.GetNextOccurrences(_startTime, endTime))
+            foreach (var occurrence in _crontab.GetNextOccurrences(_startTime, endTime))
             {
                 if (count + 1 > maxCount)
                     break;
 
-                _startTime = occurance;
+                _startTime = occurrence;
                 _totalOccurrenceCount++;
                 count++;
 
-                var timeString = occurance.ToString("ddd dd, MMM yyyy HH:mm", new CultureInfo("en-US"));
+                var timeString = occurrence.ToString("ddd dd, MMM yyyy HH:mm", new CultureInfo("en-US"));
 
                 sb.Append(timeString);
                 sb.Append(" | ");
