@@ -31,6 +31,7 @@ namespace NCrontabViewer
 
     using System;
     using System.Globalization;
+    using System.Linq;
     using System.Text;
     using System.Windows.Forms;
     using NCrontab;
@@ -121,10 +122,14 @@ namespace NCrontabViewer
                 DateTimeStyles.AssumeLocal);
 
             var sb = new StringBuilder();
-            var lastTimeString = "??? ??, ??? ???? ??:??";
 
             var count = 0;
             const int maxCount = 500;
+            var info = DateTimeFormatInfo.CurrentInfo;
+            var dayWidth = info.AbbreviatedDayNames.Max(s => s.Length);
+            var monthWidth = info.AbbreviatedMonthNames.Max(s => s.Length);
+            var timeFormat = string.Format("{{0,-{0}:ddd}} {{0:dd}}, {{0,-{1}:MMM}} {{0:yyyy HH:mm}}", dayWidth, monthWidth);
+            var lastTimeString = new string('?', string.Format(timeFormat, DateTime.MinValue).Length);
 
             foreach (var occurrence in _crontab.GetNextOccurrences(_startTime, endTime))
             {
@@ -135,22 +140,22 @@ namespace NCrontabViewer
                 _totalOccurrenceCount++;
                 count++;
 
-                var timeString = occurrence.ToString("ddd dd, MMM yyyy HH:mm", new CultureInfo("en-US"));
+                var timeString = string.Format(timeFormat, occurrence);
 
                 sb.Append(timeString);
                 sb.Append(" | ");
 
-                Diff(lastTimeString, timeString, 0, 3, sb);
+                var index = Diff(lastTimeString, timeString, 0, dayWidth, sb);
                 sb.Append(' ');
-                Diff(lastTimeString, timeString, 4, 2, sb);
+                index = Diff(lastTimeString, timeString, index + 1, 2, sb);
                 sb.Append(", ");
-                Diff(lastTimeString, timeString, 8, 3, sb);
+                index = Diff(lastTimeString, timeString, index + 2, monthWidth, sb);
                 sb.Append(' ');
-                Diff(lastTimeString, timeString, 12, 4, sb);
+                index = Diff(lastTimeString, timeString, index + 1, 4, sb);
                 sb.Append(' ');
-                Diff(lastTimeString, timeString, 17, 2, sb);
+                index = Diff(lastTimeString, timeString, index + 1, 2, sb);
                 sb.Append(':');
-                Diff(lastTimeString, timeString, 20, 2, sb);
+                Diff(lastTimeString, timeString, index + 1, 2, sb);
 
                 lastTimeString = timeString;
 
@@ -167,12 +172,14 @@ namespace NCrontabViewer
             _resultBox.ScrollToCaret();
         }
 
-        private static void Diff(string oldString, string newString, int index, int length, StringBuilder builder)
+        private static int Diff(string oldString, string newString, int index, int length, StringBuilder builder)
         {
             if (string.CompareOrdinal(oldString, index, newString, index, length) == 0)
                 builder.Append('-', length);
             else
                 builder.Append(newString, index, length);
+
+            return index + length;
         }
 
         private void More_Click(object sender, EventArgs e)
