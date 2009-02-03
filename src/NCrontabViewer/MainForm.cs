@@ -135,7 +135,8 @@ namespace NCrontabViewer
                 _totalOccurrenceCount++;
                 count++;
 
-                var timeString = occurance.ToString("ddd dd, MMM yyyy HH:mm");
+                var timeString = occurance.ToString("ddd dd, MMM yyyy HH:mm", new CultureInfo("en-US"));
+
                 sb.Append(timeString);
                 sb.Append(" | ");
 
