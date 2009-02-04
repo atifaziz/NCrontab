@@ -32,7 +32,7 @@ namespace NCrontab
     [ Serializable ]
     public enum CrontabFieldKind
     {
-        Minute, 
+        Minute = 0, // Keep in order of appearance in expression
         Hour, 
         Day, 
         Month, 
