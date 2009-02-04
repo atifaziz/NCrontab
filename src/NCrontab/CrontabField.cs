@@ -216,19 +216,11 @@ namespace NCrontab
                     // We're only setting a single value - check that it is in range.
                     //
 
-                    if (start < minValue) 
-                    {
-                        return ErrorHandling.OnError(() => new CrontabException(string.Format(
-                            "{0} is lower than the minimum allowable value for this field. Value must be between {1} and {2} (all inclusive).", 
-                            start, _impl.MinValue, _impl.MaxValue)), onError);
-                    } 
-                    
-                    if (start > maxValue) 
-                    {
-                        return ErrorHandling.OnError(() => new CrontabException(string.Format(
-                            "{0} is higher than the maximum allowable value for this field. Value must be between {1} and {2} (all inclusive).", 
-                            end, _impl.MinValue, _impl.MaxValue)), onError);
-                    }
+                    if (start < minValue)
+                        return OnValueBelowMinError(start, onError);
+
+                    if (start > maxValue)
+                        return OnValueAboveMaxError(start, onError);
                 }
             } 
             else 
@@ -246,26 +238,14 @@ namespace NCrontab
                 }
 
                 if (start < 0) 
-                {
                     start = minValue;
-                } 
                 else if (start < minValue) 
-                {
-                    return ErrorHandling.OnError(() => new CrontabException(string.Format(
-                        "{0} is lower than the minimum allowable value for this field. Value must be between {1} and {2} (all inclusive).", 
-                        start, _impl.MinValue, _impl.MaxValue)), onError);                    
-                }
+                    return OnValueBelowMinError(start, onError);                    
 
                 if (end < 0) 
-                {
                     end = maxValue;
-                } 
                 else if (end > maxValue) 
-                {
-                    return ErrorHandling.OnError(() => new CrontabException(string.Format(
-                        "{0} is higher than the maximum allowable value for this field. Value must be between {1} and {2} (all inclusive).", 
-                        end, _impl.MinValue, _impl.MaxValue)), onError);
-                }
+                    return OnValueAboveMaxError(end, onError);
             }
 
             if (interval < 1) 
@@ -296,6 +276,24 @@ namespace NCrontab
                 _maxValueSet = i;
 
             return null;
+        }
+
+        private ExceptionProvider OnValueAboveMaxError(int value, ExceptionHandler onError)
+        {
+            return ErrorHandling.OnError(
+                () => new CrontabException(string.Format(
+                    "{0} is higher than the maximum allowable value for this field. Value must be between {1} and {2} (all inclusive).", 
+                    value, _impl.MinValue, _impl.MaxValue)), 
+                onError);
+        }
+
+        private ExceptionProvider OnValueBelowMinError(int value, ExceptionHandler onError)
+        {
+            return ErrorHandling.OnError(
+                () => new CrontabException(string.Format(
+                    "{0} is lower than the minimum allowable value for this field. Value must be between {1} and {2} (all inclusive).", 
+                    value, _impl.MinValue, _impl.MaxValue)), 
+                onError);
         }
 
         public override string ToString()
