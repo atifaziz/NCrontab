@@ -243,6 +243,60 @@ namespace NCrontab.Tests
                 CronFinite("* * 31 Feb *", "01/01/2001 00:00", "01/01/2010 00:00"));
         }
 
+        [ Test, ExpectedException(typeof(CrontabException)) ]
+        public void BadMinutesField()
+        {
+            CrontabSchedule.Parse("bad * * * *");
+        }
+
+        [Test, ExpectedException(typeof(CrontabException))]
+        public void BadHoursField()
+        {
+            CrontabSchedule.Parse("* bad * * *");
+        }
+
+        [Test, ExpectedException(typeof(CrontabException))]
+        public void BadDayField()
+        {
+            CrontabSchedule.Parse("* * bad * *");
+        }
+
+        [Test, ExpectedException(typeof(CrontabException))]
+        public void BadMonthField()
+        {
+            CrontabSchedule.Parse("* * * bad *");
+        }
+
+        [Test, ExpectedException(typeof(CrontabException))]
+        public void BadDayOfWeekField()
+        {
+            CrontabSchedule.Parse("* * * * mon,bad,wed");
+        }
+
+        [Test, ExpectedException(typeof(CrontabException))]
+        public void OutOfRangeField()
+        {
+            CrontabSchedule.Parse("* 1,2,3,456,7,8,9 * * *");
+        }
+
+        [Test, ExpectedException(typeof(CrontabException))]
+        public void NonNumberValueInNumericOnlyField()
+        {
+            CrontabSchedule.Parse("* 1,Z,3,4 * * *");
+        }
+
+        [Test, ExpectedException(typeof(CrontabException))]
+        public void NonNumericFieldInterval()
+        {
+            CrontabSchedule.Parse("* 1/Z * * *");
+        }
+
+        [Test, ExpectedException(typeof(CrontabException))]
+        public void NonNumericFieldRangeComponent()
+        {
+            CrontabSchedule.Parse("* 3-l2 * * *");
+        }
+
         private static void TimeCron(TimeSpan limit, ThreadStart test)
         {
             Debug.Assert(test != null);

@@ -31,4 +31,4 @@ using System.Reflection;
 [assembly: AssemblyDescription("NUnit tests for NCrontab")]
 
 [assembly: AssemblyVersion("0.2.0.0")]
-[assembly: AssemblyFileVersion("0.2.10904.0")]
+[assembly: AssemblyFileVersion("0.2.10904.2122")]
