@@ -282,8 +282,8 @@ namespace NCrontab
         {
             return ErrorHandling.OnError(
                 () => new CrontabException(string.Format(
-                    "{0} is higher than the maximum allowable value for this field. Value must be between {1} and {2} (all inclusive).", 
-                    value, _impl.MinValue, _impl.MaxValue)), 
+                    "{0} is higher than the maximum allowable value for the [{3}] field. Value must be between {1} and {2} (all inclusive).", 
+                    value, _impl.MinValue, _impl.MaxValue, _impl.Kind)), 
                 onError);
         }
 
@@ -291,8 +291,8 @@ namespace NCrontab
         {
             return ErrorHandling.OnError(
                 () => new CrontabException(string.Format(
-                    "{0} is lower than the minimum allowable value for this field. Value must be between {1} and {2} (all inclusive).", 
-                    value, _impl.MinValue, _impl.MaxValue)), 
+                    "{0} is lower than the minimum allowable value for the [{3}] field. Value must be between {1} and {2} (all inclusive).",
+                    value, _impl.MinValue, _impl.MaxValue, _impl.Kind)), 
                 onError);
         }
 

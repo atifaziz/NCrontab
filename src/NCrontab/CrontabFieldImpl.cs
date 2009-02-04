@@ -223,13 +223,13 @@ namespace NCrontab
             }
         }
 
-        private static ExceptionProvider OnParseException(Exception innerException, string str, ExceptionHandler onError)
+        private ExceptionProvider OnParseException(Exception innerException, string str, ExceptionHandler onError)
         {
             Debug.Assert(str != null);
             Debug.Assert(innerException != null);
 
             return ErrorHandling.OnError(
-                       () => new CrontabException(string.Format("'{0}' is not a valid crontab field expression.", str), innerException), 
+                       () => new CrontabException(string.Format("'{0}' is not a valid [{1}] crontab field expression.", str, Kind), innerException), 
                        onError);
         }
 
@@ -239,7 +239,7 @@ namespace NCrontab
             Debug.Assert(acc != null);
 
             if (str.Length == 0)
-                return ErrorHandling.OnError(() => new CrontabException("A crontab field value cannot be empty."), onError);
+                return ErrorHandling.OnError(() => new CrontabException("A crontab field ({0}) value cannot be empty."), onError);
 
             //
             // Next, look for a list of values (e.g. 1,2,3).
@@ -321,8 +321,8 @@ namespace NCrontab
             if (_names == null)
             {
                 throw new CrontabException(string.Format(
-                    "'{0}' is not a valid value for this crontab field. It must be a numeric value between {1} and {2} (all inclusive).",
-                    str, _minValue.ToString(), _maxValue.ToString()));
+                    "'{0}' is not a valid [{3}] crontab field value. It must be a numeric value between {1} and {2} (all inclusive).",
+                    str, _minValue.ToString(), _maxValue.ToString(), _kind.ToString()));
             }
 
             for (var i = 0; i < _names.Length; i++)
