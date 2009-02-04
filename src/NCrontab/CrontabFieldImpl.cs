@@ -239,7 +239,7 @@ namespace NCrontab
             Debug.Assert(acc != null);
 
             if (str.Length == 0)
-                return ErrorHandling.OnError(() => new CrontabException("A crontab field ({0}) value cannot be empty."), onError);
+                return ErrorHandling.OnError(() => new CrontabException("A crontab field value cannot be empty."), onError);
 
             //
             // Next, look for a list of values (e.g. 1,2,3).
