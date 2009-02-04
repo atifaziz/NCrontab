@@ -75,31 +75,60 @@ namespace NCrontab
 
         public static CrontabSchedule Parse(string expression)
         {
+            return TryParse(expression, ErrorHandling.Throw).Value;
+        }
+
+        public static ValueOrError<CrontabSchedule> TryParse(string expression)
+        {
+            return TryParse(expression, null);
+        }
+
+        private static ValueOrError<CrontabSchedule> TryParse(string expression, ExceptionHandler onError)
+        {
             if (expression == null)
                 throw new ArgumentNullException("expression");
 
-            return new CrontabSchedule(expression);
-        }
+            var tokens = expression.Split(_separators, StringSplitOptions.RemoveEmptyEntries);
 
-        private CrontabSchedule(string expression)
-        {
-            Debug.Assert(expression != null);
-
-            var fields = expression.Split(_separators, StringSplitOptions.RemoveEmptyEntries);
-
-            if (fields.Length != 5)
+            if (tokens.Length != 5)
             {
-                throw new CrontabException(string.Format(
-                    "'{0}' is not a valid crontab expression. It must contain at least 5 components of a schedule "
-                    + "(in the sequence of minutes, hours, days, months, days of week).", 
-                    expression));
+                return ValueOrError.Error<CrontabSchedule>(
+                    ErrorHandling.OnError(() => new CrontabException(string.Format(
+                        "'{0}' is not a valid crontab expression. It must contain at least 5 components of a schedule "
+                        + "(in the sequence of minutes, hours, days, months, days of week).", 
+                        expression)), onError));
             }
 
-            _minutes = CrontabField.Minutes(fields[0]);
-            _hours = CrontabField.Hours(fields[1]);
-            _days = CrontabField.Days(fields[2]);
-            _months = CrontabField.Months(fields[3]);
-            _daysOfWeek = CrontabField.DaysOfWeek(fields[4]);
+            var fields = new CrontabField[5];
+
+            for (var i = 0; i < fields.Length; i++)
+            {
+                var field = CrontabField.TryParse((CrontabFieldKind) i, tokens[i], onError);
+                if (field.IsError)
+                    return ValueOrError.Error<CrontabSchedule>(field.ErrorProvider);
+
+                fields[i] = field.Value;
+            }
+
+            return ValueOrError.Value(new CrontabSchedule(fields[0], fields[1], fields[2], fields[3], fields[4]));
+        }
+
+        private CrontabSchedule(
+            CrontabField minutes, CrontabField hours, 
+            CrontabField days, CrontabField months, 
+            CrontabField daysOfWeek)
+        {
+            Debug.Assert(minutes != null);
+            Debug.Assert(hours != null);
+            Debug.Assert(days != null);
+            Debug.Assert(months != null);
+            Debug.Assert(daysOfWeek != null);
+
+            _minutes = minutes;
+            _hours = hours;
+            _days = days;
+            _months = months;
+            _daysOfWeek = daysOfWeek;
         }
 
         /// <summary>

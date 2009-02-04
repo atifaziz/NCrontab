@@ -1,7 +1,7 @@
 ﻿<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="3.5">
   <PropertyGroup>
     <ProjectType>Local</ProjectType>
-    <ProductVersion>9.0.21022</ProductVersion>
+    <ProductVersion>9.0.30729</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{1948D266-8DCB-4AC5-98E6-A609713011CB}</ProjectGuid>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -116,9 +116,11 @@
     <Compile Include="CrontabSchedule.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="ErrorHandling.cs" />
     <Compile Include="ICrontabField.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="ValueOrError.cs" />
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include="Microsoft.Net.Framework.2.0">

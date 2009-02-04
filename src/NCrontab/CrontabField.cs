@@ -54,16 +54,27 @@ namespace NCrontab
 
         public static CrontabField Parse(CrontabFieldKind kind, string expression)
         {
-            return new CrontabField(CrontabFieldImpl.FromKind(kind), expression);
+            return TryParse(kind, expression, ErrorHandling.Throw).Value;
         }
-        
+
+        public static ValueOrError<CrontabField> TryParse(CrontabFieldKind kind, string expression)
+        {
+            return TryParse(kind, expression, null);
+        }
+
+        public static ValueOrError<CrontabField> TryParse(CrontabFieldKind kind, string expression, ExceptionHandler onError)
+        {
+            var field = new CrontabField(CrontabFieldImpl.FromKind(kind));
+            return ValueOrError.Select(field, field._impl.TryParse(expression, field.Accumulate, onError));
+        }
+
         /// <summary>
         /// Parses a crontab field expression representing minutes.
         /// </summary>
 
         public static CrontabField Minutes(string expression)
         {
-            return new CrontabField(CrontabFieldImpl.Minute, expression);
+            return Parse(CrontabFieldKind.Minute, expression);
         }
 
         /// <summary>
@@ -72,7 +83,7 @@ namespace NCrontab
 
         public static CrontabField Hours(string expression)
         {
-            return new CrontabField(CrontabFieldImpl.Hour, expression);
+            return Parse(CrontabFieldKind.Hour, expression);
         }
 
         /// <summary>
@@ -81,7 +92,7 @@ namespace NCrontab
         
         public static CrontabField Days(string expression)
         {
-            return new CrontabField(CrontabFieldImpl.Day, expression);
+            return Parse(CrontabFieldKind.Day, expression);
         }
 
         /// <summary>
@@ -90,7 +101,7 @@ namespace NCrontab
 
         public static CrontabField Months(string expression)
         {
-            return new CrontabField(CrontabFieldImpl.Month, expression);
+            return Parse(CrontabFieldKind.Month, expression);
         }
 
         /// <summary>
@@ -99,10 +110,10 @@ namespace NCrontab
 
         public static CrontabField DaysOfWeek(string expression)
         {
-            return new CrontabField(CrontabFieldImpl.DayOfWeek, expression);
+            return Parse(CrontabFieldKind.DayOfWeek, expression);
         }
 
-        private CrontabField(CrontabFieldImpl impl, string expression)
+        private CrontabField(CrontabFieldImpl impl)
         {
             if (impl == null)
                 throw new ArgumentNullException("impl");
@@ -113,8 +124,6 @@ namespace NCrontab
             _bits.SetAll(false);
             _minValueSet = int.MaxValue;
             _maxValueSet = -1;
-
-            _impl.Parse(expression, Accumulate);
         }
 
         /// <summary>
@@ -177,7 +186,7 @@ namespace NCrontab
         /// <param name="interval" /> to 1.
         /// </remarks>
 
-        private void Accumulate(int start, int end, int interval)
+        private ExceptionProvider Accumulate(int start, int end, int interval, ExceptionHandler onError)
         {
             var minValue = _impl.MinValue;
             var maxValue = _impl.MaxValue;
@@ -195,7 +204,7 @@ namespace NCrontab
                         _minValueSet = minValue;
                         _maxValueSet = maxValue;
                         _bits.SetAll(true);
-                        return;
+                        return null;
                     }
 
                     start = minValue;
@@ -209,16 +218,16 @@ namespace NCrontab
 
                     if (start < minValue) 
                     {
-                        throw new CrontabException(string.Format(
+                        return ErrorHandling.OnError(() => new CrontabException(string.Format(
                             "'{0} is lower than the minimum allowable value for this field. Value must be between {1} and {2} (all inclusive).", 
-                            start, _impl.MinValue, _impl.MaxValue));
+                            start, _impl.MinValue, _impl.MaxValue)), onError);
                     } 
                     
                     if (start > maxValue) 
                     {
-                        throw new CrontabException(string.Format(
+                        return ErrorHandling.OnError(() => new CrontabException(string.Format(
                             "'{0} is higher than the maximum allowable value for this field. Value must be between {1} and {2} (all inclusive).", 
-                            end, _impl.MinValue, _impl.MaxValue));
+                            end, _impl.MinValue, _impl.MaxValue)), onError);
                     }
                 }
             } 
@@ -242,9 +251,9 @@ namespace NCrontab
                 } 
                 else if (start < minValue) 
                 {
-                    throw new CrontabException(string.Format(
+                    return ErrorHandling.OnError(() => new CrontabException(string.Format(
                         "'{0} is lower than the minimum allowable value for this field. Value must be between {1} and {2} (all inclusive).", 
-                        start, _impl.MinValue, _impl.MaxValue));
+                        start, _impl.MinValue, _impl.MaxValue)), onError);                    
                 }
 
                 if (end < 0) 
@@ -253,9 +262,9 @@ namespace NCrontab
                 } 
                 else if (end > maxValue) 
                 {
-                    throw new CrontabException(string.Format(
+                    return ErrorHandling.OnError(() => new CrontabException(string.Format(
                         "'{0} is higher than the maximum allowable value for this field. Value must be between {1} and {2} (all inclusive).", 
-                        end, _impl.MinValue, _impl.MaxValue));
+                        end, _impl.MinValue, _impl.MaxValue)), onError);
                 }
             }
 
@@ -285,6 +294,8 @@ namespace NCrontab
 
             if (_maxValueSet < i) 
                 _maxValueSet = i;
+
+            return null;
         }
 
         public override string ToString()

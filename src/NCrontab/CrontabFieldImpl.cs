@@ -32,7 +32,6 @@ namespace NCrontab
 
     using System;
     using System.Collections.Generic;
-    using System.Collections.ObjectModel;
     using System.Globalization;
     using System.IO;
     using System.Runtime.Serialization;
@@ -40,7 +39,7 @@ namespace NCrontab
 
     #endregion
 
-    public delegate void CrontabFieldAccumulator(int start, int end, int interval);
+    public delegate ExceptionProvider CrontabFieldAccumulator(int start, int end, int interval, ExceptionHandler onError);
 
     [ Serializable ]
     public sealed class CrontabFieldImpl : IObjectReference
@@ -199,41 +198,48 @@ namespace NCrontab
 
         public void Parse(string str, CrontabFieldAccumulator acc)
         {
+            TryParse(str, acc, ErrorHandling.Throw);
+        }
+
+        public ExceptionProvider TryParse(string str, CrontabFieldAccumulator acc, ExceptionHandler onError)
+        {
             if (acc == null)
                 throw new ArgumentNullException("acc");
 
             if (string.IsNullOrEmpty(str))
-                return;
+                return null;
 
             try
             {
-                InternalParse(str, acc);
+                return InternalParse(str, acc, onError);
             }
             catch (FormatException e)
             {
-                ThrowParseException(e, str);
+                return OnParseException(e, str, onError);
             }
             catch (CrontabException e)
             {
-                ThrowParseException(e, str);
+                return OnParseException(e, str, onError);
             }
         }
 
-        private static void ThrowParseException(Exception innerException, string str)
+        private static ExceptionProvider OnParseException(Exception innerException, string str, ExceptionHandler onError)
         {
             Debug.Assert(str != null);
             Debug.Assert(innerException != null);
 
-            throw new CrontabException(string.Format("'{0}' is not a valid crontab field expression.", str), innerException);
+            return ErrorHandling.OnError(
+                       () => new CrontabException(string.Format("'{0}' is not a valid crontab field expression.", str), innerException), 
+                       onError);
         }
 
-        private void InternalParse(string str, CrontabFieldAccumulator acc)
+        private ExceptionProvider InternalParse(string str, CrontabFieldAccumulator acc, ExceptionHandler onError)
         {
             Debug.Assert(str != null);
             Debug.Assert(acc != null);
 
             if (str.Length == 0)
-                throw new CrontabException("A crontab field value cannot be empty.");
+                return ErrorHandling.OnError(() => new CrontabException("A crontab field value cannot be empty."), onError);
 
             //
             // Next, look for a list of values (e.g. 1,2,3).
@@ -243,67 +249,61 @@ namespace NCrontab
 
             if (commaIndex > 0)
             {
-                foreach (var token in str.Split(_comma))
-                    InternalParse(token, acc);
+                ExceptionProvider e = null;
+                var token = ((IEnumerable<string>) str.Split(_comma)).GetEnumerator();
+                while (token.MoveNext() && e == null)
+                    e = InternalParse(token.Current, acc, onError);
+                return e;
             }
-            else
+            
+            var every = 1;
+
+            //
+            // Look for stepping first (e.g. */2 = every 2nd).
+            // 
+
+            var slashIndex = str.IndexOf("/");
+
+            if (slashIndex > 0)
             {
-                var every = 1;
-
-                //
-                // Look for stepping first (e.g. */2 = every 2nd).
-                // 
-
-                var slashIndex = str.IndexOf("/");
-
-                if (slashIndex > 0)
-                {
-                    every = int.Parse(str.Substring(slashIndex + 1), CultureInfo.InvariantCulture);
-                    str = str.Substring(0, slashIndex);
-                }
-
-                //
-                // Next, look for wildcard (*).
-                //
-    
-                if (str.Length == 1 && str[0]== '*')
-                {
-                    acc(-1, -1, every);
-                    return;
-                }
-
-                //
-                // Next, look for a range of values (e.g. 2-10).
-                //
-
-                var dashIndex = str.IndexOf("-");
-        
-                if (dashIndex > 0)
-                {
-                    var first = ParseValue(str.Substring(0, dashIndex));
-                    var last = ParseValue(str.Substring(dashIndex + 1));
-        
-                    acc(first, last, every);
-                    return;
-                }
-
-                //
-                // Finally, handle the case where there is only one number.
-                //
-
-                var value = ParseValue(str);
-
-                if (every == 1)
-                {
-                    acc(value, value, 1);
-                }
-                else
-                {
-                    Debug.Assert(every != 0);
-
-                    acc(value, _maxValue, every);
-                }
+                every = int.Parse(str.Substring(slashIndex + 1), CultureInfo.InvariantCulture);
+                str = str.Substring(0, slashIndex);
             }
+
+            //
+            // Next, look for wildcard (*).
+            //
+    
+            if (str.Length == 1 && str[0]== '*')
+            {
+                return acc(-1, -1, every, onError);
+            }
+
+            //
+            // Next, look for a range of values (e.g. 2-10).
+            //
+
+            var dashIndex = str.IndexOf("-");
+        
+            if (dashIndex > 0)
+            {
+                var first = ParseValue(str.Substring(0, dashIndex));
+                var last = ParseValue(str.Substring(dashIndex + 1));
+
+                return acc(first, last, every, onError);
+            }
+
+            //
+            // Finally, handle the case where there is only one number.
+            //
+
+            var value = ParseValue(str);
+
+            if (every == 1)
+                return acc(value, value, 1, onError);
+
+            Debug.Assert(every != 0);
+            return acc(value, _maxValue, every, onError);
         }
 
         private int ParseValue(string str)

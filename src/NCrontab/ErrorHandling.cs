@@ -1,4 +1,4 @@
-#region License, Terms and Author(s)
+﻿#region License, Terms and Author(s)
 //
 // NCrontab - Crontab for .NET
 // Copyright (c) 2008 Atif Aziz. All rights reserved.
@@ -25,17 +25,30 @@
 //
 #endregion
 
-#region Imports
+namespace NCrontab
+{
+    #region Imports
 
-using System.Reflection;
-using CLSCompliantAttribute = System.CLSCompliantAttribute;
+    using System;
+    using System.Diagnostics;
 
-#endregion
+    #endregion
 
-[assembly: AssemblyTitle("NCrontab")]
-[assembly: AssemblyDescription("Crontab for .NET")]
+    public delegate void ExceptionHandler(ExceptionProvider provider);
+    public delegate Exception ExceptionProvider();
 
-[assembly: AssemblyVersion("0.2.10904.0")]
-[assembly: AssemblyFileVersion("0.2.10904.0")]
+    internal static class ErrorHandling
+    {
+        public static readonly ExceptionHandler Throw = provider => { throw provider(); };
 
-[assembly: CLSCompliant(true)] 
+        internal static ExceptionProvider OnError(ExceptionProvider provider, ExceptionHandler handler)
+        {
+            Debug.Assert(provider != null);
+
+            if (handler != null)
+                handler(provider);
+            
+            return provider;
+        }
+    }
+}
