@@ -37,7 +37,7 @@ namespace NCrontab.Tests
         [Test]
         public void StringValue()
         {
-            var str = ValueOrError.Value("hello");
+            var str = new ValueOrError<string>("hello");
             Assert.That(str.HasValue, Is.True);
             Assert.That(str.Value, Is.EqualTo("hello"));
             Assert.That(str.IsError, Is.False);
@@ -48,13 +48,13 @@ namespace NCrontab.Tests
         [Test]
         public void ToStringForNullStringValue()
         {
-            Assert.That(ValueOrError.Value((string)null).ToString(), Is.EqualTo(string.Empty));
+            Assert.That(new ValueOrError<string>((string) null).ToString(), Is.EqualTo(string.Empty));
         }
 
         [Test]
         public void ErrorValue()
         {
-            var str = ValueOrError.Error<string>(new Exception());
+            var str = new ValueOrError<string>(new Exception());
             Assert.That(str.HasValue, Is.False);
             Assert.That(str.ErrorProvider, Is.Not.Null);
             var error = str.Error;

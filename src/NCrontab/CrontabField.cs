@@ -61,7 +61,8 @@ namespace NCrontab
         public static ValueOrError<CrontabField> TryParse(CrontabFieldKind kind, string expression, ExceptionHandler onError)
         {
             var field = new CrontabField(CrontabFieldImpl.FromKind(kind));
-            return ValueOrError.Select(field, field._impl.TryParse(expression, field.Accumulate, onError));
+            var error = field._impl.TryParse(expression, field.Accumulate, onError);
+            return error == null ? field : (ValueOrError<CrontabField>) error;
         }
 
         /// <summary>

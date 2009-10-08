@@ -88,11 +88,10 @@ namespace NCrontab
 
             if (tokens.Length != 5)
             {
-                return ValueOrError.Error<CrontabSchedule>(
-                    ErrorHandling.OnError(() => new CrontabException(string.Format(
-                        "'{0}' is not a valid crontab expression. It must contain at least 5 components of a schedule "
-                        + "(in the sequence of minutes, hours, days, months, days of week).", 
-                        expression)), onError));
+                return ErrorHandling.OnError(() => new CrontabException(string.Format(
+                           "'{0}' is not a valid crontab expression. It must contain at least 5 components of a schedule "
+                           + "(in the sequence of minutes, hours, days, months, days of week).", 
+                           expression)), onError);
             }
 
             var fields = new CrontabField[5];
@@ -101,12 +100,12 @@ namespace NCrontab
             {
                 var field = CrontabField.TryParse((CrontabFieldKind) i, tokens[i], onError);
                 if (field.IsError)
-                    return ValueOrError.Error<CrontabSchedule>(field.ErrorProvider);
+                    return field.ErrorProvider;
 
                 fields[i] = field.Value;
             }
 
-            return ValueOrError.Value(new CrontabSchedule(fields[0], fields[1], fields[2], fields[3], fields[4]));
+            return new CrontabSchedule(fields[0], fields[1], fields[2], fields[3], fields[4]);
         }
 
         private CrontabSchedule(

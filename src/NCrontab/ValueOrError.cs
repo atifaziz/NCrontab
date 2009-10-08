@@ -1,4 +1,4 @@
-#region License, Terms and Author(s)
+﻿#region License, Terms and Author(s)
 //
 // NCrontab - Crontab for .NET
 // Copyright (c) 2008 Atif Aziz. All rights reserved.
@@ -23,25 +23,38 @@
 
 namespace NCrontab
 {
+    #region Imports
+
     using System;
 
-    public static class ValueOrError
+    #endregion
+   
+    /// <summary>
+    /// Extension methods for <see cref="ExceptionHandler"/>.
+    /// </summary>
+ 
+    public static class ExceptionHandlerExtensions
     {
-        public static ValueOrError<T> Value<T>(T value) { return new ValueOrError<T>(value); }
-        public static ValueOrError<T> Error<T>(ExceptionProvider ep) { return new ValueOrError<T>(ep); }
-        public static ValueOrError<T> Error<T>(Exception error) { return new ValueOrError<T>(() => error); }
+        /// <summary>
+        /// Invokes the exception handler if it is defined otherwise
+        /// does nothing.
+        /// </summary>
 
-        public static ValueOrError<T> Select<T>(T value, ExceptionProvider ep)
+        public static ExceptionProvider OptInvoke(this ExceptionHandler handler, ExceptionProvider provider)
         {
-            return ep != null ? Error<T>(ep) : Value(value);
-        }
+            if (provider == null) throw new ArgumentNullException("provider");
 
-        public static ValueOrError<T> Select<T>(T value, Exception error)
-        {
-            return error != null ? Error<T>(error) : Value(value);
+            if (handler != null)
+                handler(provider());
+
+            return provider;
         }
     }
 
+    /// <summary>
+    /// A generic type that either represents a value or an error condition.
+    /// </summary>
+    
     [ Serializable ]
     public struct ValueOrError<T>
     {
@@ -51,13 +64,21 @@ namespace NCrontab
 
         private static readonly ExceptionProvider _dep = () => new Exception("Value is undefined.");
 
+        /// <summary>
+        /// Initializes the object with a defined value.
+        /// </summary>
+        
         public ValueOrError(T value) : this()
         {
             _hasValue = true;
             _value = value;
         }
 
-        public ValueOrError(Exception error) : this(CheckError(error)) {}
+        /// <summary>
+        /// Initializes the object with an error.
+        /// </summary>
+
+        public ValueOrError(Exception error) : this(CheckError(error)) { }
 
         private static ExceptionProvider CheckError(Exception error)
         {
@@ -65,17 +86,102 @@ namespace NCrontab
             return () => error;
         }
 
-        public ValueOrError(ExceptionProvider provider) : this()
+        /// <summary>
+        /// Initializes the object with a handler that will provide
+        /// the error result when needed.
+        /// </summary>
+
+        public ValueOrError(ExceptionProvider provider)
+            : this()
         {
             if (provider == null) throw new ArgumentNullException("provider");
             _ep = provider;
         }
 
+        /// <summary>
+        /// Determines if object holds a defined value or not.
+        /// </summary>
+
         public bool HasValue { get { return _hasValue; } }
+
+        /// <summary>
+        /// Gets the value otherwise throws an error if undefined.
+        /// </summary>
+        
         public T Value { get { if (!HasValue) throw ErrorProvider(); return _value; } }
+
+        /// <summary>
+        /// Determines if object identifies an error condition or not.
+        /// </summary>
+        
         public bool IsError { get { return ErrorProvider != null; } }
+
+        /// <summary>
+        /// Gets the <see cref="Exception"/> object if this object
+        /// represents an error condition otherwise it returns <c>null</c>.
+        /// </summary>
+        
         public Exception Error { get { return IsError ? ErrorProvider() : null; } }
+
+        /// <summary>
+        /// Gets the <see cref="ExceptionProvider"/> object if this 
+        /// object represents an error condition otherwise it returns <c>null</c>.
+        /// </summary>
+        
         public ExceptionProvider ErrorProvider { get { return HasValue ? null : _ep ?? _dep; } }
+
+        /// <summary>
+        /// Attempts to get the defined value or another in case
+        /// of an error.
+        /// </summary>
+
+        public T TryGetValue(T errorValue)
+        {
+            return IsError ? errorValue : Value;
+        }
+
+        /// <summary>
+        /// Implicitly converts a <typeparamref name="T"/> value to
+        /// an object of this type.
+        /// </summary>
+
+        public static implicit operator ValueOrError<T>(T value) { return new ValueOrError<T>(value); }
+
+        /// <summary>
+        /// Implicitly converts an <see cref="Exception"/> object to
+        /// an object of this type that represents the error condition.
+        /// </summary>
+        
+        public static implicit operator ValueOrError<T>(Exception error) { return new ValueOrError<T>(error); }
+
+        /// <summary>
+        /// Implicitly converts an <see cref="ExceptionProvider"/> object to
+        /// an object of this type that represents the error condition.
+        /// </summary>
+        
+        public static implicit operator ValueOrError<T>(ExceptionProvider provider) { return new ValueOrError<T>(provider); }
+
+        /// <summary>
+        /// Explicits converts this object to a <typeparamref name="T"/> value.
+        /// </summary>
+
+        public static explicit operator T(ValueOrError<T> ve) { return ve.Value; }
+
+        /// <summary>
+        /// Explicits converts this object to an <see cref="Exception"/> object
+        /// if it represents an error condition. The conversion yields <c>null</c>
+        /// if this object does not represent an error condition.
+        /// </summary>
+        
+        public static explicit operator Exception(ValueOrError<T> ve) { return ve.Error; }
+
+        /// <summary>
+        /// Explicits converts this object to an <see cref="ExceptionProvider"/> object
+        /// if it represents an error condition. The conversion yields <c>null</c>
+        /// if this object does not represent an error condition.
+        /// </summary>
+        
+        public static explicit operator ExceptionProvider(ValueOrError<T> ve) { return ve.ErrorProvider; }
 
         public override string ToString()
         {

@@ -30,19 +30,36 @@ namespace NCrontab
 
     #endregion
 
-    public delegate void ExceptionHandler(ExceptionProvider provider);
+    /// <summary>
+    /// Represents the method that will handle an <see cref="Exception"/> object.
+    /// </summary>
+
+    public delegate void ExceptionHandler(Exception e);
+
+    /// <summary>
+    /// Represents the method that will generate an <see cref="Exception"/> object.
+    /// </summary>
+    
     public delegate Exception ExceptionProvider();
+
+    /// <summary>
+    /// Defines error handling strategies.
+    /// </summary>
 
     internal static class ErrorHandling
     {
-        public static readonly ExceptionHandler Throw = provider => { throw provider(); };
+        /// <summary>
+        /// A stock <see cref="ExceptionHandler"/> that throws.
+        /// </summary>
+
+        public static readonly ExceptionHandler Throw = e => { throw e; };
 
         internal static ExceptionProvider OnError(ExceptionProvider provider, ExceptionHandler handler)
         {
             Debug.Assert(provider != null);
 
             if (handler != null)
-                handler(provider);
+                handler(provider());
             
             return provider;
         }
