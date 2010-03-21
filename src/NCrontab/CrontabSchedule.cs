@@ -128,9 +128,20 @@ namespace NCrontab
 
         /// <summary>
         /// Enumerates all the occurrences of this schedule starting with a
-        /// base time and up to an end time limit. The occurrences are
-        /// only calculated as they are enumerated.
+        /// base time and up to an end time limit. This method uses deferred
+        /// execution such that the occurrences are only calculated as they 
+        /// are enumerated.
         /// </summary>
+        /// <remarks>
+        /// This method does not return the value of <paramref name="baseTime"/>
+        /// itself if it falls on the schedule. For example, if <paramref name="baseTime" />
+        /// is midnight and the schedule was created from the expression <c>* * * * *</c> 
+        /// (meaning every minute) then the next occurrence of the schedule 
+        /// will be at one minute past midnight and not midnight itself.
+        /// The method returns the <em>next</em> occurrence <em>after</em> 
+        /// <paramref name="baseTime"/>. Also, <param name="endTime" /> is
+        /// exclusive.
+        /// </remarks>
 
         public IEnumerable<DateTime> GetNextOccurrences(DateTime baseTime, DateTime endTime)
         {
@@ -155,6 +166,16 @@ namespace NCrontab
         /// Gets the next occurrence of this schedule starting with a base 
         /// time and up to an end time limit.
         /// </summary>
+        /// <remarks>
+        /// This method does not return the value of <paramref name="baseTime"/>
+        /// itself if it falls on the schedule. For example, if <paramref name="baseTime" />
+        /// is midnight and the schedule was created from the expression <c>* * * * *</c> 
+        /// (meaning every minute) then the next occurrence of the schedule 
+        /// will be at one minute past midnight and not midnight itself.
+        /// The method returns the <em>next</em> occurrence <em>after</em> 
+        /// <paramref name="baseTime"/>. Also, <param name="endTime" /> is
+        /// exclusive.
+        /// </remarks>
         
         public DateTime GetNextOccurrence(DateTime baseTime, DateTime endTime) 
         {
