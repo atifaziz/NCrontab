@@ -1,47 +1,31 @@
 #region License, Terms and Author(s)
 //
-// BackLINQ
-// Copyright (c) 2008 Atif Aziz. All rights reserved.
+// LINQBridge
+// Copyright (c) 2007-9 Atif Aziz, Joseph Albahari. All rights reserved.
 //
 //  Author(s):
 //
 //      Atif Aziz, http://www.raboof.com
 //
-// New BSD License
-//
-// Redistribution and use in source and binary forms, with or without 
-// modification, are permitted provided that the following conditions 
-// are met:
-//
-// - Redistributions of source code must retain the above copyright 
-//   notice, this list of conditions and the following disclaimer. 
-//
-// - Redistributions in binary form must reproduce the above copyright 
-//   notice, this list of conditions and the following disclaimer in 
-//   the documentation and/or other materials provided with the 
-//   distribution. 
-//
-// - Neither the name of the original author (Atif Aziz) nor the names 
-//   of its contributors may be used to endorse or promote products 
-//   derived from this software without specific prior written 
-//   permission. 
+// This library is free software; you can redistribute it and/or modify it 
+// under the terms of the New BSD License, a copy of which should have 
+// been delivered along with this distribution.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS 
 // "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT 
-// LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS 
-// FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE 
-// COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, 
-// INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, 
-// BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; 
-// LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER 
-// CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT 
-// LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN 
-// ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE 
-// POSSIBILITY OF SUCH DAMAGE.
+// LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A 
+// PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT 
+// OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, 
+// SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT 
+// LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, 
+// DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY 
+// THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT 
+// (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE 
+// OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 #endregion
 
-// $Id: Enumerable.cs 214 2008-11-17 09:27:41Z azizatif $
+// $Id: Enumerable.cs 240 2010-10-19 21:49:03Z azizatif $
 
 namespace System.Linq
 {
@@ -51,7 +35,7 @@ namespace System.Linq
     using System.Collections;
     using System.Collections.Generic;
     using System.Diagnostics;
-    using BackLinq;
+    using LinqBridge;
 
     #endregion
 
@@ -59,14 +43,6 @@ namespace System.Linq
     /// Provides a set of static (Shared in Visual Basic) methods for 
     /// querying objects that implement <see cref="IEnumerable{T}" />.
     /// </summary>
-
-    #region Access modifier
-    #if BACKLINQ_LIB
-        public 
-    #else
-        internal
-    #endif
-    #endregion
 
     static partial class Enumerable
     {
@@ -852,13 +828,23 @@ namespace System.Linq
             IEqualityComparer<TSource> comparer)
         {
             var set = new Dictionary<TSource, object>(comparer);
+            var gotNull = false;
 
             foreach (var item in source)
             {
-                if (set.ContainsKey(item))
-                    continue;
+                if (item == null)
+                {
+                    if (gotNull)
+                        continue;
+                    gotNull = true;
+                }
+                else
+                {
+                    if (set.ContainsKey(item))
+                        continue;
+                    set.Add(item, null);
+                }
 
-                set.Add(item, null);
                 yield return item;
             }
         }
@@ -869,7 +855,7 @@ namespace System.Linq
         /// selector function.
         /// </summary>
 
-        public static Lookup<TKey, TSource> ToLookup<TSource, TKey>(
+        public static ILookup<TKey, TSource> ToLookup<TSource, TKey>(
             this IEnumerable<TSource> source,
             Func<TSource, TKey> keySelector)
         {
@@ -882,7 +868,7 @@ namespace System.Linq
         /// selector function and a key comparer.
         /// </summary>
 
-        public static Lookup<TKey, TSource> ToLookup<TSource, TKey>(
+        public static ILookup<TKey, TSource> ToLookup<TSource, TKey>(
             this IEnumerable<TSource> source,
             Func<TSource, TKey> keySelector,
             IEqualityComparer<TKey> comparer)
@@ -896,7 +882,7 @@ namespace System.Linq
         /// and element selector functions.
         /// </summary>
 
-        public static Lookup<TKey, TElement> ToLookup<TSource, TKey, TElement>(
+        public static ILookup<TKey, TElement> ToLookup<TSource, TKey, TElement>(
             this IEnumerable<TSource> source,
             Func<TSource, TKey> keySelector,
             Func<TSource, TElement> elementSelector)
@@ -910,7 +896,7 @@ namespace System.Linq
         /// selector function, a comparer and an element selector function.
         /// </summary>
 
-        public static Lookup<TKey, TElement> ToLookup<TSource, TKey, TElement>(
+        public static ILookup<TKey, TElement> ToLookup<TSource, TKey, TElement>(
             this IEnumerable<TSource> source,
             Func<TSource, TKey> keySelector,
             Func<TSource, TElement> elementSelector,
@@ -1784,7 +1770,7 @@ namespace System.Linq
     }
 }
 
-// $Id: Enumerable.g.cs 224 2008-11-27 18:15:15Z azizatif $
+// $Id: Enumerable.g.cs 215 2009-10-03 13:31:49Z azizatif $
 
 namespace System.Linq
 {
@@ -1796,7 +1782,7 @@ namespace System.Linq
     #endregion
     
     // This partial implementation was template-generated:
-    // Thu, 27 Nov 2008 18:14:23 GMT
+    // Sat, 03 Oct 2009 09:42:39 GMT
 
     partial class Enumerable
     {
@@ -2732,8 +2718,6 @@ namespace System.Linq
     }
 }
 
-// $Id: ExtensionAttribute.cs 223 2008-11-27 18:09:35Z azizatif $
-
 namespace System.Runtime.CompilerServices
 {
     /// <remarks>
@@ -2749,59 +2733,26 @@ namespace System.Runtime.CompilerServices
     internal sealed class ExtensionAttribute : Attribute { }
 }
 
-// $Id: Func.cs 223 2008-11-27 18:09:35Z azizatif $
+// $Id: Func.cs 224 2009-10-04 07:13:08Z azizatif $
 
 namespace System
 {
-    #region Access modifier
-    #if BACKLINQ_LIB
-        public 
-    #else
-        internal
-    #endif
-    #endregion
-    
+#if LINQBRIDGE_LIB
+    public delegate TResult Func<TResult>();
+    public delegate TResult Func<T, TResult>(T a);
+    public delegate TResult Func<T1, T2, TResult>(T1 arg1, T2 arg2);
+    public delegate TResult Func<T1, T2, T3, TResult>(T1 arg1, T2 arg2, T3 arg3);
+    public delegate TResult Func<T1, T2, T3, T4, TResult>(T1 arg1, T2 arg2, T3 arg3, T4 arg4);
+#else
     delegate TResult Func<TResult>();
-
-    #region Access modifier
-    #if BACKLINQ_LIB
-        public 
-    #else
-        internal
-    #endif
-    #endregion
-    
     delegate TResult Func<T, TResult>(T a);
-    #region Access modifier
-    #if BACKLINQ_LIB
-        public 
-    #else
-        internal
-    #endif
-    #endregion
-    
     delegate TResult Func<T1, T2, TResult>(T1 arg1, T2 arg2);
-    #region Access modifier
-    #if BACKLINQ_LIB
-        public 
-    #else
-        internal
-    #endif
-    #endregion
- 
     delegate TResult Func<T1, T2, T3, TResult>(T1 arg1, T2 arg2, T3 arg3);
-    #region Access modifier
-    #if BACKLINQ_LIB
-        public 
-    #else
-        internal
-    #endif
-    #endregion
-    
     delegate TResult Func<T1, T2, T3, T4, TResult>(T1 arg1, T2 arg2, T3 arg3, T4 arg4);
+#endif
 }
 
-// $Id: Grouping.cs 223 2008-11-27 18:09:35Z azizatif $
+// $Id: IGrouping.cs 225 2009-10-04 07:16:14Z azizatif $
 
 namespace System.Linq
 {
@@ -2815,15 +2766,7 @@ namespace System.Linq
     /// Represents a collection of objects that have a common key.
     /// </summary>
 
-    #region Access modifier
-    #if BACKLINQ_LIB
-        public 
-    #else
-        internal
-    #endif
-    #endregion
-    
-    interface IGrouping<TKey, TElement> : IEnumerable<TElement>
+    partial interface IGrouping<TKey, TElement> : IEnumerable<TElement>
     {
         /// <summary>
         /// Gets the key of the <see cref="IGrouping{TKey,TElement}" />.
@@ -2833,7 +2776,7 @@ namespace System.Linq
     }
 }
 
-// $Id: ILookup.cs 225 2008-11-27 18:15:55Z azizatif $
+// $Id: ILookup.cs 224 2009-10-04 07:13:08Z azizatif $
 
 namespace System.Linq
 {
@@ -2845,15 +2788,7 @@ namespace System.Linq
     /// sequences of values.
     /// </summary>
 
-    #region Access modifier
-    #if BACKLINQ_LIB
-        public 
-    #else
-        internal
-    #endif
-    #endregion
-
-    interface ILookup<TKey, TElement> : IEnumerable<IGrouping<TKey, TElement>>
+    partial interface ILookup<TKey, TElement> : IEnumerable<IGrouping<TKey, TElement>>
     {
         bool Contains(TKey key);
         int Count { get; }
@@ -2861,7 +2796,7 @@ namespace System.Linq
     }
 }
 
-// $Id: IOrderedEnumerable.cs 223 2008-11-27 18:09:35Z azizatif $
+// $Id: IOrderedEnumerable.cs 224 2009-10-04 07:13:08Z azizatif $
 
 namespace System.Linq
 {
@@ -2871,15 +2806,7 @@ namespace System.Linq
     /// Represents a sorted sequence.
     /// </summary>
 
-    #region Access modifier
-    #if BACKLINQ_LIB
-        public 
-    #else
-        internal
-    #endif
-    #endregion
-
-    interface IOrderedEnumerable<TElement> : IEnumerable<TElement>
+    partial interface IOrderedEnumerable<TElement> : IEnumerable<TElement>
     {
         /// <summary>
         /// Performs a subsequent ordering on the elements of an 
@@ -2891,7 +2818,7 @@ namespace System.Linq
     }
 }
 
-// $Id: Lookup.cs 223 2008-11-27 18:09:35Z azizatif $
+// $Id: Lookup.cs 224 2009-10-04 07:13:08Z azizatif $
 
 namespace System.Linq
 {
@@ -2908,15 +2835,7 @@ namespace System.Linq
     /// Represents a collection of keys each mapped to one or more values.
     /// </summary>
 
-    #region Access modifier
-    #if BACKLINQ_LIB
-        public 
-    #else
-        internal
-    #endif
-    #endregion
-
-    sealed class Lookup<TKey, TElement> : ILookup<TKey, TElement>
+    internal sealed class Lookup<TKey, TElement> : ILookup<TKey, TElement>
     {
         private readonly Dictionary<TKey, IGrouping<TKey, TElement>> _map;
 
@@ -2998,9 +2917,9 @@ namespace System.Linq
     }
 }
 
-// $Id: OrderedEnumerable.cs 225 2008-11-27 18:15:55Z azizatif $
+// $Id: OrderedEnumerable.cs 237 2010-01-31 12:20:24Z azizatif $
 
-namespace BackLinq
+namespace LinqBridge
 {
     #region Imports
 
@@ -3057,7 +2976,7 @@ namespace BackLinq
             // thus making the sort stable.
             //
 
-            var list = _source.Select((e, i) => new Tuple<T, int>(e, i)).ToList();
+            var list = _source.Select(new Func<T, int, Tuple<T, int>>(TagPosition)).ToList();
             
             list.Sort((x, y) => 
             {
@@ -3081,8 +3000,30 @@ namespace BackLinq
                 return x.Second.CompareTo(y.Second);
             });
 
-            return list.Select(pv => pv.First).GetEnumerator();
+            return list.Select(new Func<Tuple<T, int>, T>(GetFirst)).GetEnumerator();
 
+        }
+
+        /// <remarks>
+        /// See <a href="http://code.google.com/p/linqbridge/issues/detail?id=11">issue #11</a>
+        /// for why this method is needed and cannot be expressed as a 
+        /// lambda at the call site.
+        /// </remarks>
+
+        private static Tuple<T, int> TagPosition(T e, int i)
+        {
+            return new Tuple<T, int>(e, i);
+        }
+
+        /// <remarks>
+        /// See <a href="http://code.google.com/p/linqbridge/issues/detail?id=11">issue #11</a>
+        /// for why this method is needed and cannot be expressed as a 
+        /// lambda at the call site.
+        /// </remarks>
+
+        private static T GetFirst(Tuple<T, int> pv)
+        {
+            return pv.First;
         }
 
         IEnumerator IEnumerable.GetEnumerator()
@@ -3092,9 +3033,9 @@ namespace BackLinq
     }
 }
 
-// $Id: Tuple.cs 223 2008-11-27 18:09:35Z azizatif $
+// $Id: Tuple.cs 215 2009-10-03 13:31:49Z azizatif $
 
-namespace BackLinq
+namespace LinqBridge
 {
     #region Imports
 
@@ -3141,4 +3082,21 @@ namespace BackLinq
             return string.Format(@"{{ First = {0}, Second = {1} }}", First, Second);
         }
     }
+}
+
+// $Id: Action.cs 239 2010-02-05 23:26:23Z azizatif $
+
+namespace System
+{
+#if LINQBRIDGE_LIB
+    public delegate void Action();
+    public delegate void Action<T1, T2>(T1 arg1, T2 arg2);
+    public delegate void Action<T1, T2, T3>(T1 arg1, T2 arg2, T3 arg3);
+    public delegate void Action<T1, T2, T3, T4>(T1 arg1, T2 arg2, T3 arg3, T4 arg4);
+#else
+    delegate void Action();
+    delegate void Action<T1, T2>(T1 arg1, T2 arg2);
+    delegate void Action<T1, T2, T3>(T1 arg1, T2 arg2, T3 arg3);
+    delegate void Action<T1, T2, T3, T4>(T1 arg1, T2 arg2, T3 arg3, T4 arg4);
+#endif
 }

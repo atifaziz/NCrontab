@@ -45,7 +45,7 @@
     <Compile Include="..\SolutionInfo.cs">
       <Link>SolutionInfo.cs</Link>
     </Compile>
-    <Compile Include="BackLINQ.cs" />
+    <Compile Include="LinqBridge-1.2.cs" />
     <Compile Include="MainForm.cs">
       <SubType>Form</SubType>
     </Compile>
