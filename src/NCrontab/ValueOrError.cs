@@ -28,28 +28,6 @@ namespace NCrontab
     using System;
 
     #endregion
-   
-    /// <summary>
-    /// Extension methods for <see cref="ExceptionHandler"/>.
-    /// </summary>
- 
-    public static class ExceptionHandlerExtensions
-    {
-        /// <summary>
-        /// Invokes the exception handler if it is defined otherwise
-        /// does nothing.
-        /// </summary>
-
-        public static ExceptionProvider OptInvoke(this ExceptionHandler handler, ExceptionProvider provider)
-        {
-            if (provider == null) throw new ArgumentNullException("provider");
-
-            if (handler != null)
-                handler(provider());
-
-            return provider;
-        }
-    }
 
     /// <summary>
     /// A generic type that either represents a value or an error condition.

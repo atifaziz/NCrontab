@@ -121,7 +121,6 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="ErrorHandling.cs" />
-    <Compile Include="ExtensionAttribute.cs" />
     <Compile Include="ICrontabField.cs">
       <SubType>Code</SubType>
     </Compile>
