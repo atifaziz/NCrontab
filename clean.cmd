@@ -1,4 +1,4 @@
 @echo off
 pushd "%~dp0"
-for %%i in (Debug Release) do "%SystemRoot%\Microsoft.NET\Framework\v3.5\msbuild" /target:Clean /p:Configuration=%%i src\NCrontab.sln
+for %%i in (Debug Release) do "%SystemRoot%\Microsoft.NET\Framework\v4.0.30319\msbuild" /target:Clean /p:Configuration=%%i src\NCrontab.sln
 popd
