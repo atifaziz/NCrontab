@@ -26,6 +26,6 @@ using System.Reflection;
 [assembly: AssemblyTitle("NCrontabViewer")]
 [assembly: AssemblyDescription("NCrontab GUI sample")]
 
-[assembly: AssemblyVersion("0.2.0.0")]
-[assembly: AssemblyFileVersion("0.2.10903.0")]
+[assembly: AssemblyVersion("1.0.0.0")]
+[assembly: AssemblyFileVersion("1.0.13228.2236")]
 

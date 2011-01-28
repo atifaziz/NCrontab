@@ -26,5 +26,5 @@ using System.Reflection;
 [assembly: AssemblyTitle("NCrontab.Tests")]
 [assembly: AssemblyDescription("NUnit tests for NCrontab")]
 
-[assembly: AssemblyVersion("0.2.0.0")]
-[assembly: AssemblyFileVersion("0.2.10904.2122")]
+[assembly: AssemblyVersion("1.0.0.0")]
+[assembly: AssemblyFileVersion("1.0.13228.2236")]
