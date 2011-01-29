@@ -1,0 +1,13 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package>
+    <metadata>
+        <id>ncrontab</id>
+        <version>1.0.0</version>
+        <authors>Atif Aziz</authors>
+        <description>NCrontab is crontab for Microsoft .NET Framework 2.0 and above. It provides parsing and formatting of crontab expressions as well as calculation of occurrences of time based on a schedule expressed in the crontab format.</description>
+        <language>en-US</language>
+        <licenseUrl>http://www.apache.org/licenses/LICENSE-2.0</licenseUrl>
+        <projectUrl>http://ncrontab.googlecode.com/</projectUrl>
+        <tags>cron schedule time</tags>
+    </metadata>
+</package>
