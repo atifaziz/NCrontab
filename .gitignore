@@ -8,3 +8,5 @@ obj/
 _ReSharper.*
 *.orig
 dist/
+pkg/base/
+*.nupkg
