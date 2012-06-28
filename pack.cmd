@@ -1,5 +1,4 @@
-rem @echo off
-echo on
+@echo off
 call build && call :pack
 goto :EOF
 
