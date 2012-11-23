@@ -140,13 +140,13 @@ namespace NCrontab
         public static implicit operator ValueOrError<T>(ExceptionProvider provider) { return new ValueOrError<T>(provider); }
 
         /// <summary>
-        /// Explicits converts this object to a <typeparamref name="T"/> value.
+        /// Explicitly converts this object to a <typeparamref name="T"/> value.
         /// </summary>
 
         public static explicit operator T(ValueOrError<T> ve) { return ve.Value; }
 
         /// <summary>
-        /// Explicits converts this object to an <see cref="Exception"/> object
+        /// Explicitly converts this object to an <see cref="Exception"/> object
         /// if it represents an error condition. The conversion yields <c>null</c>
         /// if this object does not represent an error condition.
         /// </summary>
