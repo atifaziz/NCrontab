@@ -50,19 +50,19 @@ namespace NCrontab
 
         public static CrontabField Parse(CrontabFieldKind kind, string expression)
         {
-            return TryParse(kind, expression, ErrorHandling.Throw).Value;
+            return TryParse(kind, expression, v => v, e => { throw e(); });
         }
-
-        public static ValueOrError<CrontabField> TryParse(CrontabFieldKind kind, string expression)
+        
+        public static CrontabField TryParse(CrontabFieldKind kind, string expression)
         {
-            return TryParse(kind, expression, null);
+            return TryParse(kind, expression, v => v, _ => null);
         }
 
-        public static ValueOrError<CrontabField> TryParse(CrontabFieldKind kind, string expression, ExceptionHandler onError)
+        public static T TryParse<T>(CrontabFieldKind kind, string expression, Converter<CrontabField, T> valueSelector, Converter<ExceptionProvider, T> errorSelector)
         {
             var field = new CrontabField(CrontabFieldImpl.FromKind(kind));
-            var error = field._impl.TryParse(expression, field.Accumulate, onError);
-            return error == null ? field : (ValueOrError<CrontabField>) error;
+            var error = field._impl.TryParse(expression, field.Accumulate, null, e => e);
+            return error == null ? valueSelector(field) : errorSelector(error);
         }
 
         /// <summary>
@@ -183,7 +183,7 @@ namespace NCrontab
         /// <param name="interval" /> to 1.
         /// </remarks>
 
-        private ExceptionProvider Accumulate(int start, int end, int interval, ExceptionHandler onError)
+        private T Accumulate<T>(int start, int end, int interval, T success, Converter<ExceptionProvider, T> errorSelector)
         {
             var minValue = _impl.MinValue;
             var maxValue = _impl.MaxValue;
@@ -201,7 +201,7 @@ namespace NCrontab
                         _minValueSet = minValue;
                         _maxValueSet = maxValue;
                         _bits.SetAll(true);
-                        return null;
+                        return success;
                     }
 
                     start = minValue;
@@ -214,10 +214,10 @@ namespace NCrontab
                     //
 
                     if (start < minValue)
-                        return OnValueBelowMinError(start, onError);
+                        return OnValueBelowMinError(start, errorSelector);
 
                     if (start > maxValue)
-                        return OnValueAboveMaxError(start, onError);
+                        return OnValueAboveMaxError(start, errorSelector);
                 }
             } 
             else 
@@ -237,12 +237,12 @@ namespace NCrontab
                 if (start < 0) 
                     start = minValue;
                 else if (start < minValue) 
-                    return OnValueBelowMinError(start, onError);                    
+                    return OnValueBelowMinError(start, errorSelector);                    
 
                 if (end < 0) 
                     end = maxValue;
                 else if (end > maxValue) 
-                    return OnValueAboveMaxError(end, onError);
+                    return OnValueAboveMaxError(end, errorSelector);
             }
 
             if (interval < 1) 
@@ -272,25 +272,23 @@ namespace NCrontab
             if (_maxValueSet < i) 
                 _maxValueSet = i;
 
-            return null;
+            return success;
         }
 
-        private ExceptionProvider OnValueAboveMaxError(int value, ExceptionHandler onError)
+        private T OnValueAboveMaxError<T>(int value, Converter<ExceptionProvider, T> errorSelector)
         {
-            return ErrorHandling.OnError(
+            return errorSelector(
                 () => new CrontabException(string.Format(
                     "{0} is higher than the maximum allowable value for the [{3}] field. Value must be between {1} and {2} (all inclusive).", 
-                    value, _impl.MinValue, _impl.MaxValue, _impl.Kind)), 
-                onError);
+                    value, _impl.MinValue, _impl.MaxValue, _impl.Kind)));
         }
 
-        private ExceptionProvider OnValueBelowMinError(int value, ExceptionHandler onError)
+        private T OnValueBelowMinError<T>(int value, Converter<ExceptionProvider, T> errorSelector)
         {
-            return ErrorHandling.OnError(
+            return errorSelector(
                 () => new CrontabException(string.Format(
                     "{0} is lower than the minimum allowable value for the [{3}] field. Value must be between {1} and {2} (all inclusive).",
-                    value, _impl.MinValue, _impl.MaxValue, _impl.Kind)), 
-                onError);
+                    value, _impl.MinValue, _impl.MaxValue, _impl.Kind)));
         }
 
         public override string ToString()
