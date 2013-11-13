@@ -40,6 +40,8 @@ namespace NCrontab
     [ Serializable ]
     public sealed class CrontabSchedule
     {
+        private readonly bool _isSixPartExpression;
+        private readonly CrontabField _seconds;
         private readonly CrontabField _minutes;
         private readonly CrontabField _hours;
         private readonly CrontabField _days;
@@ -69,6 +71,23 @@ namespace NCrontab
         // Source: http://www.adminschoice.com/docs/crontab.htm
         //
 
+        // Six-part crontab expression format:
+        //
+        // * * * * * *
+        // - - - - - -
+        // | | | | | |
+        // | | | | | +--- day of week (0 - 6) (Sunday=0)
+        // | | | | +----- month (1 - 12)
+        // | | | +------- day of month (1 - 31)
+        // | | +--------- hour (0 - 23)
+        // | +----------- min (0 - 59)
+        // +------------- sec (0 - 59)
+        //
+        // The six-part crontab expression behaves similarly to the traditional
+        // format, except that it can denotate more precise schedules that use 
+        // a seconds component.
+        // 
+
         public static CrontabSchedule Parse(string expression)
         {
             return TryParse(expression, ErrorHandling.Throw).Value;
@@ -86,7 +105,7 @@ namespace NCrontab
 
             var tokens = expression.Split(_separators, StringSplitOptions.RemoveEmptyEntries);
 
-            if (tokens.Length != 5)
+            if (tokens.Length < 5 || tokens.Length > 6)
             {
                 return ErrorHandling.OnError(() => new CrontabException(string.Format(
                            "'{0}' is not a valid crontab expression. It must contain at least 5 components of a schedule "
@@ -94,31 +113,47 @@ namespace NCrontab
                            expression)), onError);
             }
 
-            var fields = new CrontabField[5];
+            var fields = new CrontabField[6];
 
-            for (var i = 0; i < fields.Length; i++)
+            int fieldOffset;
+            if (tokens.Length == 5)
             {
-                var field = CrontabField.TryParse((CrontabFieldKind) i, tokens[i], onError);
+                fields[0] = CrontabField.Seconds("0");
+                fieldOffset = 1;
+            }
+            else
+            {
+                fieldOffset = 0;
+            }
+
+            for (var i = 0; i < tokens.Length; i++)
+            {
+                var kind = (CrontabFieldKind) (i + fieldOffset);
+                var field = CrontabField.TryParse(kind, tokens[i], onError);
                 if (field.IsError)
                     return field.ErrorProvider;
 
-                fields[i] = field.Value;
+                fields[i + fieldOffset] = field.Value;
             }
 
-            return new CrontabSchedule(fields[0], fields[1], fields[2], fields[3], fields[4]);
+            return new CrontabSchedule(tokens.Length == 6, fields[0], fields[1], fields[2], fields[3], fields[4], fields[5]);
         }
 
         private CrontabSchedule(
+            bool isSixPartExpression, CrontabField seconds,
             CrontabField minutes, CrontabField hours, 
             CrontabField days, CrontabField months, 
             CrontabField daysOfWeek)
         {
+            Debug.Assert(seconds != null);
             Debug.Assert(minutes != null);
             Debug.Assert(hours != null);
             Debug.Assert(days != null);
             Debug.Assert(months != null);
             Debug.Assert(daysOfWeek != null);
 
+            _isSixPartExpression = isSixPartExpression;
+            _seconds = seconds;
             _minutes = minutes;
             _hours = hours;
             _days = days;
@@ -186,6 +221,7 @@ namespace NCrontab
             var baseDay = baseTime.Day;
             var baseHour = baseTime.Hour;
             var baseMinute = baseTime.Minute;
+            var baseSecond = baseTime.Second;
 
             var endYear = endTime.Year;
             var endMonth = endTime.Month;
@@ -195,7 +231,20 @@ namespace NCrontab
             var month = baseMonth;
             var day = baseDay;
             var hour = baseHour;
-            var minute = baseMinute + 1;
+            var minute = baseMinute;
+            var second = baseSecond + 1;
+
+            //
+            // Second
+            //
+
+            second = _seconds.Next(second);
+
+            if (second == nil)
+            {
+                second = _seconds.GetFirst();
+                minute++;
+            }
 
             //
             // Minute
@@ -234,8 +283,9 @@ namespace NCrontab
 
             RetryDayMonth:
         
-            if (day == nil) 
+            if (day == nil)
             {
+                second = _seconds.GetFirst();
                 minute = _minutes.GetFirst();
                 hour = _hours.GetFirst();
                 day = _days.GetFirst();
@@ -243,6 +293,7 @@ namespace NCrontab
             }
             else if (day > baseDay)
             {
+                second = _seconds.GetFirst();
                 minute = _minutes.GetFirst();
                 hour = _hours.GetFirst();
             }
@@ -253,8 +304,9 @@ namespace NCrontab
 
             month = _months.Next(month);
 
-            if (month == nil) 
+            if (month == nil)
             {
+                second = _seconds.GetFirst();
                 minute = _minutes.GetFirst();
                 hour = _hours.GetFirst();
                 day = _days.GetFirst();
@@ -263,6 +315,7 @@ namespace NCrontab
             }
             else if (month > baseMonth)
             {
+                second = _seconds.GetFirst();
                 minute = _minutes.GetFirst();
                 hour = _hours.GetFirst();
                 day = _days.GetFirst();
@@ -296,7 +349,7 @@ namespace NCrontab
                 goto RetryDayMonth;
             }
 
-            var nextTime = new DateTime(year, month, day, hour, minute, 0, 0, baseTime.Kind);
+            var nextTime = new DateTime(year, month, day, hour, minute, second, 0, baseTime.Kind);
 
             if (nextTime >= endTime)
                 return endTime;
@@ -308,7 +361,7 @@ namespace NCrontab
             if (_daysOfWeek.Contains((int) nextTime.DayOfWeek)) 
                 return nextTime;
 
-            return GetNextOccurrence(new DateTime(year, month, day, 23, 59, 0, 0, baseTime.Kind), endTime);
+            return GetNextOccurrence(new DateTime(year, month, day, 23, 59, 59, 0, baseTime.Kind), endTime);
         }
 
         /// <summary>
@@ -320,6 +373,10 @@ namespace NCrontab
         {
             var writer = new StringWriter(CultureInfo.InvariantCulture);
 
+            if (_isSixPartExpression)
+            {
+                _seconds.Format(writer, true); writer.Write(' ');
+            }
             _minutes.Format(writer, true); writer.Write(' ');
             _hours.Format(writer, true); writer.Write(' ');
             _days.Format(writer, true); writer.Write(' ');
