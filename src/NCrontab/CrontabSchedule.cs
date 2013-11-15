@@ -108,8 +108,9 @@ namespace NCrontab
             if (tokens.Length < 5 || tokens.Length > 6)
             {
                 return ErrorHandling.OnError(() => new CrontabException(string.Format(
-                           "'{0}' is not a valid crontab expression. It must contain at least 5 components of a schedule "
-                           + "(in the sequence of minutes, hours, days, months, days of week).", 
+                           "'{0}' is not a valid crontab expression. It must either contain 5 components of a schedule "
+                           + "(in the sequence of minutes, hours, days, months, days of week) or 6 components "
+                           + "(in the sequence of seconds, minutes, hours, days, months, days of week).", 
                            expression)), onError);
             }
 
