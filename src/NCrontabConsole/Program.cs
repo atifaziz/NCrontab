@@ -39,13 +39,13 @@ namespace NCrontabConsole
         {
             try
             {
-                if (args.Length != 3)
+                if (args.Length < 3)
                     throw new ApplicationException("Missing required arguments. You must at least supply CRONTAB-EXPRESSION START-DATE END-DATE.");
 
                 var expression = args[0];
                 var start = ParseDateArgument(args[1], "start");
                 var end = ParseDateArgument(args[2], "end");
-                var format = args.Length == 4 ? args[3] : "f";
+                var format = args.Length > 3 ? args[3] : "f";
 
                 WriteOccurrences(CrontabSchedule.Parse(expression), start, end, format, Console.Out);
 
