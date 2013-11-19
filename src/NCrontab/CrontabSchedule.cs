@@ -71,15 +71,15 @@ namespace NCrontab
 
         public static CrontabSchedule Parse(string expression)
         {
-            return TryParse(expression, ErrorHandling.Throw).Value;
+            return TryParse(expression, v => v, e => { throw e(); });
         }
 
-        public static ValueOrError<CrontabSchedule> TryParse(string expression)
+        public static CrontabSchedule TryParse(string expression)
         {
-            return TryParse(expression, null);
+            return TryParse(expression, v => v, _ => null);
         }
 
-        private static ValueOrError<CrontabSchedule> TryParse(string expression, ExceptionHandler onError)
+        public static T TryParse<T>(string expression, Converter<CrontabSchedule, T> valueSelector, Converter<ExceptionProvider, T> errorSelector)
         {
             if (expression == null)
                 throw new ArgumentNullException("expression");
@@ -88,24 +88,25 @@ namespace NCrontab
 
             if (tokens.Length != 5)
             {
-                return ErrorHandling.OnError(() => new CrontabException(string.Format(
+                return errorSelector(() => new CrontabException(string.Format(
                            "'{0}' is not a valid crontab expression. It must contain at least 5 components of a schedule "
                            + "(in the sequence of minutes, hours, days, months, days of week).", 
-                           expression)), onError);
+                           expression)));
             }
 
             var fields = new CrontabField[5];
 
             for (var i = 0; i < fields.Length; i++)
             {
-                var field = CrontabField.TryParse((CrontabFieldKind) i, tokens[i], onError);
-                if (field.IsError)
-                    return field.ErrorProvider;
+                var field = CrontabField.TryParse((CrontabFieldKind) i, tokens[i], v => new { ErrorProvider = (ExceptionProvider) null, Value = v },
+                                                                                   e => new { ErrorProvider = e, Value = (CrontabField) null });
+                if (field.ErrorProvider != null)
+                    return errorSelector(field.ErrorProvider);
 
                 fields[i] = field.Value;
             }
 
-            return new CrontabSchedule(fields[0], fields[1], fields[2], fields[3], fields[4]);
+            return valueSelector(new CrontabSchedule(fields[0], fields[1], fields[2], fields[3], fields[4]));
         }
 
         private CrontabSchedule(
