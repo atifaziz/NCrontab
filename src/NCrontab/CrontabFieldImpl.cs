@@ -34,7 +34,7 @@ namespace NCrontab
 
     #endregion
 
-    public delegate ExceptionProvider CrontabFieldAccumulator(int start, int end, int interval, ExceptionHandler onError);
+    public delegate T CrontabFieldAccumulator<T>(int start, int end, int interval, T successs, Converter<ExceptionProvider, T> onError);
 
     [ Serializable ]
     public sealed class CrontabFieldImpl : IObjectReference
@@ -192,50 +192,49 @@ namespace NCrontab
             }
         }
 
-        public void Parse(string str, CrontabFieldAccumulator acc)
+        public void Parse(string str, CrontabFieldAccumulator<ExceptionProvider> acc)
         {
-            TryParse(str, acc, ErrorHandling.Throw);
+            TryParse(str, acc, null, ep => { throw ep(); });
         }
-
-        public ExceptionProvider TryParse(string str, CrontabFieldAccumulator acc, ExceptionHandler onError)
+        
+        public T TryParse<T>(string str, CrontabFieldAccumulator<T> acc, T success, Converter<ExceptionProvider, T> errorSelector)
         {
             if (acc == null)
                 throw new ArgumentNullException("acc");
 
             if (string.IsNullOrEmpty(str))
-                return null;
+                return success;
 
             try
             {
-                return InternalParse(str, acc, onError);
+                return InternalParse(str, acc, success, errorSelector);
             }
             catch (FormatException e)
             {
-                return OnParseException(e, str, onError);
+                return OnParseException(e, str, errorSelector);
             }
             catch (CrontabException e)
             {
-                return OnParseException(e, str, onError);
+                return OnParseException(e, str, errorSelector);
             }
         }
 
-        private ExceptionProvider OnParseException(Exception innerException, string str, ExceptionHandler onError)
+        private T OnParseException<T>(Exception innerException, string str, Converter<ExceptionProvider, T> errorSelector)
         {
             Debug.Assert(str != null);
             Debug.Assert(innerException != null);
 
-            return ErrorHandling.OnError(
-                       () => new CrontabException(string.Format("'{0}' is not a valid [{1}] crontab field expression.", str, Kind), innerException), 
-                       onError);
+            return errorSelector(
+                       () => new CrontabException(string.Format("'{0}' is not a valid [{1}] crontab field expression.", str, Kind), innerException));
         }
 
-        private ExceptionProvider InternalParse(string str, CrontabFieldAccumulator acc, ExceptionHandler onError)
+        private T InternalParse<T>(string str, CrontabFieldAccumulator<T> acc, T success, Converter<ExceptionProvider, T> errorSelector)
         {
             Debug.Assert(str != null);
             Debug.Assert(acc != null);
 
             if (str.Length == 0)
-                return ErrorHandling.OnError(() => new CrontabException("A crontab field value cannot be empty."), onError);
+                return errorSelector(() => new CrontabException("A crontab field value cannot be empty."));
 
             //
             // Next, look for a list of values (e.g. 1,2,3).
@@ -245,11 +244,11 @@ namespace NCrontab
 
             if (commaIndex > 0)
             {
-                ExceptionProvider e = null;
+                var result = success;
                 var token = ((IEnumerable<string>) str.Split(_comma)).GetEnumerator();
-                while (token.MoveNext() && e == null)
-                    e = InternalParse(token.Current, acc, onError);
-                return e;
+                while (token.MoveNext() && result == null)
+                    result = InternalParse(token.Current, acc, success, errorSelector);
+                return result;
             }
             
             var every = 1;
@@ -272,7 +271,7 @@ namespace NCrontab
     
             if (str.Length == 1 && str[0]== '*')
             {
-                return acc(-1, -1, every, onError);
+                return acc(-1, -1, every, success, errorSelector);
             }
 
             //
@@ -286,7 +285,7 @@ namespace NCrontab
                 var first = ParseValue(str.Substring(0, dashIndex));
                 var last = ParseValue(str.Substring(dashIndex + 1));
 
-                return acc(first, last, every, onError);
+                return acc(first, last, every, success, errorSelector);
             }
 
             //
@@ -296,10 +295,10 @@ namespace NCrontab
             var value = ParseValue(str);
 
             if (every == 1)
-                return acc(value, value, 1, onError);
+                return acc(value, value, 1, success, errorSelector);
 
             Debug.Assert(every != 0);
-            return acc(value, _maxValue, every, onError);
+            return acc(value, _maxValue, every, success, errorSelector);
         }
 
         private int ParseValue(string str)

@@ -124,7 +124,6 @@
     <Compile Include="ICrontabField.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="ValueOrError.cs" />
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include="Microsoft.Net.Framework.2.0">

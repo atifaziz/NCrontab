@@ -30,6 +30,7 @@ namespace NCrontab.Tests
     using System.Globalization;
     using System.Threading;
     using NUnit.Framework;
+    using ParseOptions = CrontabSchedule.ParseOptions;
 
     #endregion
  
@@ -59,7 +60,7 @@ namespace NCrontab.Tests
         [Test]
         public void SixPartAllTimeString()
         {
-            Assert.AreEqual("* * * * * *", CrontabSchedule.Parse("* * * * * *").ToString());
+            Assert.AreEqual("* * * * * *", CrontabSchedule.Parse("* * * * * *", new ParseOptions { IncludingSeconds = true }).ToString());
         }
 
         [ Test ]
@@ -69,10 +70,11 @@ namespace NCrontab.Tests
             Assert.AreEqual("* * * 1,3,5,7,9,11 *", CrontabSchedule.Parse("* * * */2 *").ToString());
             Assert.AreEqual("10,25,40 * * * *", CrontabSchedule.Parse("10-40/15 * * * *").ToString());
             Assert.AreEqual("* * * 1,3,8 1-2,5", CrontabSchedule.Parse("* * * Mar,Jan,Aug Fri,Mon-Tue").ToString());
-            Assert.AreEqual("1 * 1-3 * * *", CrontabSchedule.Parse("1 * 1-2,3 * * *").ToString());
-            Assert.AreEqual("22 * * * 1,3,5,7,9,11 *", CrontabSchedule.Parse("22 * * * */2 *").ToString());
-            Assert.AreEqual("33 10,25,40 * * * *", CrontabSchedule.Parse("33 10-40/15 * * * *").ToString());
-            Assert.AreEqual("55 * * * 1,3,8 1-2,5", CrontabSchedule.Parse("55 * * * Mar,Jan,Aug Fri,Mon-Tue").ToString());
+            var includingSeconds = new ParseOptions { IncludingSeconds = true };
+            Assert.AreEqual("1 * 1-3 * * *", CrontabSchedule.Parse("1 * 1-2,3 * * *", includingSeconds).ToString());
+            Assert.AreEqual("22 * * * 1,3,5,7,9,11 *", CrontabSchedule.Parse("22 * * * */2 *", includingSeconds).ToString());
+            Assert.AreEqual("33 10,25,40 * * * *", CrontabSchedule.Parse("33 10-40/15 * * * *", includingSeconds).ToString());
+            Assert.AreEqual("55 * * * 1,3,8 1-2,5", CrontabSchedule.Parse("55 * * * Mar,Jan,Aug Fri,Mon-Tue", includingSeconds).ToString());
         }
 
         /// <summary>
@@ -96,20 +98,22 @@ namespace NCrontab.Tests
 
             // Second tests
 
-            CronCall("01/01/2003 00:00:00", "45 * * * * *", "01/01/2003 00:00:45", false);
+            var cronCall = CronCall(new ParseOptions { IncludingSeconds = true });
 
-            CronCall("01/01/2003 00:00:00", "45-47,48,49 * * * * *", "01/01/2003 00:00:45", false);
-            CronCall("01/01/2003 00:00:45", "45-47,48,49 * * * * *", "01/01/2003 00:00:46", false);
-            CronCall("01/01/2003 00:00:46", "45-47,48,49 * * * * *", "01/01/2003 00:00:47", false);
-            CronCall("01/01/2003 00:00:47", "45-47,48,49 * * * * *", "01/01/2003 00:00:48", false);
-            CronCall("01/01/2003 00:00:48", "45-47,48,49 * * * * *", "01/01/2003 00:00:49", false);
-            CronCall("01/01/2003 00:00:49", "45-47,48,49 * * * * *", "01/01/2003 00:01:45", false);
+            cronCall("01/01/2003 00:00:00", "45 * * * * *", "01/01/2003 00:00:45", false);
 
-            CronCall("01/01/2003 00:00:00", "2/5 * * * * *", "01/01/2003 00:00:02", false);
-            CronCall("01/01/2003 00:00:02", "2/5 * * * * *", "01/01/2003 00:00:07", false);
-            CronCall("01/01/2003 00:00:50", "2/5 * * * * *", "01/01/2003 00:00:52", false);
-            CronCall("01/01/2003 00:00:52", "2/5 * * * * *", "01/01/2003 00:00:57", false);
-            CronCall("01/01/2003 00:00:57", "2/5 * * * * *", "01/01/2003 00:01:02", false);
+            cronCall("01/01/2003 00:00:00", "45-47,48,49 * * * * *", "01/01/2003 00:00:45", false);
+            cronCall("01/01/2003 00:00:45", "45-47,48,49 * * * * *", "01/01/2003 00:00:46", false);
+            cronCall("01/01/2003 00:00:46", "45-47,48,49 * * * * *", "01/01/2003 00:00:47", false);
+            cronCall("01/01/2003 00:00:47", "45-47,48,49 * * * * *", "01/01/2003 00:00:48", false);
+            cronCall("01/01/2003 00:00:48", "45-47,48,49 * * * * *", "01/01/2003 00:00:49", false);
+            cronCall("01/01/2003 00:00:49", "45-47,48,49 * * * * *", "01/01/2003 00:01:45", false);
+
+            cronCall("01/01/2003 00:00:00", "2/5 * * * * *", "01/01/2003 00:00:02", false);
+            cronCall("01/01/2003 00:00:02", "2/5 * * * * *", "01/01/2003 00:00:07", false);
+            cronCall("01/01/2003 00:00:50", "2/5 * * * * *", "01/01/2003 00:00:52", false);
+            cronCall("01/01/2003 00:00:52", "2/5 * * * * *", "01/01/2003 00:00:57", false);
+            cronCall("01/01/2003 00:00:57", "2/5 * * * * *", "01/01/2003 00:01:02", false);
 
             // Minute tests
 
@@ -128,20 +132,20 @@ namespace NCrontab.Tests
             CronCall("01/01/2003 00:52:00", "2/5 * * * *", "01/01/2003 00:57:00", false);
             CronCall("01/01/2003 00:57:00", "2/5 * * * *", "01/01/2003 01:02:00", false);
 
-            CronCall("01/01/2003 00:00:30", "3 45 * * * *", "01/01/2003 00:45:03", false);
+            cronCall("01/01/2003 00:00:30", "3 45 * * * *", "01/01/2003 00:45:03", false);
 
-            CronCall("01/01/2003 00:00:30", "6 45-47,48,49 * * * *", "01/01/2003 00:45:06", false);
-            CronCall("01/01/2003 00:45:30", "6 45-47,48,49 * * * *", "01/01/2003 00:46:06", false);
-            CronCall("01/01/2003 00:46:30", "6 45-47,48,49 * * * *", "01/01/2003 00:47:06", false);
-            CronCall("01/01/2003 00:47:30", "6 45-47,48,49 * * * *", "01/01/2003 00:48:06", false);
-            CronCall("01/01/2003 00:48:30", "6 45-47,48,49 * * * *", "01/01/2003 00:49:06", false);
-            CronCall("01/01/2003 00:49:30", "6 45-47,48,49 * * * *", "01/01/2003 01:45:06", false);
+            cronCall("01/01/2003 00:00:30", "6 45-47,48,49 * * * *", "01/01/2003 00:45:06", false);
+            cronCall("01/01/2003 00:45:30", "6 45-47,48,49 * * * *", "01/01/2003 00:46:06", false);
+            cronCall("01/01/2003 00:46:30", "6 45-47,48,49 * * * *", "01/01/2003 00:47:06", false);
+            cronCall("01/01/2003 00:47:30", "6 45-47,48,49 * * * *", "01/01/2003 00:48:06", false);
+            cronCall("01/01/2003 00:48:30", "6 45-47,48,49 * * * *", "01/01/2003 00:49:06", false);
+            cronCall("01/01/2003 00:49:30", "6 45-47,48,49 * * * *", "01/01/2003 01:45:06", false);
 
-            CronCall("01/01/2003 00:00:30", "9 2/5 * * * *", "01/01/2003 00:02:09", false);
-            CronCall("01/01/2003 00:02:30", "9 2/5 * * * *", "01/01/2003 00:07:09", false);
-            CronCall("01/01/2003 00:50:30", "9 2/5 * * * *", "01/01/2003 00:52:09", false);
-            CronCall("01/01/2003 00:52:30", "9 2/5 * * * *", "01/01/2003 00:57:09", false);
-            CronCall("01/01/2003 00:57:30", "9 2/5 * * * *", "01/01/2003 01:02:09", false);
+            cronCall("01/01/2003 00:00:30", "9 2/5 * * * *", "01/01/2003 00:02:09", false);
+            cronCall("01/01/2003 00:02:30", "9 2/5 * * * *", "01/01/2003 00:07:09", false);
+            cronCall("01/01/2003 00:50:30", "9 2/5 * * * *", "01/01/2003 00:52:09", false);
+            cronCall("01/01/2003 00:52:30", "9 2/5 * * * *", "01/01/2003 00:57:09", false);
+            cronCall("01/01/2003 00:57:30", "9 2/5 * * * *", "01/01/2003 01:02:09", false);
 
             // Hour tests
 
@@ -268,12 +272,13 @@ namespace NCrontab.Tests
             CronFinite(" *  * * * Mon", "01/01/2003 00:00:00", "02/01/2003 12:00:00");
             CronFinite("30 12 * * Mon", "01/01/2003 00:00:00", "06/01/2003 12:00:00");
 
-            CronFinite(" *  *  * * * *  ", "01/01/2003 00:00:00", "01/01/2003 00:00:00");
-            CronFinite(" *  *  * * * *  ", "31/12/2002 23:59:59", "01/01/2003 00:00:00");
-            CronFinite(" *  *  * * * Mon", "31/12/2002 23:59:59", "01/01/2003 00:00:00");
-            CronFinite(" *  *  * * * Mon", "01/01/2003 00:00:00", "02/01/2003 00:00:00");
-            CronFinite(" *  *  * * * Mon", "01/01/2003 00:00:00", "02/01/2003 12:00:00");
-            CronFinite("10 30 12 * * Mon", "01/01/2003 00:00:00", "06/01/2003 12:00:10");
+            var cronFinite = CronFinite(new ParseOptions { IncludingSeconds = true });
+            cronFinite(" *  *  * * * *  ", "01/01/2003 00:00:00", "01/01/2003 00:00:00");
+            cronFinite(" *  *  * * * *  ", "31/12/2002 23:59:59", "01/01/2003 00:00:00");
+            cronFinite(" *  *  * * * Mon", "31/12/2002 23:59:59", "01/01/2003 00:00:00");
+            cronFinite(" *  *  * * * Mon", "01/01/2003 00:00:00", "02/01/2003 00:00:00");
+            cronFinite(" *  *  * * * Mon", "01/01/2003 00:00:00", "02/01/2003 12:00:00");
+            cronFinite("10 30 12 * * Mon", "01/01/2003 00:00:00", "06/01/2003 12:00:10");
         }
 
         [ Test, Category("Performance") ]
@@ -287,7 +292,7 @@ namespace NCrontab.Tests
             TimeCron(TimeSpan.FromSeconds(1), () =>
                 CronFinite("* * 31 Feb *", "01/01/2001 00:00:00", "01/01/2010 00:00:00"));
             TimeCron(TimeSpan.FromSeconds(1), () =>
-                CronFinite("* * * 31 Feb *", "01/01/2001 00:00:00", "01/01/2010 00:00:00"));
+                CronFinite(new ParseOptions { IncludingSeconds = true })("* * * 31 Feb *", "01/01/2001 00:00:00", "01/01/2010 00:00:00"));
         }
 
         [Test, ExpectedException(typeof(CrontabException))]
@@ -383,37 +388,57 @@ namespace NCrontab.Tests
                         "Check there is not an infinite loop somewhere.", limit);
         }
 
-        private static void CronCall(string startTimeString, string cronExpression, string nextTimeString, bool expectException) 
+        delegate void CronCallHandler(string startTimeString, string cronExpression, string nextTimeString, bool expectException);
+
+        private static void CronCall(string startTimeString, string cronExpression, string nextTimeString, bool expectException)
         {
-            var start = Time(startTimeString);
+            CronCall(null)(startTimeString, cronExpression, nextTimeString, expectException);
+        }
 
-            try 
+        private static CronCallHandler CronCall(ParseOptions options)
+        {
+            return (startTimeString, cronExpression, nextTimeString, expectException) =>
             {
-                var schedule = CrontabSchedule.Parse(cronExpression);
+                var start = Time(startTimeString);
 
-                if (expectException) 
-                    Assert.Fail("The expression <{0}> cannot be valid.", cronExpression);
+                try 
+                {
+                    var schedule = CrontabSchedule.Parse(cronExpression, options);
 
-                var next = schedule.GetNextOccurrence(start);
+                    if (expectException) 
+                        Assert.Fail("The expression <{0}> cannot be valid.", cronExpression);
 
-                Assert.AreEqual(nextTimeString, TimeString(next),
-                    "Occurrence of <{0}> after <{1}>.", cronExpression, startTimeString);
-            } 
-            catch (CrontabException e) 
-            {
-                if (!expectException) 
-                    Assert.Fail("Unexpected ParseException while parsing <{0}>: {1}", cronExpression, e.ToString());
-            }
+                    var next = schedule.GetNextOccurrence(start);
+
+                    Assert.AreEqual(nextTimeString, TimeString(next),
+                        "Occurrence of <{0}> after <{1}>.", cronExpression, startTimeString);
+                } 
+                catch (CrontabException e) 
+                {
+                    if (!expectException) 
+                        Assert.Fail("Unexpected ParseException while parsing <{0}>: {1}", cronExpression, e.ToString());
+                }                      
+            };
         }
 
         private static void CronFinite(string cronExpression, string startTimeString, string endTimeString)
         {
-            var schedule = CrontabSchedule.Parse(cronExpression);
-            var occurrence = schedule.GetNextOccurrence(Time(startTimeString), Time(endTimeString));
+            CronFinite(null)(cronExpression, startTimeString, endTimeString);
+        }
 
-            Assert.AreEqual(endTimeString, TimeString(occurrence),
-                "Occurrence of <{0}> after <{1}> did not terminate with <{2}>.",
-                cronExpression, startTimeString, endTimeString);
+        delegate void CronFiniteHandler(string cronExpression, string startTimeString, string endTimeString);
+
+        private static CronFiniteHandler CronFinite(ParseOptions options)
+        {
+            return (cronExpression, startTimeString, endTimeString) =>
+            {
+                var schedule = CrontabSchedule.Parse(cronExpression, options);
+                var occurrence = schedule.GetNextOccurrence(Time(startTimeString), Time(endTimeString));
+
+                Assert.AreEqual(endTimeString, TimeString(occurrence),
+                    "Occurrence of <{0}> after <{1}> did not terminate with <{2}>.",
+                    cronExpression, startTimeString, endTimeString);
+            };
         }
 
         private static string TimeString(DateTime time)
