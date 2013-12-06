@@ -9,4 +9,4 @@ if not exist base\lib md base\lib
 copy ..\COPYING*.txt base > nul ^
  && copy ..\lic base > nul ^
  && copy ..\bin\Release base\lib > nul ^
- && ..\tools\nuget pack nuspec.xml -b base
+ && ..\tools\nuget pack ncrontab.nuspec -b base
