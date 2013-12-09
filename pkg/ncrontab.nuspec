@@ -11,4 +11,10 @@
         <projectUrl>http://ncrontab.googlecode.com/</projectUrl>
         <tags>cron schedule time</tags>
     </metadata>
+    <files>
+        <file src="..\bin\Release\*" target="lib\net20" />
+        <file src="..\COPYING.txt" target="COPYING.txt" />
+        <file src="..\src\*.cs" target="src" />
+        <file src="..\src\NCrontab\**\*.cs" target="src\NCrontab" />
+    </files>
 </package>
