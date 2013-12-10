@@ -36,9 +36,12 @@ namespace NCrontabViewer
 
     public partial class MainForm : Form
     {
+        private static readonly char[] _separators = new[] { ' ' };
+
         private DateTime _lastChangeTime;
         private bool _dirty;
         private CrontabSchedule _crontab;
+        private bool _isSixPart;
         private DateTime _startTime;
         private int _totalOccurrenceCount;
 
@@ -51,6 +54,7 @@ namespace NCrontabViewer
         {
             _lastChangeTime = DateTime.Now;
             _dirty = true;
+            _isSixPart = false;
             _crontab = null;
         }
 
@@ -81,6 +85,7 @@ namespace NCrontabViewer
                     if (expression.Length == 0)
                         return;
 
+                    _isSixPart = expression.Split(_separators, StringSplitOptions.RemoveEmptyEntries).Length == 6;
                     _crontab = CrontabSchedule.Parse(expression);
                    
                     _totalOccurrenceCount = 0;
@@ -124,7 +129,8 @@ namespace NCrontabViewer
             var info = DateTimeFormatInfo.CurrentInfo;
             var dayWidth = info.AbbreviatedDayNames.Max(s => s.Length);
             var monthWidth = info.AbbreviatedMonthNames.Max(s => s.Length);
-            var timeFormat = string.Format("{{0,-{0}:ddd}} {{0:dd}}, {{0,-{1}:MMM}} {{0:yyyy HH:mm}}", dayWidth, monthWidth);
+            var timeComponent = _isSixPart ? "HH:mm:ss" : "HH:mm";
+            var timeFormat = string.Format("{{0,-{0}:ddd}} {{0:dd}}, {{0,-{1}:MMM}} {{0:yyyy {2}}}", dayWidth, monthWidth, timeComponent);
             var lastTimeString = new string('?', string.Format(timeFormat, DateTime.MinValue).Length);
 
             foreach (var occurrence in _crontab.GetNextOccurrences(_startTime, endTime))
@@ -151,7 +157,12 @@ namespace NCrontabViewer
                 sb.Append(' ');
                 index = Diff(lastTimeString, timeString, index + 1, 2, sb);
                 sb.Append(':');
-                Diff(lastTimeString, timeString, index + 1, 2, sb);
+                index = Diff(lastTimeString, timeString, index + 1, 2, sb);
+                if (_isSixPart)
+                {
+                    sb.Append(':');
+                    Diff(lastTimeString, timeString, index + 1, 2, sb);
+                }
 
                 lastTimeString = timeString;
 
