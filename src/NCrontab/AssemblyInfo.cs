@@ -31,7 +31,4 @@ using CLSCompliantAttribute = System.CLSCompliantAttribute;
 [assembly: AssemblyTitle("NCrontab")]
 [assembly: AssemblyDescription("Crontab for .NET")]
 
-[assembly: AssemblyVersion("2.0.0.0")]
-[assembly: AssemblyFileVersion("2.0.15720.2109")]
-
 [assembly: CLSCompliant(true)] 
