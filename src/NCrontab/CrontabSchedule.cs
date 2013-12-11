@@ -23,13 +23,13 @@
 
 namespace NCrontab
 {
-	#region Imports
+    #region Imports
 
-	using System;
-	using System.Collections.Generic;
-	using System.Globalization;
-	using System.IO;
-	using Debug = System.Diagnostics.Debug;
+    using System;
+    using System.Collections.Generic;
+    using System.Globalization;
+    using System.IO;
+    using Debug = System.Diagnostics.Debug;
 
     #endregion
 
