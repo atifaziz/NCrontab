@@ -39,10 +39,10 @@ namespace NCrontab
     [ Serializable ]
     public sealed class CrontabField : ICrontabField
     {
-        private readonly BitArray _bits;
-        private /* readonly */ int _minValueSet;
-        private /* readonly */ int _maxValueSet;
-        private readonly CrontabFieldImpl _impl;
+        readonly BitArray _bits;
+        /* readonly */ int _minValueSet;
+        /* readonly */ int _maxValueSet;
+        readonly CrontabFieldImpl _impl;
 
         /// <summary>
         /// Parses a crontab field expression given its kind.
@@ -119,7 +119,7 @@ namespace NCrontab
             return Parse(CrontabFieldKind.DayOfWeek, expression);
         }
 
-        private CrontabField(CrontabFieldImpl impl)
+        CrontabField(CrontabFieldImpl impl)
         {
             if (impl == null)
                 throw new ArgumentNullException("impl");
@@ -163,12 +163,12 @@ namespace NCrontab
             return -1;
         }
 
-        private int IndexToValue(int index)
+        int IndexToValue(int index)
         {
             return index + _impl.MinValue;
         }
 
-        private int ValueToIndex(int value)
+        int ValueToIndex(int value)
         {
             return value - _impl.MinValue;
         }
@@ -192,7 +192,7 @@ namespace NCrontab
         /// <param name="interval" /> to 1.
         /// </remarks>
 
-        private T Accumulate<T>(int start, int end, int interval, T success, Converter<ExceptionProvider, T> errorSelector)
+        T Accumulate<T>(int start, int end, int interval, T success, Converter<ExceptionProvider, T> errorSelector)
         {
             var minValue = _impl.MinValue;
             var maxValue = _impl.MaxValue;
@@ -284,7 +284,7 @@ namespace NCrontab
             return success;
         }
 
-        private T OnValueAboveMaxError<T>(int value, Converter<ExceptionProvider, T> errorSelector)
+        T OnValueAboveMaxError<T>(int value, Converter<ExceptionProvider, T> errorSelector)
         {
             return errorSelector(
                 () => new CrontabException(string.Format(
@@ -292,7 +292,7 @@ namespace NCrontab
                     value, _impl.MinValue, _impl.MaxValue, _impl.Kind)));
         }
 
-        private T OnValueBelowMinError<T>(int value, Converter<ExceptionProvider, T> errorSelector)
+        T OnValueBelowMinError<T>(int value, Converter<ExceptionProvider, T> errorSelector)
         {
             return errorSelector(
                 () => new CrontabException(string.Format(

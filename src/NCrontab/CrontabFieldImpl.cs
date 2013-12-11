@@ -46,15 +46,15 @@ namespace NCrontab
         public static readonly CrontabFieldImpl Month     = new CrontabFieldImpl(CrontabFieldKind.Month, 1, 12, new[] { "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December" });
         public static readonly CrontabFieldImpl DayOfWeek = new CrontabFieldImpl(CrontabFieldKind.DayOfWeek, 0, 6, new[] { "Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday" });
 
-        private static readonly CrontabFieldImpl[] _fieldByKind = new[] { Second, Minute, Hour, Day, Month, DayOfWeek };
+        static readonly CrontabFieldImpl[] _fieldByKind = new[] { Second, Minute, Hour, Day, Month, DayOfWeek };
 
-        private static readonly CompareInfo _comparer = CultureInfo.InvariantCulture.CompareInfo;
-        private static readonly char[] _comma = new[] { ',' };
+        static readonly CompareInfo _comparer = CultureInfo.InvariantCulture.CompareInfo;
+        static readonly char[] _comma = new[] { ',' };
 
-        private readonly CrontabFieldKind _kind;
-        private readonly int _minValue;
-        private readonly int _maxValue;
-        private readonly string[] _names;
+        readonly CrontabFieldKind _kind;
+        readonly int _minValue;
+        readonly int _maxValue;
+        readonly string[] _names;
 
         public static CrontabFieldImpl FromKind(CrontabFieldKind kind)
         {
@@ -68,7 +68,7 @@ namespace NCrontab
             return _fieldByKind[(int) kind];
         }
 
-        private CrontabFieldImpl(CrontabFieldKind kind, int minValue, int maxValue, string[] names)
+        CrontabFieldImpl(CrontabFieldKind kind, int minValue, int maxValue, string[] names)
         {
             Debug.Assert(Enum.IsDefined(typeof(CrontabFieldKind), kind));
             Debug.Assert(minValue >= 0);
@@ -154,7 +154,7 @@ namespace NCrontab
             }
         }
 
-        private void FormatValue(int value, TextWriter writer, bool noNames)
+        void FormatValue(int value, TextWriter writer, bool noNames)
         {
             Debug.Assert(writer != null);
 
@@ -176,7 +176,7 @@ namespace NCrontab
             }
         }
 
-        private static void FastFormatNumericValue(int value, TextWriter writer)
+        static void FastFormatNumericValue(int value, TextWriter writer)
         {
             Debug.Assert(value >= 0 && value < 100);
             Debug.Assert(writer != null);
@@ -219,7 +219,7 @@ namespace NCrontab
             }
         }
 
-        private T OnParseException<T>(Exception innerException, string str, Converter<ExceptionProvider, T> errorSelector)
+        T OnParseException<T>(Exception innerException, string str, Converter<ExceptionProvider, T> errorSelector)
         {
             Debug.Assert(str != null);
             Debug.Assert(innerException != null);
@@ -228,7 +228,7 @@ namespace NCrontab
                        () => new CrontabException(string.Format("'{0}' is not a valid [{1}] crontab field expression.", str, Kind), innerException));
         }
 
-        private T InternalParse<T>(string str, CrontabFieldAccumulator<T> acc, T success, Converter<ExceptionProvider, T> errorSelector)
+        T InternalParse<T>(string str, CrontabFieldAccumulator<T> acc, T success, Converter<ExceptionProvider, T> errorSelector)
         {
             Debug.Assert(str != null);
             Debug.Assert(acc != null);
@@ -301,7 +301,7 @@ namespace NCrontab
             return acc(value, _maxValue, every, success, errorSelector);
         }
 
-        private int ParseValue(string str)
+        int ParseValue(string str)
         {
             Debug.Assert(str != null);
 

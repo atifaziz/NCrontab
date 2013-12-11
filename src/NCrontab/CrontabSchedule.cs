@@ -40,16 +40,16 @@ namespace NCrontab
     [ Serializable ]
     public sealed class CrontabSchedule
     {
-        private readonly CrontabField _seconds;
-        private readonly CrontabField _minutes;
-        private readonly CrontabField _hours;
-        private readonly CrontabField _days;
-        private readonly CrontabField _months;
-        private readonly CrontabField _daysOfWeek;
+        readonly CrontabField _seconds;
+        readonly CrontabField _minutes;
+        readonly CrontabField _hours;
+        readonly CrontabField _days;
+        readonly CrontabField _months;
+        readonly CrontabField _daysOfWeek;
 
-        private static readonly CrontabField SecondZero = CrontabField.Seconds("0");
+        static readonly CrontabField SecondZero = CrontabField.Seconds("0");
 
-        private static readonly char[] _separators = new[] { ' ' };
+        static readonly char[] _separators = new[] { ' ' };
 
         [Serializable]
         public sealed class ParseOptions
@@ -404,7 +404,7 @@ namespace NCrontab
             return writer.ToString();
         }
 
-        private static Calendar Calendar
+        static Calendar Calendar
         {
             get { return CultureInfo.InvariantCulture.Calendar; }
         }

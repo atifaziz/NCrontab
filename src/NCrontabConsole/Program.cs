@@ -35,7 +35,7 @@ namespace NCrontabConsole
     
     internal static class Program
     {
-        private static int Main(string[] args)
+        static int Main(string[] args)
         {
             try
             {
@@ -59,7 +59,7 @@ namespace NCrontabConsole
             }  
         }
 
-        private static DateTime ParseDateArgument(string arg, string hint)
+        static DateTime ParseDateArgument(string arg, string hint)
         {
             try
             {
@@ -71,7 +71,7 @@ namespace NCrontabConsole
             }
         }
 
-        private static void WriteOccurrences(CrontabSchedule schedule, DateTime start, DateTime end, string format, TextWriter output) 
+        static void WriteOccurrences(CrontabSchedule schedule, DateTime start, DateTime end, string format, TextWriter output) 
         {
             var occurrence = schedule.GetNextOccurrences(start, end).GetEnumerator();
             while (occurrence.MoveNext())

@@ -37,7 +37,7 @@ namespace NCrontab.Tests
     [ TestFixture ]
     public sealed class CrontabScheduleTests
     {
-        private const string _timeFormat = "dd/MM/yyyy HH:mm:ss";
+        const string _timeFormat = "dd/MM/yyyy HH:mm:ss";
 
         [ Test, ExpectedException(typeof(ArgumentNullException)) ]
         public void CannotParseNullString()
@@ -364,7 +364,7 @@ namespace NCrontab.Tests
             CrontabSchedule.Parse("* * 3-l2 * * *");
         }
 
-        private static void TimeCron(TimeSpan limit, ThreadStart test)
+        static void TimeCron(TimeSpan limit, ThreadStart test)
         {
             Debug.Assert(test != null);
 
@@ -390,12 +390,12 @@ namespace NCrontab.Tests
 
         delegate void CronCallHandler(string startTimeString, string cronExpression, string nextTimeString, bool expectException);
 
-        private static void CronCall(string startTimeString, string cronExpression, string nextTimeString, bool expectException)
+        static void CronCall(string startTimeString, string cronExpression, string nextTimeString, bool expectException)
         {
             CronCall(null)(startTimeString, cronExpression, nextTimeString, expectException);
         }
 
-        private static CronCallHandler CronCall(ParseOptions options)
+        static CronCallHandler CronCall(ParseOptions options)
         {
             return (startTimeString, cronExpression, nextTimeString, expectException) =>
             {
@@ -421,14 +421,14 @@ namespace NCrontab.Tests
             };
         }
 
-        private static void CronFinite(string cronExpression, string startTimeString, string endTimeString)
+        static void CronFinite(string cronExpression, string startTimeString, string endTimeString)
         {
             CronFinite(null)(cronExpression, startTimeString, endTimeString);
         }
 
         delegate void CronFiniteHandler(string cronExpression, string startTimeString, string endTimeString);
 
-        private static CronFiniteHandler CronFinite(ParseOptions options)
+        static CronFiniteHandler CronFinite(ParseOptions options)
         {
             return (cronExpression, startTimeString, endTimeString) =>
             {
@@ -441,12 +441,12 @@ namespace NCrontab.Tests
             };
         }
 
-        private static string TimeString(DateTime time)
+        static string TimeString(DateTime time)
         {
             return time.ToString(_timeFormat, CultureInfo.InvariantCulture);
         }
 
-        private static DateTime Time(string str)
+        static DateTime Time(string str)
         {
             return DateTime.ParseExact(str, _timeFormat, CultureInfo.InvariantCulture);
         }

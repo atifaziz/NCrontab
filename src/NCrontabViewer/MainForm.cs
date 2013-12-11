@@ -36,21 +36,21 @@ namespace NCrontabViewer
 
     public partial class MainForm : Form
     {
-        private static readonly char[] _separators = new[] { ' ' };
+        static readonly char[] _separators = new[] { ' ' };
 
-        private DateTime _lastChangeTime;
-        private bool _dirty;
-        private CrontabSchedule _crontab;
-        private bool _isSixPart;
-        private DateTime _startTime;
-        private int _totalOccurrenceCount;
+        DateTime _lastChangeTime;
+        bool _dirty;
+        CrontabSchedule _crontab;
+        bool _isSixPart;
+        DateTime _startTime;
+        int _totalOccurrenceCount;
 
         public MainForm()
         {
             InitializeComponent();
         }
 
-        private void CronBox_Changed(object sender, EventArgs args)
+        void CronBox_Changed(object sender, EventArgs args)
         {
             _lastChangeTime = DateTime.Now;
             _dirty = true;
@@ -58,7 +58,7 @@ namespace NCrontabViewer
             _crontab = null;
         }
 
-        private void Timer_Tick(object sender, EventArgs args)
+        void Timer_Tick(object sender, EventArgs args)
         {
             var changeLapse = DateTime.Now - _lastChangeTime;
 
@@ -69,7 +69,7 @@ namespace NCrontabViewer
             DoCrontabbing();
         }
 
-        private void DoCrontabbing()
+        void DoCrontabbing()
         {
             _resultBox.Clear();
             _errorProvider.SetError(_cronBox, null);
@@ -179,7 +179,7 @@ namespace NCrontabViewer
             _resultBox.ScrollToCaret();
         }
 
-        private static int Diff(string oldString, string newString, int index, int length, StringBuilder builder)
+        static int Diff(string oldString, string newString, int index, int length, StringBuilder builder)
         {
             if (string.CompareOrdinal(oldString, index, newString, index, length) == 0)
                 builder.Append('-', length);
@@ -189,7 +189,7 @@ namespace NCrontabViewer
             return index + length;
         }
 
-        private void More_Click(object sender, EventArgs e)
+        void More_Click(object sender, EventArgs e)
         {
             DoCrontabbing();
         }
