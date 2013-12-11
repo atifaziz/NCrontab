@@ -49,8 +49,6 @@ namespace NCrontab
 
         static readonly CrontabField SecondZero = CrontabField.Seconds("0");
 
-        static readonly char[] _separators = { ' ' };
-
         [Serializable]
         public sealed class ParseOptions
         {
@@ -124,7 +122,7 @@ namespace NCrontab
         {
             if (expression == null) throw new ArgumentNullException("expression");
 
-            var tokens = expression.Split(_separators, StringSplitOptions.RemoveEmptyEntries);
+            var tokens = expression.Split(StringSeparatorStock.Space, StringSplitOptions.RemoveEmptyEntries);
 
             var includingSeconds = options != null && options.IncludingSeconds;
             if (tokens.Length < 5 || tokens.Length > (includingSeconds ? 6 : 5))

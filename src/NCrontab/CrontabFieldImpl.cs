@@ -49,7 +49,6 @@ namespace NCrontab
         static readonly CrontabFieldImpl[] _fieldByKind = { Second, Minute, Hour, Day, Month, DayOfWeek };
 
         static readonly CompareInfo _comparer = CultureInfo.InvariantCulture.CompareInfo;
-        static readonly char[] _comma = { ',' };
 
         readonly CrontabFieldKind _kind;
         readonly int _minValue;
@@ -245,7 +244,7 @@ namespace NCrontab
             if (commaIndex > 0)
             {
                 var result = success;
-                var token = ((IEnumerable<string>) str.Split(_comma)).GetEnumerator();
+                var token = ((IEnumerable<string>) str.Split(StringSeparatorStock.Comma)).GetEnumerator();
                 while (token.MoveNext() && result == null)
                     result = InternalParse(token.Current, acc, success, errorSelector);
                 return result;
