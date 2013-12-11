@@ -46,10 +46,10 @@ namespace NCrontab
         public static readonly CrontabFieldImpl Month     = new CrontabFieldImpl(CrontabFieldKind.Month, 1, 12, new[] { "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December" });
         public static readonly CrontabFieldImpl DayOfWeek = new CrontabFieldImpl(CrontabFieldKind.DayOfWeek, 0, 6, new[] { "Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday" });
 
-        static readonly CrontabFieldImpl[] _fieldByKind = new[] { Second, Minute, Hour, Day, Month, DayOfWeek };
+        static readonly CrontabFieldImpl[] _fieldByKind = { Second, Minute, Hour, Day, Month, DayOfWeek };
 
         static readonly CompareInfo _comparer = CultureInfo.InvariantCulture.CompareInfo;
-        static readonly char[] _comma = new[] { ',' };
+        static readonly char[] _comma = { ',' };
 
         readonly CrontabFieldKind _kind;
         readonly int _minValue;

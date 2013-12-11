@@ -49,7 +49,7 @@ namespace NCrontab
 
         static readonly CrontabField SecondZero = CrontabField.Seconds("0");
 
-        static readonly char[] _separators = new[] { ' ' };
+        static readonly char[] _separators = { ' ' };
 
         [Serializable]
         public sealed class ParseOptions
