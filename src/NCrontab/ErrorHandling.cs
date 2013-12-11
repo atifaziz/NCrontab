@@ -23,12 +23,7 @@
 
 namespace NCrontab
 {
-    #region Imports
-
     using System;
-    using System.Diagnostics;
-
-    #endregion
 
     /// <summary>
     /// Represents the method that will generate an <see cref="Exception"/> object.
