@@ -28,12 +28,11 @@ namespace NCrontabConsole
     using System;
     using System.Diagnostics;
     using System.Globalization;
-    using System.IO;
     using NCrontab;
 
     #endregion
     
-    internal static class Program
+    static class Program
     {
         static int Main(string[] args)
         {
@@ -46,8 +45,10 @@ namespace NCrontabConsole
                 var start = ParseDateArgument(args[1], "start");
                 var end = ParseDateArgument(args[2], "end");
                 var format = args.Length > 3 ? args[3] : "f";
+                var schedule = CrontabSchedule.Parse(expression);
 
-                WriteOccurrences(CrontabSchedule.Parse(expression), start, end, format, Console.Out);
+                foreach (var occurrence in schedule.GetNextOccurrences(start, end))
+                    Console.Out.WriteLine(occurrence.ToString(format));
 
                 return 0;
             }
@@ -69,13 +70,6 @@ namespace NCrontabConsole
             {
                 throw new ApplicationException("Invalid " + hint + " date or date format argument.", e);
             }
-        }
-
-        static void WriteOccurrences(CrontabSchedule schedule, DateTime start, DateTime end, string format, TextWriter output) 
-        {
-            var occurrence = schedule.GetNextOccurrences(start, end).GetEnumerator();
-            while (occurrence.MoveNext())
-                output.WriteLine(occurrence.Current.ToString(format));
         }
     }
 }
