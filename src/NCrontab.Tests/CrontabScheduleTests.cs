@@ -33,7 +33,7 @@ namespace NCrontab.Tests
     [ TestFixture ]
     public sealed class CrontabScheduleTests
     {
-        const string _timeFormat = "dd/MM/yyyy HH:mm:ss";
+        const string TimeFormat = "dd/MM/yyyy HH:mm:ss";
 
         [ Test, ExpectedException(typeof(ArgumentNullException)) ]
         public void CannotParseNullString()
@@ -439,12 +439,12 @@ namespace NCrontab.Tests
 
         static string TimeString(DateTime time)
         {
-            return time.ToString(_timeFormat, CultureInfo.InvariantCulture);
+            return time.ToString(TimeFormat, CultureInfo.InvariantCulture);
         }
 
         static DateTime Time(string str)
         {
-            return DateTime.ParseExact(str, _timeFormat, CultureInfo.InvariantCulture);
+            return DateTime.ParseExact(str, TimeFormat, CultureInfo.InvariantCulture);
         }
     }
 }

@@ -187,6 +187,7 @@ namespace NCrontabViewer
             return index + length;
         }
 
+        // ReSharper disable once InconsistentNaming
         void More_Click(object sender, EventArgs e)
         {
             DoCrontabbing();

@@ -42,9 +42,9 @@ namespace NCrontab
         public static readonly CrontabFieldImpl Month     = new CrontabFieldImpl(CrontabFieldKind.Month, 1, 12, new[] { "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December" });
         public static readonly CrontabFieldImpl DayOfWeek = new CrontabFieldImpl(CrontabFieldKind.DayOfWeek, 0, 6, new[] { "Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday" });
 
-        static readonly CrontabFieldImpl[] _fieldByKind = { Second, Minute, Hour, Day, Month, DayOfWeek };
+        static readonly CrontabFieldImpl[] FieldByKind = { Second, Minute, Hour, Day, Month, DayOfWeek };
 
-        static readonly CompareInfo _comparer = CultureInfo.InvariantCulture.CompareInfo;
+        static readonly CompareInfo Comparer = CultureInfo.InvariantCulture.CompareInfo;
 
         readonly CrontabFieldKind _kind;
         readonly int _minValue;
@@ -60,7 +60,7 @@ namespace NCrontab
                     string.Join(", ", Enum.GetNames(typeof(CrontabFieldKind)))), "kind");
             }
 
-            return _fieldByKind[(int) kind];
+            return FieldByKind[(int) kind];
         }
 
         CrontabFieldImpl(CrontabFieldKind kind, int minValue, int maxValue, string[] names)
@@ -317,7 +317,7 @@ namespace NCrontab
 
             for (var i = 0; i < _names.Length; i++)
             {
-                if (_comparer.IsPrefix(_names[i], str, CompareOptions.IgnoreCase))
+                if (Comparer.IsPrefix(_names[i], str, CompareOptions.IgnoreCase))
                     return i + _minValue;
             }
 
