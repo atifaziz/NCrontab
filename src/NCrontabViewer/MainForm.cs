@@ -32,7 +32,7 @@ namespace NCrontabViewer
 
     public partial class MainForm : Form
     {
-        static readonly char[] _separators = { ' ' };
+        static readonly char[] Separators = { ' ' };
 
         DateTime _lastChangeTime;
         bool _dirty;
@@ -46,6 +46,7 @@ namespace NCrontabViewer
             InitializeComponent();
         }
 
+        // ReSharper disable once InconsistentNaming
         void CronBox_Changed(object sender, EventArgs args)
         {
             _lastChangeTime = DateTime.Now;
@@ -54,6 +55,7 @@ namespace NCrontabViewer
             _crontab = null;
         }
 
+        // ReSharper disable once InconsistentNaming
         void Timer_Tick(object sender, EventArgs args)
         {
             var changeLapse = DateTime.Now - _lastChangeTime;
@@ -81,7 +83,7 @@ namespace NCrontabViewer
                     if (expression.Length == 0)
                         return;
 
-                    _isSixPart = expression.Split(_separators, StringSplitOptions.RemoveEmptyEntries).Length == 6;
+                    _isSixPart = expression.Split(Separators, StringSplitOptions.RemoveEmptyEntries).Length == 6;
                     _crontab = CrontabSchedule.Parse(expression);
                    
                     _totalOccurrenceCount = 0;
