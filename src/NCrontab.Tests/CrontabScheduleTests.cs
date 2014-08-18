@@ -59,7 +59,13 @@ namespace NCrontab.Tests
             Assert.AreEqual("* * * * * *", CrontabSchedule.Parse("* * * * * *", new ParseOptions { IncludingSeconds = true }).ToString());
         }
 
-        [ Test ]
+        [Test, ExpectedException(typeof(CrontabException))]
+        public void CannotParseWhenSecondsRequired()
+        {
+            CrontabSchedule.Parse("* * * * *", new ParseOptions { IncludingSeconds = true });
+        }
+
+        [Test]
         public void Formatting()
         {
             Assert.AreEqual("* 1-3 * * *", CrontabSchedule.Parse("* 1-2,3 * * *").ToString());
