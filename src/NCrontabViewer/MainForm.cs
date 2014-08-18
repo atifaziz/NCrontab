@@ -84,13 +84,13 @@ namespace NCrontabViewer
                         return;
 
                     _isSixPart = expression.Split(Separators, StringSplitOptions.RemoveEmptyEntries).Length == 6;
-                    _crontab = CrontabSchedule.Parse(expression);
+                    _crontab = CrontabSchedule.Parse(expression, new CrontabSchedule.ParseOptions { IncludingSeconds = _isSixPart });
                    
                     _totalOccurrenceCount = 0;
                     
                     _startTime = DateTime.ParseExact(_startTimePicker.Text, 
                         _startTimePicker.CustomFormat, CultureInfo.InvariantCulture, 
-                        DateTimeStyles.AssumeLocal).AddMinutes(-1);
+                        DateTimeStyles.AssumeLocal) - (_isSixPart ? TimeSpan.FromSeconds(1): TimeSpan.FromMinutes(1));
                 }
                 catch (CrontabException e)
                 {
