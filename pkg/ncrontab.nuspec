@@ -10,6 +10,7 @@
         <licenseUrl>http://www.apache.org/licenses/LICENSE-2.0</licenseUrl>
         <projectUrl>http://ncrontab.googlecode.com/</projectUrl>
         <tags>cron schedule time</tags>
+        <releaseNotes>Support for six-part expression where first field represents seconds.</releaseNotes>
     </metadata>
     <files>
         <file src="..\bin\Release\*" target="lib\net20" />
