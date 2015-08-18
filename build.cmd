@@ -13,4 +13,9 @@ if not exist "%MSBUILDEXE%" (
     exit /b 1
 )
 set EnableNuGetPackageRestore=true
-for %%s in (src\*.sln) do for %%c in (debug release) do "%MSBUILDEXE%" %%s /p:Configuration=%%c /v:m %*
+call :build Debug && call :build Release
+goto :EOF
+
+:build
+"%MSBUILDEXE%" src\NCrontab.sln /p:Configuration=%1 /v:m %2 %3 %4 %5 %6 %7 %8 %9
+goto :EOF
