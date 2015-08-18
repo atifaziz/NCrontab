@@ -12,6 +12,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		pkg\ncrontab.nuspec = pkg\ncrontab.nuspec
 		pack.cmd = pack.cmd
 		packw.cmd = packw.cmd
+		README.md = README.md
 		src\SolutionInfo.cs = src\SolutionInfo.cs
 	EndProjectSection
 EndProject
