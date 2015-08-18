@@ -12,8 +12,12 @@ if not exist "%MSBUILDEXE%" (
     echo machine, which is required to build the solution.
     exit /b 1
 )
-set EnableNuGetPackageRestore=true
-call :build Debug && call :build Release
+for %%i in (NuGet.exe) do set nuget=%%~dpnx$PATH:i
+if "%nuget%"=="" (
+    echo WARNING! NuGet executable not found in PATH so build may fail!
+    echo For more on NuGet, see http://nuget.codeplex.com
+)
+nuget restore && call :build Debug && call :build Release
 goto :EOF
 
 :build
