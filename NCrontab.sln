@@ -5,17 +5,17 @@ VisualStudioVersion = 12.0.30501.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{A4109292-0FE5-4761-868A-31A5BEB1810A}"
 	ProjectSection(SolutionItems) = preProject
-		..\pkg\ncrontab.nuspec = ..\pkg\ncrontab.nuspec
-		SolutionInfo.cs = SolutionInfo.cs
+		pkg\ncrontab.nuspec = pkg\ncrontab.nuspec
+		src\SolutionInfo.cs = src\SolutionInfo.cs
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NCrontab", "NCrontab\NCrontab.csproj", "{1948D266-8DCB-4AC5-98E6-A609713011CB}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NCrontab", "src\NCrontab\NCrontab.csproj", "{1948D266-8DCB-4AC5-98E6-A609713011CB}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NCrontabConsole", "NCrontabConsole\NCrontabConsole.csproj", "{89D84924-0952-40FC-8994-758C4215ABEB}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NCrontabConsole", "src\NCrontabConsole\NCrontabConsole.csproj", "{89D84924-0952-40FC-8994-758C4215ABEB}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NCrontab.Tests", "NCrontab.Tests\NCrontab.Tests.csproj", "{7F587D68-75DD-4779-8744-85E9B07EC565}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NCrontab.Tests", "src\NCrontab.Tests\NCrontab.Tests.csproj", "{7F587D68-75DD-4779-8744-85E9B07EC565}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NCrontabViewer", "NCrontabViewer\NCrontabViewer.csproj", "{02F42DAC-8A9F-45BB-B734-BB08F0D194C4}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NCrontabViewer", "src\NCrontabViewer\NCrontabViewer.csproj", "{02F42DAC-8A9F-45BB-B734-BB08F0D194C4}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
