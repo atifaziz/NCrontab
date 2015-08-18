@@ -1,4 +1,4 @@
-﻿namespace NCrontabViewer
+namespace NCrontabViewer
 {
     partial class MainForm
     {

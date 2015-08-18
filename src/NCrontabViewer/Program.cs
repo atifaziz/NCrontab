@@ -1,4 +1,4 @@
-﻿#region License and Terms
+#region License and Terms
 //
 // NCrontab - Crontab for .NET
 // Copyright (c) 2008 Atif Aziz. All rights reserved.
