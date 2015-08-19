@@ -14,9 +14,9 @@
         <releaseNotes>Minor release due to project move (no code changes).</releaseNotes>
     </metadata>
     <files>
-        <file src="..\bin\Release\*" target="lib\net20" />
-        <file src="..\COPYING.txt" target="COPYING.txt" />
-        <file src="..\src\*.cs" target="src" />
-        <file src="..\src\NCrontab\**\*.cs" target="src\NCrontab" />
+        <file src="bin\Release\*" target="lib\net20" />
+        <file src="COPYING.txt" target="COPYING.txt" />
+        <file src="*.cs" target="src" />
+        <file src="NCrontab\**\*.cs" target="src\NCrontab" />
     </files>
 </package>

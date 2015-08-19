@@ -11,7 +11,7 @@ if "%nuget%"=="" goto :nonuget
 if not exist dist md dist
 if not %errorlevel%==0 exit /b %errorlevel%
 call build /v:m ^
-    && nuget pack pkg\ncrontab.nuspec -OutputDirectory dist -Symbols
+    && nuget pack ncrontab.nuspec -OutputDirectory dist -Symbols
 goto :EOF
 
 :nonuget
