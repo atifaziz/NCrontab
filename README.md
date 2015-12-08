@@ -24,7 +24,7 @@ Star (`*`) in the value field above means all legal values as in parentheses for
 that column. The value column can have a `*` or a list of elements separated by
 commas. An element is either a number in the ranges shown above or two numbers in
 the range separated by a hyphen (meaning an inclusive range). For more, see
-[CrontabExpression](https://code.google.com/p/ncrontab/wiki/CrontabExpression).
+[CrontabExpression](https://github.com/atifaziz/NCrontab/wiki/Crontab-Expression).
 
 Below is an example in [IronPython][ipy] of how to use `CrontabSchedule` class
 from NCrontab to generate occurrences of the schedule `0 12 * */2 Mon`
