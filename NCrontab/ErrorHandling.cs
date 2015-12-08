@@ -24,6 +24,6 @@ namespace NCrontab
     /// <summary>
     /// Represents the method that will generate an <see cref="Exception"/> object.
     /// </summary>
-    
+
     public delegate Exception ExceptionProvider();
 }

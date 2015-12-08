@@ -60,7 +60,7 @@ namespace NCrontabViewer
         {
             var changeLapse = DateTime.Now - _lastChangeTime;
 
-            if (!_dirty || changeLapse <= TimeSpan.FromMilliseconds(500)) 
+            if (!_dirty || changeLapse <= TimeSpan.FromMilliseconds(500))
                 return;
 
             _dirty = false;
@@ -85,11 +85,11 @@ namespace NCrontabViewer
 
                     _isSixPart = expression.Split(Separators, StringSplitOptions.RemoveEmptyEntries).Length == 6;
                     _crontab = CrontabSchedule.Parse(expression, new CrontabSchedule.ParseOptions { IncludingSeconds = _isSixPart });
-                   
+
                     _totalOccurrenceCount = 0;
-                    
-                    _startTime = DateTime.ParseExact(_startTimePicker.Text, 
-                        _startTimePicker.CustomFormat, CultureInfo.InvariantCulture, 
+
+                    _startTime = DateTime.ParseExact(_startTimePicker.Text,
+                        _startTimePicker.CustomFormat, CultureInfo.InvariantCulture,
                         DateTimeStyles.AssumeLocal) - (_isSixPart ? TimeSpan.FromSeconds(1): TimeSpan.FromMinutes(1));
                 }
                 catch (CrontabException e)
@@ -116,7 +116,7 @@ namespace NCrontabViewer
 
             }
 
-            var endTime = DateTime.ParseExact(_endTimePicker.Text, 
+            var endTime = DateTime.ParseExact(_endTimePicker.Text,
                 _endTimePicker.CustomFormat, CultureInfo.InvariantCulture,
                 DateTimeStyles.AssumeLocal);
 

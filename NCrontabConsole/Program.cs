@@ -27,7 +27,7 @@ namespace NCrontabConsole
     using NCrontab;
 
     #endregion
-    
+
     static class Program
     {
         static int Main(string[] args)
@@ -53,7 +53,7 @@ namespace NCrontabConsole
                 Console.Error.WriteLine(e.Message);
                 Trace.WriteLine(e.ToString());
                 return 1;
-            }  
+            }
         }
 
         static DateTime ParseDateArgument(string arg, string hint)

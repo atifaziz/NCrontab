@@ -21,24 +21,24 @@ namespace NCrontab
 {
     #region Imports
 
-    using System;    
+    using System;
     using System.Runtime.Serialization;
-    
+
     #endregion
-    
+
     [ Serializable ]
     public class CrontabException : Exception
     {
         public CrontabException() :
             base("Crontab error.") {} // TODO: Fix message and add it to resource.
 
-        public CrontabException(string message) : 
+        public CrontabException(string message) :
             base(message) {}
 
         public CrontabException(string message, Exception innerException) :
             base(message, innerException) {}
 
-        protected CrontabException(SerializationInfo info, StreamingContext context) : 
+        protected CrontabException(SerializationInfo info, StreamingContext context) :
             base(info, context) {}
     }
 }

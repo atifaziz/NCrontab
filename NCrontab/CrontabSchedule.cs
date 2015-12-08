@@ -63,11 +63,11 @@ namespace NCrontab
         // | +----------- hour (0 - 23)
         // +------------- min (0 - 59)
         //
-        // Star (*) in the value field above means all legal values as in 
-        // braces for that column. The value column can have a * or a list 
-        // of elements separated by commas. An element is either a number in 
-        // the ranges shown above or two numbers in the range separated by a 
-        // hyphen (meaning an inclusive range). 
+        // Star (*) in the value field above means all legal values as in
+        // braces for that column. The value column can have a * or a list
+        // of elements separated by commas. An element is either a number in
+        // the ranges shown above or two numbers in the range separated by a
+        // hyphen (meaning an inclusive range).
         //
         // Source: http://www.adminschoice.com/docs/crontab.htm
         //
@@ -84,10 +84,10 @@ namespace NCrontab
         // | +----------- min (0 - 59)
         // +------------- sec (0 - 59)
         //
-        // The six-part expression behaves similarly to the traditional 
-        // crontab format except that it can denotate more precise schedules 
+        // The six-part expression behaves similarly to the traditional
+        // crontab format except that it can denotate more precise schedules
         // that use a seconds component.
-        // 
+        //
 
         public static CrontabSchedule Parse(string expression)
         {
@@ -154,8 +154,8 @@ namespace NCrontab
 
         CrontabSchedule(
             CrontabField seconds,
-            CrontabField minutes, CrontabField hours, 
-            CrontabField days, CrontabField months, 
+            CrontabField minutes, CrontabField hours,
+            CrontabField days, CrontabField months,
             CrontabField daysOfWeek)
         {
             Debug.Assert(minutes != null);
@@ -175,16 +175,16 @@ namespace NCrontab
         /// <summary>
         /// Enumerates all the occurrences of this schedule starting with a
         /// base time and up to an end time limit. This method uses deferred
-        /// execution such that the occurrences are only calculated as they 
+        /// execution such that the occurrences are only calculated as they
         /// are enumerated.
         /// </summary>
         /// <remarks>
         /// This method does not return the value of <paramref name="baseTime"/>
         /// itself if it falls on the schedule. For example, if <paramref name="baseTime" />
-        /// is midnight and the schedule was created from the expression <c>* * * * *</c> 
-        /// (meaning every minute) then the next occurrence of the schedule 
+        /// is midnight and the schedule was created from the expression <c>* * * * *</c>
+        /// (meaning every minute) then the next occurrence of the schedule
         /// will be at one minute past midnight and not midnight itself.
-        /// The method returns the <em>next</em> occurrence <em>after</em> 
+        /// The method returns the <em>next</em> occurrence <em>after</em>
         /// <paramref name="baseTime"/>. Also, <param name="endTime" /> is
         /// exclusive.
         /// </remarks>
@@ -192,7 +192,7 @@ namespace NCrontab
         public IEnumerable<DateTime> GetNextOccurrences(DateTime baseTime, DateTime endTime)
         {
             for (var occurrence = GetNextOccurrence(baseTime, endTime);
-                 occurrence < endTime; 
+                 occurrence < endTime;
                  occurrence = GetNextOccurrence(occurrence, endTime))
             {
                 yield return occurrence;
@@ -209,16 +209,16 @@ namespace NCrontab
         }
 
         /// <summary>
-        /// Gets the next occurrence of this schedule starting with a base 
+        /// Gets the next occurrence of this schedule starting with a base
         /// time and up to an end time limit.
         /// </summary>
         /// <remarks>
         /// This method does not return the value of <paramref name="baseTime"/>
         /// itself if it falls on the schedule. For example, if <paramref name="baseTime" />
-        /// is midnight and the schedule was created from the expression <c>* * * * *</c> 
-        /// (meaning every minute) then the next occurrence of the schedule 
+        /// is midnight and the schedule was created from the expression <c>* * * * *</c>
+        /// (meaning every minute) then the next occurrence of the schedule
         /// will be at one minute past midnight and not midnight itself.
-        /// The method returns the <em>next</em> occurrence <em>after</em> 
+        /// The method returns the <em>next</em> occurrence <em>after</em>
         /// <paramref name="baseTime"/>. Also, <param name="endTime" /> is
         /// exclusive.
         /// </remarks>
@@ -264,7 +264,7 @@ namespace NCrontab
 
             minute = _minutes.Next(minute);
 
-            if (minute == nil) 
+            if (minute == nil)
             {
                 minute = _minutes.GetFirst();
                 hour++;
@@ -275,8 +275,8 @@ namespace NCrontab
             //
 
             hour = _hours.Next(hour);
-            
-            if (hour == nil) 
+
+            if (hour == nil)
             {
                 minute = _minutes.GetFirst();
                 hour = _hours.GetFirst();
@@ -294,7 +294,7 @@ namespace NCrontab
             day = _days.Next(day);
 
             RetryDayMonth:
-        
+
             if (day == nil)
             {
                 second = seconds.GetFirst();
@@ -370,14 +370,14 @@ namespace NCrontab
             // Day of week
             //
 
-            if (_daysOfWeek.Contains((int) nextTime.DayOfWeek)) 
+            if (_daysOfWeek.Contains((int) nextTime.DayOfWeek))
                 return nextTime;
 
             return GetNextOccurrence(new DateTime(year, month, day, 23, 59, 59, 0, baseTime.Kind), endTime);
         }
 
         /// <summary>
-        /// Returns a string in crontab expression (expanded) that represents 
+        /// Returns a string in crontab expression (expanded) that represents
         /// this schedule.
         /// </summary>
 
