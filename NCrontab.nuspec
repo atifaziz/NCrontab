@@ -9,7 +9,7 @@
         <language>en-US</language>
         <copyright>Copyright &#169; 2008 Atif Aziz. All rights reserved.</copyright>
         <licenseUrl>http://www.apache.org/licenses/LICENSE-2.0</licenseUrl>
-        <projectUrl>http://ncrontab.googlecode.com/</projectUrl>
+        <projectUrl>https://github.com/atifaziz/NCrontab</projectUrl>
         <tags>cron schedule time</tags>
         <releaseNotes>Minor release due to project move (no code changes).</releaseNotes>
     </metadata>
