@@ -50,7 +50,7 @@ namespace NCrontab
         public static CrontabField TryParse(CrontabFieldKind kind, string expression) =>
             TryParse(kind, expression, v => v, _ => null);
 
-        public static T TryParse<T>(CrontabFieldKind kind, string expression, Converter<CrontabField, T> valueSelector, Converter<ExceptionProvider, T> errorSelector)
+        public static T TryParse<T>(CrontabFieldKind kind, string expression, Func<CrontabField, T> valueSelector, Func<ExceptionProvider, T> errorSelector)
         {
             var field = new CrontabField(CrontabFieldImpl.FromKind(kind));
             var error = field._impl.TryParse(expression, field.Accumulate, null, e => e);
@@ -158,7 +158,7 @@ namespace NCrontab
         /// <param name="interval" /> to 1.
         /// </remarks>
 
-        T Accumulate<T>(int start, int end, int interval, T success, Converter<ExceptionProvider, T> errorSelector)
+        T Accumulate<T>(int start, int end, int interval, T success, Func<ExceptionProvider, T> errorSelector)
         {
             var minValue = _impl.MinValue;
             var maxValue = _impl.MaxValue;
@@ -250,13 +250,13 @@ namespace NCrontab
             return success;
         }
 
-        T OnValueAboveMaxError<T>(int value, Converter<ExceptionProvider, T> errorSelector) =>
+        T OnValueAboveMaxError<T>(int value, Func<ExceptionProvider, T> errorSelector) =>
             errorSelector(
                 () => new CrontabException(
                     $"{value} is higher than the maximum allowable value for the [{_impl.Kind}] field. " +
                     $"Value must be between {_impl.MinValue} and {_impl.MaxValue} (all inclusive)."));
 
-        T OnValueBelowMinError<T>(int value, Converter<ExceptionProvider, T> errorSelector) =>
+        T OnValueBelowMinError<T>(int value, Func<ExceptionProvider, T> errorSelector) =>
             errorSelector(
                 () => new CrontabException(
                     $"{value} is lower than the minimum allowable value for the [{_impl.Kind}] field. " +

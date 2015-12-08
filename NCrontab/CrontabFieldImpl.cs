@@ -30,7 +30,7 @@ namespace NCrontab
 
     #endregion
 
-    public delegate T CrontabFieldAccumulator<T>(int start, int end, int interval, T successs, Converter<ExceptionProvider, T> onError);
+    public delegate T CrontabFieldAccumulator<T>(int start, int end, int interval, T successs, Func<ExceptionProvider, T> onError);
 
     [ Serializable ]
     public sealed class CrontabFieldImpl : IObjectReference
@@ -167,7 +167,7 @@ namespace NCrontab
         public void Parse(string str, CrontabFieldAccumulator<ExceptionProvider> acc) =>
             TryParse(str, acc, null, ep => { throw ep(); });
 
-        public T TryParse<T>(string str, CrontabFieldAccumulator<T> acc, T success, Converter<ExceptionProvider, T> errorSelector)
+        public T TryParse<T>(string str, CrontabFieldAccumulator<T> acc, T success, Func<ExceptionProvider, T> errorSelector)
         {
             if (acc == null) throw new ArgumentNullException(nameof(acc));
 
@@ -188,7 +188,7 @@ namespace NCrontab
             }
         }
 
-        T OnParseException<T>(Exception innerException, string str, Converter<ExceptionProvider, T> errorSelector)
+        T OnParseException<T>(Exception innerException, string str, Func<ExceptionProvider, T> errorSelector)
         {
             Debug.Assert(str != null);
             Debug.Assert(innerException != null);
@@ -197,7 +197,7 @@ namespace NCrontab
                        () => new CrontabException($"'{str}' is not a valid [{Kind}] crontab field expression.", innerException));
         }
 
-        T InternalParse<T>(string str, CrontabFieldAccumulator<T> acc, T success, Converter<ExceptionProvider, T> errorSelector)
+        T InternalParse<T>(string str, CrontabFieldAccumulator<T> acc, T success, Func<ExceptionProvider, T> errorSelector)
         {
             Debug.Assert(str != null);
             Debug.Assert(acc != null);
