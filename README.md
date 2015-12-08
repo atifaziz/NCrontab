@@ -1,6 +1,6 @@
 # NCrontab: Crontab for .NET
 
-NCrontab is a library written in C# 3.0 that provides the following facilities:
+NCrontab is a library written in C# 6.0 that provides the following facilities:
 
 * Parsing of crontab expressions
 * Formatting of crontab expressions

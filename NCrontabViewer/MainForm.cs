@@ -128,7 +128,7 @@ namespace NCrontabViewer
             var dayWidth = info.AbbreviatedDayNames.Max(s => s.Length);
             var monthWidth = info.AbbreviatedMonthNames.Max(s => s.Length);
             var timeComponent = _isSixPart ? "HH:mm:ss" : "HH:mm";
-            var timeFormat = string.Format("{{0,-{0}:ddd}} {{0:dd}}, {{0,-{1}:MMM}} {{0:yyyy {2}}}", dayWidth, monthWidth, timeComponent);
+            var timeFormat = $"{{0,-{dayWidth}:ddd}} {{0:dd}}, {{0,-{monthWidth}:MMM}} {{0:yyyy {timeComponent}}}";
             var lastTimeString = new string('?', string.Format(timeFormat, DateTime.MinValue).Length);
 
             foreach (var occurrence in _crontab.GetNextOccurrences(_startTime, endTime))
@@ -169,8 +169,7 @@ namespace NCrontabViewer
 
             _moreButton.Enabled = count == maxCount;
 
-            _statusBarPanel.Text = string.Format("Last count = {0}, Total = {1}",
-                count.ToString("N0"), _totalOccurrenceCount.ToString("N0"));
+            _statusBarPanel.Text = $"Last count = {count:N0}, Total = {_totalOccurrenceCount:N0}";
 
             _resultBox.Text = sb.ToString();
             _resultBox.Select(0, 0);
@@ -188,9 +187,6 @@ namespace NCrontabViewer
         }
 
         // ReSharper disable once InconsistentNaming
-        void More_Click(object sender, EventArgs e)
-        {
-            DoCrontabbing();
-        }
+        void More_Click(object sender, EventArgs e) => DoCrontabbing();
     }
 }

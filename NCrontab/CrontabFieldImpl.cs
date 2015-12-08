@@ -46,18 +46,14 @@ namespace NCrontab
 
         static readonly CompareInfo Comparer = CultureInfo.InvariantCulture.CompareInfo;
 
-        readonly CrontabFieldKind _kind;
-        readonly int _minValue;
-        readonly int _maxValue;
         readonly string[] _names;
 
         public static CrontabFieldImpl FromKind(CrontabFieldKind kind)
         {
             if (!Enum.IsDefined(typeof(CrontabFieldKind), kind))
             {
-                throw new ArgumentException(string.Format(
-                    "Invalid crontab field kind. Valid values are {0}.",
-                    string.Join(", ", Enum.GetNames(typeof(CrontabFieldKind)))), "kind");
+                var kinds = string.Join(", ", Enum.GetNames(typeof(CrontabFieldKind)));
+                throw new ArgumentException($"Invalid crontab field kind. Valid values are {kinds}.", nameof(kind));
             }
 
             return FieldByKind[(int) kind];
@@ -70,44 +66,25 @@ namespace NCrontab
             Debug.Assert(maxValue >= minValue);
             Debug.Assert(names == null || names.Length == (maxValue - minValue + 1));
 
-            _kind = kind;
-            _minValue = minValue;
-            _maxValue = maxValue;
+            Kind = kind;
+            MinValue = minValue;
+            MaxValue = maxValue;
             _names = names;
         }
 
-        public CrontabFieldKind Kind
-        {
-            get { return _kind; }
-        }
+        public CrontabFieldKind Kind { get; }
+        public int MinValue { get; }
+        public int MaxValue { get; }
 
-        public int MinValue
-        {
-            get { return _minValue; }
-        }
+        public int ValueCount => MaxValue - MinValue + 1;
 
-        public int MaxValue
-        {
-            get { return _maxValue; }
-        }
-
-        public int ValueCount
-        {
-            get { return _maxValue - _minValue + 1; }
-        }
-
-        public void Format(ICrontabField field, TextWriter writer)
-        {
+        public void Format(ICrontabField field, TextWriter writer) =>
             Format(field, writer, false);
-        }
 
         public void Format(ICrontabField field, TextWriter writer, bool noNames)
         {
-            if (field == null)
-                throw new ArgumentNullException("field");
-
-            if (writer == null)
-                throw new ArgumentNullException("writer");
+            if (field == null) throw new ArgumentNullException(nameof(field));
+            if (writer == null) throw new ArgumentNullException(nameof(writer));
 
             var next = field.GetFirst();
             var count = 0;
@@ -124,13 +101,13 @@ namespace NCrontab
                 }
                 while (next - last == 1);
 
-                if (count == 0 
-                    && first == _minValue && last == _maxValue)
+                if (count == 0
+                    && first == MinValue && last == MaxValue)
                 {
                     writer.Write('*');
                     return;
                 }
-                
+
                 if (count > 0)
                     writer.Write(',');
 
@@ -166,7 +143,7 @@ namespace NCrontab
             }
             else
             {
-                var index = value - _minValue;
+                var index = value - MinValue;
                 writer.Write(_names[index]);
             }
         }
@@ -187,15 +164,12 @@ namespace NCrontab
             }
         }
 
-        public void Parse(string str, CrontabFieldAccumulator<ExceptionProvider> acc)
-        {
+        public void Parse(string str, CrontabFieldAccumulator<ExceptionProvider> acc) =>
             TryParse(str, acc, null, ep => { throw ep(); });
-        }
-        
+
         public T TryParse<T>(string str, CrontabFieldAccumulator<T> acc, T success, Converter<ExceptionProvider, T> errorSelector)
         {
-            if (acc == null)
-                throw new ArgumentNullException("acc");
+            if (acc == null) throw new ArgumentNullException(nameof(acc));
 
             if (string.IsNullOrEmpty(str))
                 return success;
@@ -220,7 +194,7 @@ namespace NCrontab
             Debug.Assert(innerException != null);
 
             return errorSelector(
-                       () => new CrontabException(string.Format("'{0}' is not a valid [{1}] crontab field expression.", str, Kind), innerException));
+                       () => new CrontabException($"'{str}' is not a valid [{Kind}] crontab field expression.", innerException));
         }
 
         T InternalParse<T>(string str, CrontabFieldAccumulator<T> acc, T success, Converter<ExceptionProvider, T> errorSelector)
@@ -234,7 +208,7 @@ namespace NCrontab
             //
             // Next, look for a list of values (e.g. 1,2,3).
             //
-    
+
             var commaIndex = str.IndexOf(",");
 
             if (commaIndex > 0)
@@ -245,12 +219,12 @@ namespace NCrontab
                     result = InternalParse(token.Current, acc, success, errorSelector);
                 return result;
             }
-            
+
             var every = 1;
 
             //
             // Look for stepping first (e.g. */2 = every 2nd).
-            // 
+            //
 
             var slashIndex = str.IndexOf("/");
 
@@ -263,7 +237,7 @@ namespace NCrontab
             //
             // Next, look for wildcard (*).
             //
-    
+
             if (str.Length == 1 && str[0]== '*')
             {
                 return acc(-1, -1, every, success, errorSelector);
@@ -274,7 +248,7 @@ namespace NCrontab
             //
 
             var dashIndex = str.IndexOf("-");
-        
+
             if (dashIndex > 0)
             {
                 var first = ParseValue(str.Substring(0, dashIndex));
@@ -293,7 +267,7 @@ namespace NCrontab
                 return acc(value, value, 1, success, errorSelector);
 
             Debug.Assert(every != 0);
-            return acc(value, _maxValue, every, success, errorSelector);
+            return acc(value, MaxValue, every, success, errorSelector);
         }
 
         int ParseValue(string str)
@@ -304,7 +278,7 @@ namespace NCrontab
                 throw new CrontabException("A crontab field value cannot be empty.");
 
             var firstChar = str[0];
-        
+
             if (firstChar >= '0' && firstChar <= '9')
                 return int.Parse(str, CultureInfo.InvariantCulture);
 
@@ -312,23 +286,19 @@ namespace NCrontab
             {
                 throw new CrontabException(string.Format(
                     "'{0}' is not a valid [{3}] crontab field value. It must be a numeric value between {1} and {2} (all inclusive).",
-                    str, _minValue.ToString(), _maxValue.ToString(), _kind.ToString()));
+                    str, MinValue.ToString(), MaxValue.ToString(), Kind.ToString()));
             }
 
             for (var i = 0; i < _names.Length; i++)
             {
                 if (Comparer.IsPrefix(_names[i], str, CompareOptions.IgnoreCase))
-                    return i + _minValue;
+                    return i + MinValue;
             }
 
-            throw new CrontabException(string.Format(
-                "'{0}' is not a known value name. Use one of the following: {1}.", 
-                str, string.Join(", ", _names)));
+            var names = string.Join(", ", _names);
+            throw new CrontabException($"'{str}' is not a known value name. Use one of the following: {names}.");
         }
 
-        object IObjectReference.GetRealObject(StreamingContext context)
-        {
-            return FromKind(Kind);
-        }
+        object IObjectReference.GetRealObject(StreamingContext context) => FromKind(Kind);
     }
 }

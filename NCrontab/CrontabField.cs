@@ -44,15 +44,11 @@ namespace NCrontab
         /// Parses a crontab field expression given its kind.
         /// </summary>
 
-        public static CrontabField Parse(CrontabFieldKind kind, string expression)
-        {
-            return TryParse(kind, expression, v => v, e => { throw e(); });
-        }
-        
-        public static CrontabField TryParse(CrontabFieldKind kind, string expression)
-        {
-            return TryParse(kind, expression, v => v, _ => null);
-        }
+        public static CrontabField Parse(CrontabFieldKind kind, string expression) =>
+            TryParse(kind, expression, v => v, e => { throw e(); });
+
+        public static CrontabField TryParse(CrontabFieldKind kind, string expression) =>
+            TryParse(kind, expression, v => v, _ => null);
 
         public static T TryParse<T>(CrontabFieldKind kind, string expression, Converter<CrontabField, T> valueSelector, Converter<ExceptionProvider, T> errorSelector)
         {
@@ -65,60 +61,47 @@ namespace NCrontab
         /// Parses a crontab field expression representing seconds.
         /// </summary>
 
-        public static CrontabField Seconds(string expression)
-        {
-            return Parse(CrontabFieldKind.Second, expression);
-        }
+        public static CrontabField Seconds(string expression) =>
+            Parse(CrontabFieldKind.Second, expression);
 
         /// <summary>
         /// Parses a crontab field expression representing minutes.
         /// </summary>
 
-        public static CrontabField Minutes(string expression)
-        {
-            return Parse(CrontabFieldKind.Minute, expression);
-        }
+        public static CrontabField Minutes(string expression) =>
+            Parse(CrontabFieldKind.Minute, expression);
 
         /// <summary>
         /// Parses a crontab field expression representing hours.
         /// </summary>
 
-        public static CrontabField Hours(string expression)
-        {
-            return Parse(CrontabFieldKind.Hour, expression);
-        }
+        public static CrontabField Hours(string expression) =>
+            Parse(CrontabFieldKind.Hour, expression);
 
         /// <summary>
         /// Parses a crontab field expression representing days in any given month.
         /// </summary>
-        
-        public static CrontabField Days(string expression)
-        {
-            return Parse(CrontabFieldKind.Day, expression);
-        }
+
+        public static CrontabField Days(string expression) =>
+            Parse(CrontabFieldKind.Day, expression);
 
         /// <summary>
         /// Parses a crontab field expression representing months.
         /// </summary>
 
-        public static CrontabField Months(string expression)
-        {
-            return Parse(CrontabFieldKind.Month, expression);
-        }
+        public static CrontabField Months(string expression) =>
+            Parse(CrontabFieldKind.Month, expression);
 
         /// <summary>
         /// Parses a crontab field expression representing days of a week.
         /// </summary>
 
-        public static CrontabField DaysOfWeek(string expression)
-        {
-            return Parse(CrontabFieldKind.DayOfWeek, expression);
-        }
+        public static CrontabField DaysOfWeek(string expression) =>
+            Parse(CrontabFieldKind.DayOfWeek, expression);
 
         CrontabField(CrontabFieldImpl impl)
         {
-            if (impl == null)
-                throw new ArgumentNullException("impl");
+            if (impl == null) throw new ArgumentNullException(nameof(impl));
 
             _impl = impl;
             _bits = new BitArray(impl.ValueCount);
@@ -132,13 +115,10 @@ namespace NCrontab
         /// Gets the first value of the field or -1.
         /// </summary>
 
-        public int GetFirst()
-        {
-            return _minValueSet < int.MaxValue ? _minValueSet : -1;
-        }
+        public int GetFirst() => _minValueSet < int.MaxValue ? _minValueSet : -1;
 
         /// <summary>
-        /// Gets the next value of the field that occurs after the given 
+        /// Gets the next value of the field that occurs after the given
         /// start value or -1 if there is no next value available.
         /// </summary>
 
@@ -152,31 +132,21 @@ namespace NCrontab
 
             for (var i = startIndex; i <= lastIndex; i++)
             {
-                if (_bits[i]) 
+                if (_bits[i])
                     return IndexToValue(i);
             }
 
             return -1;
         }
 
-        int IndexToValue(int index)
-        {
-            return index + _impl.MinValue;
-        }
-
-        int ValueToIndex(int value)
-        {
-            return value - _impl.MinValue;
-        }
+        int IndexToValue(int index) => index + _impl.MinValue;
+        int ValueToIndex(int value) => value - _impl.MinValue;
 
         /// <summary>
         /// Determines if the given value occurs in the field.
         /// </summary>
 
-        public bool Contains(int value)
-        {
-            return _bits[ValueToIndex(value)];
-        }
+        public bool Contains(int value) => _bits[ValueToIndex(value)];
 
         /// <summary>
         /// Accumulates the given range (start to end) and interval of values
@@ -193,15 +163,15 @@ namespace NCrontab
             var minValue = _impl.MinValue;
             var maxValue = _impl.MaxValue;
 
-            if (start == end) 
+            if (start == end)
             {
-                if (start < 0) 
+                if (start < 0)
                 {
                     //
                     // We're setting the entire range of values.
                     //
 
-                    if (interval <= 1) 
+                    if (interval <= 1)
                     {
                         _minValueSet = minValue;
                         _maxValueSet = maxValue;
@@ -211,8 +181,8 @@ namespace NCrontab
 
                     start = minValue;
                     end = maxValue;
-                } 
-                else 
+                }
+                else
                 {
                     //
                     // We're only setting a single value - check that it is in range.
@@ -224,33 +194,33 @@ namespace NCrontab
                     if (start > maxValue)
                         return OnValueAboveMaxError(start, errorSelector);
                 }
-            } 
-            else 
+            }
+            else
             {
                 //
                 // For ranges, if the start is bigger than the end value then
                 // swap them over.
                 //
 
-                if (start > end) 
+                if (start > end)
                 {
                     end ^= start;
                     start ^= end;
                     end ^= start;
                 }
 
-                if (start < 0) 
+                if (start < 0)
                     start = minValue;
-                else if (start < minValue) 
-                    return OnValueBelowMinError(start, errorSelector);                    
+                else if (start < minValue)
+                    return OnValueBelowMinError(start, errorSelector);
 
-                if (end < 0) 
+                if (end < 0)
                     end = maxValue;
-                else if (end > maxValue) 
+                else if (end > maxValue)
                     return OnValueAboveMaxError(end, errorSelector);
             }
 
-            if (interval < 1) 
+            if (interval < 1)
                 interval = 1;
 
             int i;
@@ -260,7 +230,7 @@ namespace NCrontab
             // the valid field values.
             //
 
-            for (i = start - minValue; i <= (end - minValue); i += interval) 
+            for (i = start - minValue; i <= (end - minValue); i += interval)
                 _bits[i] = true;
 
             //
@@ -269,37 +239,30 @@ namespace NCrontab
             // so far.
             //
 
-            if (_minValueSet > start) 
+            if (_minValueSet > start)
                 _minValueSet = start;
 
             i += (minValue - interval);
 
-            if (_maxValueSet < i) 
+            if (_maxValueSet < i)
                 _maxValueSet = i;
 
             return success;
         }
 
-        T OnValueAboveMaxError<T>(int value, Converter<ExceptionProvider, T> errorSelector)
-        {
-            return errorSelector(
-                () => new CrontabException(string.Format(
-                    "{0} is higher than the maximum allowable value for the [{3}] field. Value must be between {1} and {2} (all inclusive).", 
-                    value, _impl.MinValue, _impl.MaxValue, _impl.Kind)));
-        }
+        T OnValueAboveMaxError<T>(int value, Converter<ExceptionProvider, T> errorSelector) =>
+            errorSelector(
+                () => new CrontabException(
+                    $"{value} is higher than the maximum allowable value for the [{_impl.Kind}] field. " +
+                    $"Value must be between {_impl.MinValue} and {_impl.MaxValue} (all inclusive)."));
 
-        T OnValueBelowMinError<T>(int value, Converter<ExceptionProvider, T> errorSelector)
-        {
-            return errorSelector(
-                () => new CrontabException(string.Format(
-                    "{0} is lower than the minimum allowable value for the [{3}] field. Value must be between {1} and {2} (all inclusive).",
-                    value, _impl.MinValue, _impl.MaxValue, _impl.Kind)));
-        }
+        T OnValueBelowMinError<T>(int value, Converter<ExceptionProvider, T> errorSelector) =>
+            errorSelector(
+                () => new CrontabException(
+                    $"{value} is lower than the minimum allowable value for the [{_impl.Kind}] field. " +
+                    $"Value must be between {_impl.MinValue} and {_impl.MaxValue} (all inclusive)."));
 
-        public override string ToString()
-        {
-            return ToString(null);
-        }
+        public override string ToString() => ToString(null);
 
         public string ToString(string format)
         {
@@ -321,14 +284,9 @@ namespace NCrontab
             return writer.ToString();
         }
 
-        public void Format(TextWriter writer)
-        {
-            Format(writer, false);
-        }
+        public void Format(TextWriter writer) => Format(writer, false);
 
-        public void Format(TextWriter writer, bool noNames)
-        {
+        public void Format(TextWriter writer, bool noNames) =>
             _impl.Format(this, writer, noNames);
-        }
     }
 }

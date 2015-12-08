@@ -89,34 +89,22 @@ namespace NCrontab
         // that use a seconds component.
         //
 
-        public static CrontabSchedule Parse(string expression)
-        {
-            return Parse(expression, null);
-        }
+        public static CrontabSchedule Parse(string expression) => Parse(expression, null);
 
-        public static CrontabSchedule Parse(string expression, ParseOptions options)
-        {
-            return TryParse(expression, options, v => v, e => { throw e(); });
-        }
+        public static CrontabSchedule Parse(string expression, ParseOptions options) =>
+            TryParse(expression, options, v => v, e => { throw e(); });
 
-        public static CrontabSchedule TryParse(string expression)
-        {
-            return TryParse(expression, null);
-        }
+        public static CrontabSchedule TryParse(string expression) => TryParse(expression, null);
 
-        public static CrontabSchedule TryParse(string expression, ParseOptions options)
-        {
-            return TryParse(expression, options, v => v, _ => null);
-        }
+        public static CrontabSchedule TryParse(string expression, ParseOptions options) =>
+            TryParse(expression, options, v => v, _ => null);
 
-        public static T TryParse<T>(string expression, Converter<CrontabSchedule, T> valueSelector, Converter<ExceptionProvider, T> errorSelector)
-        {
-            return TryParse(expression, null, valueSelector, errorSelector);
-        }
+        public static T TryParse<T>(string expression, Converter<CrontabSchedule, T> valueSelector, Converter<ExceptionProvider, T> errorSelector) =>
+            TryParse(expression, null, valueSelector, errorSelector);
 
         public static T TryParse<T>(string expression, ParseOptions options, Converter<CrontabSchedule, T> valueSelector, Converter<ExceptionProvider, T> errorSelector)
         {
-            if (expression == null) throw new ArgumentNullException("expression");
+            if (expression == null) throw new ArgumentNullException(nameof(expression));
 
             var tokens = expression.Split(StringSeparatorStock.Space, StringSplitOptions.RemoveEmptyEntries);
 
@@ -126,13 +114,11 @@ namespace NCrontab
             {
                 return errorSelector(() =>
                 {
-                    var message = string.Format(
-                        "'{0}' is an invalid crontab expression. It must contain {1}.",
-                        expression,
+                    var components =
                         includingSeconds
                         ? "6 components of a schedule in the sequence of seconds, minutes, hours, days, months, and days of week"
-                        : "5 components of a schedule in the sequence of minutes, hours, days, months, and days of week");
-                    return new CrontabException(message);
+                        : "5 components of a schedule in the sequence of minutes, hours, days, months, and days of week";
+                    return new CrontabException($"'{expression}' is an invalid crontab expression. It must contain {components}.");
                 });
             }
 
@@ -203,10 +189,8 @@ namespace NCrontab
         /// Gets the next occurrence of this schedule starting with a base time.
         /// </summary>
 
-        public DateTime GetNextOccurrence(DateTime baseTime)
-        {
-            return GetNextOccurrence(baseTime, DateTime.MaxValue);
-        }
+        public DateTime GetNextOccurrence(DateTime baseTime) =>
+            GetNextOccurrence(baseTime, DateTime.MaxValue);
 
         /// <summary>
         /// Gets the next occurrence of this schedule starting with a base
@@ -399,9 +383,6 @@ namespace NCrontab
             return writer.ToString();
         }
 
-        static Calendar Calendar
-        {
-            get { return CultureInfo.InvariantCulture.Calendar; }
-        }
+        static Calendar Calendar => CultureInfo.InvariantCulture.Calendar;
     }
 }
