@@ -19,15 +19,11 @@
 
 namespace NCrontab
 {
-    #region Imports
-
     using System;
-    using System.Runtime.Serialization;
 
-    #endregion
+    // ReSharper disable once PartialTypeWithSinglePart
 
-    [ Serializable ]
-    public class CrontabException : Exception
+    public partial class CrontabException : Exception
     {
         public CrontabException() :
             base("Crontab error.") {} // TODO: Fix message and add it to resource.
@@ -37,8 +33,5 @@ namespace NCrontab
 
         public CrontabException(string message, Exception innerException) :
             base(message, innerException) {}
-
-        protected CrontabException(SerializationInfo info, StreamingContext context) :
-            base(info, context) {}
     }
 }

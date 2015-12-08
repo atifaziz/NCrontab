@@ -19,13 +19,29 @@
 
 namespace NCrontab
 {
-    public enum CrontabFieldKind
+    using System;
+    using System.Runtime.Serialization;
+
+    [Serializable]
+    partial class CrontabException
     {
-        Second    = 0, // Keep in order of appearance in expression
-        Minute    = 1,
-        Hour      = 2,
-        Day       = 3,
-        Month     = 4,
-        DayOfWeek = 5
+        protected CrontabException(SerializationInfo info, StreamingContext context) :
+            base(info, context) {}
+    }
+
+    [Serializable]
+    partial class CrontabField {}
+
+    [Serializable]
+    partial class CrontabSchedule
+    {
+        [Serializable]
+        partial class ParseOptions {}
+    }
+
+    [Serializable]
+    partial class CrontabFieldImpl : IObjectReference
+    {
+        object IObjectReference.GetRealObject(StreamingContext context) => FromKind(Kind);
     }
 }

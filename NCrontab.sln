@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
-VisualStudioVersion = 14.0.23107.0
+VisualStudioVersion = 14.0.24720.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{A4109292-0FE5-4761-868A-31A5BEB1810A}"
 	ProjectSection(SolutionItems) = preProject
@@ -23,6 +23,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NCrontab.Tests", "NCrontab.Tests\NCrontab.Tests.csproj", "{7F587D68-75DD-4779-8744-85E9B07EC565}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NCrontabViewer", "NCrontabViewer\NCrontabViewer.csproj", "{02F42DAC-8A9F-45BB-B734-BB08F0D194C4}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NCrontab.Portable", "NCrontab\NCrontab.Portable.csproj", "{D8441CFB-E606-4304-8CA3-FD6E0FF1CD73}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -46,6 +48,10 @@ Global
 		{02F42DAC-8A9F-45BB-B734-BB08F0D194C4}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{02F42DAC-8A9F-45BB-B734-BB08F0D194C4}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{02F42DAC-8A9F-45BB-B734-BB08F0D194C4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D8441CFB-E606-4304-8CA3-FD6E0FF1CD73}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D8441CFB-E606-4304-8CA3-FD6E0FF1CD73}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D8441CFB-E606-4304-8CA3-FD6E0FF1CD73}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D8441CFB-E606-4304-8CA3-FD6E0FF1CD73}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

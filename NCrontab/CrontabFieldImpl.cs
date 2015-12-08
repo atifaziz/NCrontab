@@ -25,15 +25,15 @@ namespace NCrontab
     using System.Collections.Generic;
     using System.Globalization;
     using System.IO;
-    using System.Runtime.Serialization;
     using Debug = System.Diagnostics.Debug;
 
     #endregion
 
     public delegate T CrontabFieldAccumulator<T>(int start, int end, int interval, T successs, Func<ExceptionProvider, T> onError);
 
-    [ Serializable ]
-    public sealed class CrontabFieldImpl : IObjectReference
+    // ReSharper disable once PartialTypeWithSinglePart
+
+    public sealed partial class CrontabFieldImpl
     {
         public static readonly CrontabFieldImpl Second    = new CrontabFieldImpl(CrontabFieldKind.Second, 0, 59, null);
         public static readonly CrontabFieldImpl Minute    = new CrontabFieldImpl(CrontabFieldKind.Minute, 0, 59, null);
@@ -298,7 +298,5 @@ namespace NCrontab
             var names = string.Join(", ", _names);
             throw new CrontabException($"'{str}' is not a known value name. Use one of the following: {names}.");
         }
-
-        object IObjectReference.GetRealObject(StreamingContext context) => FromKind(Kind);
     }
 }

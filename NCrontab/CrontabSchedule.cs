@@ -33,8 +33,9 @@ namespace NCrontab
     /// Represents a schedule initialized from the crontab expression.
     /// </summary>
 
-    [ Serializable ]
-    public sealed class CrontabSchedule
+    // ReSharper disable once PartialTypeWithSinglePart
+
+    public sealed partial class CrontabSchedule
     {
         readonly CrontabField _seconds;
         readonly CrontabField _minutes;
@@ -45,8 +46,9 @@ namespace NCrontab
 
         static readonly CrontabField SecondZero = CrontabField.Seconds("0");
 
-        [Serializable]
-        public sealed class ParseOptions
+        // ReSharper disable once PartialTypeWithSinglePart
+
+        public sealed partial class ParseOptions
         {
             public bool IncludingSeconds { get; set; }
         }

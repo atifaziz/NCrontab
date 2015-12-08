@@ -32,8 +32,9 @@ namespace NCrontab
     /// Represents a single crontab field.
     /// </summary>
 
-    [ Serializable ]
-    public sealed class CrontabField : ICrontabField
+    // ReSharper disable once PartialTypeWithSinglePart
+
+    public sealed partial class CrontabField : ICrontabField
     {
         readonly BitArray _bits;
         /* readonly */ int _minValueSet;

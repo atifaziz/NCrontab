@@ -5,6 +5,7 @@ bin/
 *.cache
 *.suo
 obj/
+obj.portable/
 _ReSharper.*
 *.orig
 dist/

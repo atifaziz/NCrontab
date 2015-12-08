@@ -11,12 +11,21 @@
         <licenseUrl>http://www.apache.org/licenses/LICENSE-2.0</licenseUrl>
         <projectUrl>https://github.com/atifaziz/NCrontab</projectUrl>
         <tags>cron schedule time</tags>
-        <releaseNotes>Replaces uses of Converter with Func and therefore requires .NET Framework 3.5 as a minimum.</releaseNotes>
+        <releaseNotes>Replaces uses of Converter with Func and therefore requires .NET Framework 3.5 as a minimum.
+
+This release also make the library available as a PCL for:
+- Microsoft .NET Framework 4.5
+- Microsoft Windows 8.0
+- Microsoft Windows Phone 8.1
+- Microsoft Windows Phone Silverlight 8.0</releaseNotes>
     </metadata>
     <files>
-        <file src="bin\Release\*" target="lib\net35" />
+        <file src="bin\Release\*" target="lib\net35-client" />
+        <file src="bin\Release\*" target="lib\net40-client" />
+        <file src="bin\Release\*" target="lib\net45" />
+        <file src="bin\Portable\Release\*" target="lib\portable-net45+netcore45+wpa81+wp8" />
         <file src="COPYING.txt" target="COPYING.txt" />
         <file src="*.cs" target="src" />
-        <file src="NCrontab\**\*.cs" target="src\NCrontab" />
+        <file src="NCrontab\**\*.cs" target="src\NCrontab" exclude="**\obj*\**\*.cs" />
     </files>
 </package>

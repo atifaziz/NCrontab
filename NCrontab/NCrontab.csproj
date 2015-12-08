@@ -98,8 +98,6 @@
     <Reference Include="System">
       <Name>System</Name>
     </Reference>
-    <Reference Include="System.Data" />
-    <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="..\SolutionInfo.cs">
@@ -130,6 +128,7 @@
     <Compile Include="ICrontabField.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Serialization.cs" />
     <Compile Include="StringSeparatorStock.cs" />
   </ItemGroup>
   <ItemGroup>
