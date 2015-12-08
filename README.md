@@ -1,5 +1,8 @@
 # NCrontab: Crontab for .NET
 
+[![Build Status][build-badge]][builds]
+[![NuGet][nuget-badge]][nuget-pkg]
+
 NCrontab is a library written in C# 6.0 that provides the following facilities:
 
 * Parsing of crontab expressions
@@ -129,3 +132,7 @@ Below is the same example in [F#][f#] Interactive (`fsi.exe`):
 
   [ipy]: http://en.wikipedia.org/wiki/IronPython
   [f#]: http://msdn.microsoft.com/en-us/fsharp/cc742182
+  [build-badge]: https://img.shields.io/appveyor/ci/raboof/ncrontab.svg
+  [nuget-badge]: https://img.shields.io/nuget/v/ncrontab.svg
+  [nuget-pkg]: https://www.nuget.org/packages/ncrontab
+  [builds]: https://ci.appveyor.com/project/raboof/ncrontab
