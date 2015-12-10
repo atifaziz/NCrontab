@@ -300,54 +300,62 @@ namespace NCrontab.Tests
             });
         }
 
-        [TestCase("bad * * * * *")]
-        public void BadSecondsField(string expression) =>
-            Assert.Throws<CrontabException>(() => CrontabSchedule.Parse(expression));
+        static void BadField(string expression, bool includingSeconds)
+        {
+            Assert.Throws<CrontabException>(() => CrontabSchedule.Parse(expression, new ParseOptions
+            {
+                IncludingSeconds = includingSeconds
+            }));
+        }
 
-        [TestCase("bad * * * *")]
-        [TestCase("* bad * * * *")]
-        public void BadMinutesField(string expression) =>
-            Assert.Throws<CrontabException>(() => CrontabSchedule.Parse(expression));
+        [TestCase("bad * * * * *", false)]
+        public void BadSecondsField(string expression, bool includingSeconds) =>
+            BadField(expression, includingSeconds);
 
-        [TestCase("* bad * * *")]
-        [TestCase("* * bad * * *")]
-        public void BadHoursField(string expression) =>
-            Assert.Throws<CrontabException>(() => CrontabSchedule.Parse(expression));
+        [TestCase("bad * * * *", false)]
+        [TestCase("* bad * * * *", true)]
+        public void BadMinutesField(string expression, bool includingSeconds) =>
+            BadField(expression, includingSeconds);
 
-        [TestCase("* * bad * *")]
-        [TestCase("* * * bad * *")]
-        public void BadDayField(string expression) =>
-            Assert.Throws<CrontabException>(() => CrontabSchedule.Parse(expression));
+        [TestCase("* bad * * *", false)]
+        [TestCase("* * bad * * *", true)]
+        public void BadHoursField(string expression, bool includingSeconds) =>
+            BadField(expression, includingSeconds);
 
-        [TestCase("* * * bad *")]
-        [TestCase("* * * * bad *")]
-        public void BadMonthField(string expression) =>
-            Assert.Throws<CrontabException>(() => CrontabSchedule.Parse(expression));
+        [TestCase("* * bad * *", false)]
+        [TestCase("* * * bad * *", true)]
+        public void BadDayField(string expression, bool includingSeconds) =>
+            BadField(expression, includingSeconds);
 
-        [TestCase("* * * * mon,bad,wed")]
-        [TestCase("* * * * * mon,bad,wed")]
-        public void BadDayOfWeekField(string expression) =>
-            Assert.Throws<CrontabException>(() => CrontabSchedule.Parse(expression));
+        [TestCase("* * * bad *", false)]
+        [TestCase("* * * * bad *", true)]
+        public void BadMonthField(string expression, bool includingSeconds) =>
+            BadField(expression, includingSeconds);
 
-        [TestCase("* 1,2,3,456,7,8,9 * * *")]
-        [TestCase("* * 1,2,3,456,7,8,9 * * *")]
-        public void OutOfRangeField(string expression) =>
-            Assert.Throws<CrontabException>(() => CrontabSchedule.Parse(expression));
+        [TestCase("* * * * mon,bad,wed", false)]
+        [TestCase("* * * * * mon,bad,wed", true)]
+        public void BadDayOfWeekField(string expression, bool includingSeconds) =>
+            BadField(expression, includingSeconds);
 
-        [TestCase("* 1,Z,3,4 * * *")]
-        [TestCase("* * 1,Z,3,4 * * *")]
-        public void NonNumberValueInNumericOnlyField(string expression) =>
-            Assert.Throws<CrontabException>(() => CrontabSchedule.Parse(expression));
+        [TestCase("* 1,2,3,456,7,8,9 * * *", false)]
+        [TestCase("* * 1,2,3,456,7,8,9 * * *", true)]
+        public void OutOfRangeField(string expression, bool includingSeconds) =>
+            BadField(expression, includingSeconds);
 
-        [TestCase("* 1/Z * * *")]
-        [TestCase("* * 1/Z * * *")]
-        public void NonNumericFieldInterval(string expression) =>
-            Assert.Throws<CrontabException>(() => CrontabSchedule.Parse(expression));
+        [TestCase("* 1,Z,3,4 * * *", false)]
+        [TestCase("* * 1,Z,3,4 * * *", true)]
+        public void NonNumberValueInNumericOnlyField(string expression, bool includingSeconds) =>
+            BadField(expression, includingSeconds);
 
-        [TestCase("* 3-l2 * * *")]
-        [TestCase("* * 3-l2 * * *")]
-        public void NonNumericFieldRangeComponent(string expression) =>
-            Assert.Throws<CrontabException>(() => CrontabSchedule.Parse(expression));
+        [TestCase("* 1/Z * * *", false)]
+        [TestCase("* * 1/Z * * *", true)]
+        public void NonNumericFieldInterval(string expression, bool includingSeconds) =>
+            BadField(expression, includingSeconds);
+
+        [TestCase("* 3-l2 * * *", false)]
+        [TestCase("* * 3-l2 * * *", true)]
+        public void NonNumericFieldRangeComponent(string expression, bool includingSeconds) =>
+            BadField(expression, includingSeconds);
 
         static void CronCall(string startTimeString, string cronExpression, string nextTimeString, ParseOptions options)
         {
