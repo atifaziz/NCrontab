@@ -30,25 +30,25 @@ namespace NCrontab.Tests
 
     #endregion
 
-    [ TestFixture ]
+    [TestFixture]
     public sealed class CrontabScheduleTests
     {
         const string TimeFormat = "dd/MM/yyyy HH:mm:ss";
 
-        [ Test ]
+        [Test]
         public void CannotParseNullString()
         {
             var e = Assert.Throws<ArgumentNullException>(() => CrontabSchedule.Parse(null));
             Assert.That(e.ParamName, Is.EqualTo("expression"));
         }
 
-        [ Test ]
+        [Test]
         public void CannotParseEmptyString()
         {
             Assert.Throws<CrontabException>(() => CrontabSchedule.Parse(string.Empty));
         }
 
-        [ Test ]
+        [Test]
         public void AllTimeString()
         {
             Assert.AreEqual("* * * * *", CrontabSchedule.Parse("* * * * *").ToString());
@@ -85,7 +85,7 @@ namespace NCrontab.Tests
         /// time correctly in various circumstances.
         /// </summary>
 
-        [ Test ]
+        [Test]
         public void Evaluations()
         {
             CronCall("01/01/2003 00:00:00", "* * * * *", "01/01/2003 00:01:00", false);
@@ -265,7 +265,7 @@ namespace NCrontab.Tests
             CronCall("29/02/2004 12:01:00", "1 12 28 2 *", "28/02/2005 12:01:00", false);
         }
 
-        [ Test ]
+        [Test]
         public void FiniteOccurrences()
         {
             CronFinite(" *  * * * *  ", "01/01/2003 00:00:00", "01/01/2003 00:00:00");
@@ -284,7 +284,7 @@ namespace NCrontab.Tests
             cronFinite("10 30 12 * * Mon", "01/01/2003 00:00:00", "06/01/2003 12:00:10");
         }
 
-        [ Test, Category("Performance") ]
+        [Test, Category("Performance")]
         public void DontLoopIndefinitely()
         {
             //
@@ -304,7 +304,7 @@ namespace NCrontab.Tests
             Assert.Throws<CrontabException>(() => CrontabSchedule.Parse("bad * * * * *"));
         }
 
-        [ Test ]
+        [Test]
         public void BadMinutesField()
         {
             Assert.Throws<CrontabException>(() => CrontabSchedule.Parse("bad * * * *"));
