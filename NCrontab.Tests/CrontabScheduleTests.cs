@@ -391,14 +391,11 @@ namespace NCrontab.Tests
                         "Check there is not an infinite loop somewhere.", limit);
         }
 
-        static void CronCall(string startTimeString, string cronExpression, string nextTimeString, bool expectException)
-        {
+        static void CronCall(string startTimeString, string cronExpression, string nextTimeString, bool expectException) =>
             CronCall(null)(startTimeString, cronExpression, nextTimeString, expectException);
-        }
 
-        static Action<string, string, string, bool> CronCall(ParseOptions options)
-        {
-            return (startTimeString, cronExpression, nextTimeString, expectException) =>
+        static Action<string, string, string, bool> CronCall(ParseOptions options) =>
+            (startTimeString, cronExpression, nextTimeString, expectException) =>
             {
                 var start = Time(startTimeString);
 
@@ -420,16 +417,12 @@ namespace NCrontab.Tests
                         Assert.Fail("Unexpected ParseException while parsing <{0}>: {1}", cronExpression, e.ToString());
                 }
             };
-        }
 
-        static void CronFinite(string cronExpression, string startTimeString, string endTimeString)
-        {
+        static void CronFinite(string cronExpression, string startTimeString, string endTimeString) =>
             CronFinite(null)(cronExpression, startTimeString, endTimeString);
-        }
 
-        static Action<string, string, string> CronFinite(ParseOptions options)
-        {
-            return (cronExpression, startTimeString, endTimeString) =>
+        static Action<string, string, string> CronFinite(ParseOptions options) =>
+            (cronExpression, startTimeString, endTimeString) =>
             {
                 var schedule = CrontabSchedule.Parse(cronExpression, options);
                 var occurrence = schedule.GetNextOccurrence(Time(startTimeString), Time(endTimeString));
@@ -438,16 +431,8 @@ namespace NCrontab.Tests
                     "Occurrence of <{0}> after <{1}> did not terminate with <{2}>.",
                     cronExpression, startTimeString, endTimeString);
             };
-        }
 
-        static string TimeString(DateTime time)
-        {
-            return time.ToString(TimeFormat, CultureInfo.InvariantCulture);
-        }
-
-        static DateTime Time(string str)
-        {
-            return DateTime.ParseExact(str, TimeFormat, CultureInfo.InvariantCulture);
-        }
+        static string TimeString(DateTime time) => time.ToString(TimeFormat, CultureInfo.InvariantCulture);
+        static DateTime Time(string str) => DateTime.ParseExact(str, TimeFormat, CultureInfo.InvariantCulture);
     }
 }
