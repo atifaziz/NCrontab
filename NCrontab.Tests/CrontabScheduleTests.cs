@@ -19,16 +19,10 @@
 
 namespace NCrontab.Tests
 {
-    #region Imports
-
     using System;
-    using System.Diagnostics;
     using System.Globalization;
-    using System.Threading;
     using NUnit.Framework;
     using ParseOptions = CrontabSchedule.ParseOptions;
-
-    #endregion
 
     [TestFixture]
     public sealed class CrontabScheduleTests
@@ -289,21 +283,21 @@ namespace NCrontab.Tests
             });
         }
 
-        [Test, Category("Performance")]
-        public void DontLoopIndefinitely()
-        {
-            //
-            // Test to check we don't loop indefinitely looking for a February
-            // 31st because no such date would ever exist!
-            //
+        //
+        // Test to check we don't loop indefinitely looking for a February
+        // 31st because no such date would ever exist!
+        //
 
-            TimeCron(TimeSpan.FromSeconds(1), () =>
-                CronFinite("* * 31 Feb *", "01/01/2001 00:00:00", "01/01/2010 00:00:00"));
-            TimeCron(TimeSpan.FromSeconds(1), () =>
-                CronFinite("* * * 31 Feb *", "01/01/2001 00:00:00", "01/01/2010 00:00:00", new ParseOptions
-                {
-                    IncludingSeconds = true
-                }));
+        [Category("Performance")]
+        [Timeout(1000)]
+        [TestCase("* * 31 Feb *", false)]
+        [TestCase("* * * 31 Feb *", true)]
+        public void DontLoopIndefinitely(string expression, bool includingSeconds)
+        {
+            CronFinite(expression, "01/01/2001 00:00:00", "01/01/2010 00:00:00", new ParseOptions
+            {
+                IncludingSeconds = includingSeconds
+            });
         }
 
         [TestCase("bad * * * * *")]
@@ -354,30 +348,6 @@ namespace NCrontab.Tests
         [TestCase("* * 3-l2 * * *")]
         public void NonNumericFieldRangeComponent(string expression) =>
             Assert.Throws<CrontabException>(() => CrontabSchedule.Parse(expression));
-
-        static void TimeCron(TimeSpan limit, ThreadStart test)
-        {
-            Debug.Assert(test != null);
-
-            Exception e = null;
-
-            var worker = new Thread(() => { try { test(); } catch (Exception ee) { e = ee; } });
-
-            worker.Start();
-
-            if (worker.Join(!Debugger.IsAttached ? (int) limit.TotalMilliseconds : Timeout.Infinite))
-            {
-                if (e != null)
-                    throw new Exception(e.Message, e);
-
-                return;
-            }
-
-            worker.Abort();
-
-            Assert.Fail("The test did not complete in the allocated time ({0}). " +
-                        "Check there is not an infinite loop somewhere.", limit);
-        }
 
         static void CronCall(string startTimeString, string cronExpression, string nextTimeString, ParseOptions options)
         {
