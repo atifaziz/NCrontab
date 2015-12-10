@@ -66,18 +66,18 @@ namespace NCrontab.Tests
             Assert.Throws<CrontabException>(() => CrontabSchedule.Parse("* * * * *", new ParseOptions { IncludingSeconds = true }));
         }
 
-        [Test]
-        public void Formatting()
+        [TestCase("* 1-3 * * *"            , "* 1-2,3 * * *"                   , false)]
+        [TestCase("* * * 1,3,5,7,9,11 *"   , "* * * */2 *"                     , false)]
+        [TestCase("10,25,40 * * * *"       , "10-40/15 * * * *"                , false)]
+        [TestCase("* * * 1,3,8 1-2,5"      , "* * * Mar,Jan,Aug Fri,Mon-Tue"   , false)]
+        [TestCase("1 * 1-3 * * *"          , "1 * 1-2,3 * * *"                 , true )]
+        [TestCase("22 * * * 1,3,5,7,9,11 *", "22 * * * */2 *"                  , true )]
+        [TestCase("33 10,25,40 * * * *"    , "33 10-40/15 * * * *"             , true )]
+        [TestCase("55 * * * 1,3,8 1-2,5"   , "55 * * * Mar,Jan,Aug Fri,Mon-Tue", true )]
+        public void Formatting(string format, string expression, bool includingSeconds)
         {
-            Assert.AreEqual("* 1-3 * * *", CrontabSchedule.Parse("* 1-2,3 * * *").ToString());
-            Assert.AreEqual("* * * 1,3,5,7,9,11 *", CrontabSchedule.Parse("* * * */2 *").ToString());
-            Assert.AreEqual("10,25,40 * * * *", CrontabSchedule.Parse("10-40/15 * * * *").ToString());
-            Assert.AreEqual("* * * 1,3,8 1-2,5", CrontabSchedule.Parse("* * * Mar,Jan,Aug Fri,Mon-Tue").ToString());
-            var includingSeconds = new ParseOptions { IncludingSeconds = true };
-            Assert.AreEqual("1 * 1-3 * * *", CrontabSchedule.Parse("1 * 1-2,3 * * *", includingSeconds).ToString());
-            Assert.AreEqual("22 * * * 1,3,5,7,9,11 *", CrontabSchedule.Parse("22 * * * */2 *", includingSeconds).ToString());
-            Assert.AreEqual("33 10,25,40 * * * *", CrontabSchedule.Parse("33 10-40/15 * * * *", includingSeconds).ToString());
-            Assert.AreEqual("55 * * * 1,3,8 1-2,5", CrontabSchedule.Parse("55 * * * Mar,Jan,Aug Fri,Mon-Tue", includingSeconds).ToString());
+            var options = new ParseOptions { IncludingSeconds = includingSeconds };
+            Assert.AreEqual(format, CrontabSchedule.Parse(expression, options).ToString());
         }
 
         /// <summary>
@@ -85,203 +85,208 @@ namespace NCrontab.Tests
         /// time correctly in various circumstances.
         /// </summary>
 
-        [Test]
-        public void Evaluations()
+        [TestCase("01/01/2003 00:00:00", "* * * * *", "01/01/2003 00:01:00", false)]
+        [TestCase("01/01/2003 00:01:00", "* * * * *", "01/01/2003 00:02:00", false)]
+        [TestCase("01/01/2003 00:02:00", "* * * * *", "01/01/2003 00:03:00", false)]
+        [TestCase("01/01/2003 00:59:00", "* * * * *", "01/01/2003 01:00:00", false)]
+        [TestCase("01/01/2003 01:59:00", "* * * * *", "01/01/2003 02:00:00", false)]
+        [TestCase("01/01/2003 23:59:00", "* * * * *", "02/01/2003 00:00:00", false)]
+        [TestCase("31/12/2003 23:59:00", "* * * * *", "01/01/2004 00:00:00", false)]
+
+        [TestCase("28/02/2003 23:59:00", "* * * * *", "01/03/2003 00:00:00", false)]
+        [TestCase("28/02/2004 23:59:00", "* * * * *", "29/02/2004 00:00:00", false)]
+
+        // Second tests
+
+        [TestCase("01/01/2003 00:00:00", "45 * * * * *", "01/01/2003 00:00:45"         , true)]
+
+        [TestCase("01/01/2003 00:00:00", "45-47,48,49 * * * * *", "01/01/2003 00:00:45", true)]
+        [TestCase("01/01/2003 00:00:45", "45-47,48,49 * * * * *", "01/01/2003 00:00:46", true)]
+        [TestCase("01/01/2003 00:00:46", "45-47,48,49 * * * * *", "01/01/2003 00:00:47", true)]
+        [TestCase("01/01/2003 00:00:47", "45-47,48,49 * * * * *", "01/01/2003 00:00:48", true)]
+        [TestCase("01/01/2003 00:00:48", "45-47,48,49 * * * * *", "01/01/2003 00:00:49", true)]
+        [TestCase("01/01/2003 00:00:49", "45-47,48,49 * * * * *", "01/01/2003 00:01:45", true)]
+
+        [TestCase("01/01/2003 00:00:00", "2/5 * * * * *", "01/01/2003 00:00:02"        , true)]
+        [TestCase("01/01/2003 00:00:02", "2/5 * * * * *", "01/01/2003 00:00:07"        , true)]
+        [TestCase("01/01/2003 00:00:50", "2/5 * * * * *", "01/01/2003 00:00:52"        , true)]
+        [TestCase("01/01/2003 00:00:52", "2/5 * * * * *", "01/01/2003 00:00:57"        , true)]
+        [TestCase("01/01/2003 00:00:57", "2/5 * * * * *", "01/01/2003 00:01:02"        , true)]
+
+        // Minute tests
+
+        [TestCase("01/01/2003 00:00:00", "45 * * * *", "01/01/2003 00:45:00", false)]
+
+        [TestCase("01/01/2003 00:00:00", "45-47,48,49 * * * *", "01/01/2003 00:45:00", false)]
+        [TestCase("01/01/2003 00:45:00", "45-47,48,49 * * * *", "01/01/2003 00:46:00", false)]
+        [TestCase("01/01/2003 00:46:00", "45-47,48,49 * * * *", "01/01/2003 00:47:00", false)]
+        [TestCase("01/01/2003 00:47:00", "45-47,48,49 * * * *", "01/01/2003 00:48:00", false)]
+        [TestCase("01/01/2003 00:48:00", "45-47,48,49 * * * *", "01/01/2003 00:49:00", false)]
+        [TestCase("01/01/2003 00:49:00", "45-47,48,49 * * * *", "01/01/2003 01:45:00", false)]
+
+        [TestCase("01/01/2003 00:00:00", "2/5 * * * *", "01/01/2003 00:02:00", false)]
+        [TestCase("01/01/2003 00:02:00", "2/5 * * * *", "01/01/2003 00:07:00", false)]
+        [TestCase("01/01/2003 00:50:00", "2/5 * * * *", "01/01/2003 00:52:00", false)]
+        [TestCase("01/01/2003 00:52:00", "2/5 * * * *", "01/01/2003 00:57:00", false)]
+        [TestCase("01/01/2003 00:57:00", "2/5 * * * *", "01/01/2003 01:02:00", false)]
+
+        [TestCase("01/01/2003 00:00:30", "3 45 * * * *", "01/01/2003 00:45:03", true)]
+
+        [TestCase("01/01/2003 00:00:30", "6 45-47,48,49 * * * *", "01/01/2003 00:45:06", true)]
+        [TestCase("01/01/2003 00:45:30", "6 45-47,48,49 * * * *", "01/01/2003 00:46:06", true)]
+        [TestCase("01/01/2003 00:46:30", "6 45-47,48,49 * * * *", "01/01/2003 00:47:06", true)]
+        [TestCase("01/01/2003 00:47:30", "6 45-47,48,49 * * * *", "01/01/2003 00:48:06", true)]
+        [TestCase("01/01/2003 00:48:30", "6 45-47,48,49 * * * *", "01/01/2003 00:49:06", true)]
+        [TestCase("01/01/2003 00:49:30", "6 45-47,48,49 * * * *", "01/01/2003 01:45:06", true)]
+
+        [TestCase("01/01/2003 00:00:30", "9 2/5 * * * *", "01/01/2003 00:02:09", true)]
+        [TestCase("01/01/2003 00:02:30", "9 2/5 * * * *", "01/01/2003 00:07:09", true)]
+        [TestCase("01/01/2003 00:50:30", "9 2/5 * * * *", "01/01/2003 00:52:09", true)]
+        [TestCase("01/01/2003 00:52:30", "9 2/5 * * * *", "01/01/2003 00:57:09", true)]
+        [TestCase("01/01/2003 00:57:30", "9 2/5 * * * *", "01/01/2003 01:02:09", true)]
+
+        // Hour tests
+
+        [TestCase("20/12/2003 10:00:00", " * 3/4 * * *", "20/12/2003 11:00:00", false)]
+        [TestCase("20/12/2003 00:30:00", " * 3   * * *", "20/12/2003 03:00:00", false)]
+        [TestCase("20/12/2003 01:45:00", "30 3   * * *", "20/12/2003 03:30:00", false)]
+
+        // Day of month tests
+
+        [TestCase("07/01/2003 00:00:00", "30  *  1 * *", "01/02/2003 00:30:00", false)]
+        [TestCase("01/02/2003 00:30:00", "30  *  1 * *", "01/02/2003 01:30:00", false)]
+
+        [TestCase("01/01/2003 00:00:00", "10  * 22    * *", "22/01/2003 00:10:00", false)]
+        [TestCase("01/01/2003 00:00:00", "30 23 19    * *", "19/01/2003 23:30:00", false)]
+        [TestCase("01/01/2003 00:00:00", "30 23 21    * *", "21/01/2003 23:30:00", false)]
+        [TestCase("01/01/2003 00:01:00", " *  * 21    * *", "21/01/2003 00:00:00", false)]
+        [TestCase("10/07/2003 00:00:00", " *  * 30,31 * *", "30/07/2003 00:00:00", false)]
+
+        // Test month rollovers for months with 28,29,30 and 31 days
+
+        [TestCase("28/02/2002 23:59:59", "* * * 3 *", "01/03/2002 00:00:00", false)]
+        [TestCase("29/02/2004 23:59:59", "* * * 3 *", "01/03/2004 00:00:00", false)]
+        [TestCase("31/03/2002 23:59:59", "* * * 4 *", "01/04/2002 00:00:00", false)]
+        [TestCase("30/04/2002 23:59:59", "* * * 5 *", "01/05/2002 00:00:00", false)]
+
+        // Test month 30,31 days
+
+        [TestCase("01/01/2000 00:00:00", "0 0 15,30,31 * *", "15/01/2000 00:00:00", false)]
+        [TestCase("15/01/2000 00:00:00", "0 0 15,30,31 * *", "30/01/2000 00:00:00", false)]
+        [TestCase("30/01/2000 00:00:00", "0 0 15,30,31 * *", "31/01/2000 00:00:00", false)]
+        [TestCase("31/01/2000 00:00:00", "0 0 15,30,31 * *", "15/02/2000 00:00:00", false)]
+
+        [TestCase("15/02/2000 00:00:00", "0 0 15,30,31 * *", "15/03/2000 00:00:00", false)]
+
+        [TestCase("15/03/2000 00:00:00", "0 0 15,30,31 * *", "30/03/2000 00:00:00", false)]
+        [TestCase("30/03/2000 00:00:00", "0 0 15,30,31 * *", "31/03/2000 00:00:00", false)]
+        [TestCase("31/03/2000 00:00:00", "0 0 15,30,31 * *", "15/04/2000 00:00:00", false)]
+
+        [TestCase("15/04/2000 00:00:00", "0 0 15,30,31 * *", "30/04/2000 00:00:00", false)]
+        [TestCase("30/04/2000 00:00:00", "0 0 15,30,31 * *", "15/05/2000 00:00:00", false)]
+
+        [TestCase("15/05/2000 00:00:00", "0 0 15,30,31 * *", "30/05/2000 00:00:00", false)]
+        [TestCase("30/05/2000 00:00:00", "0 0 15,30,31 * *", "31/05/2000 00:00:00", false)]
+        [TestCase("31/05/2000 00:00:00", "0 0 15,30,31 * *", "15/06/2000 00:00:00", false)]
+
+        [TestCase("15/06/2000 00:00:00", "0 0 15,30,31 * *", "30/06/2000 00:00:00", false)]
+        [TestCase("30/06/2000 00:00:00", "0 0 15,30,31 * *", "15/07/2000 00:00:00", false)]
+
+        [TestCase("15/07/2000 00:00:00", "0 0 15,30,31 * *", "30/07/2000 00:00:00", false)]
+        [TestCase("30/07/2000 00:00:00", "0 0 15,30,31 * *", "31/07/2000 00:00:00", false)]
+        [TestCase("31/07/2000 00:00:00", "0 0 15,30,31 * *", "15/08/2000 00:00:00", false)]
+
+        [TestCase("15/08/2000 00:00:00", "0 0 15,30,31 * *", "30/08/2000 00:00:00", false)]
+        [TestCase("30/08/2000 00:00:00", "0 0 15,30,31 * *", "31/08/2000 00:00:00", false)]
+        [TestCase("31/08/2000 00:00:00", "0 0 15,30,31 * *", "15/09/2000 00:00:00", false)]
+
+        [TestCase("15/09/2000 00:00:00", "0 0 15,30,31 * *", "30/09/2000 00:00:00", false)]
+        [TestCase("30/09/2000 00:00:00", "0 0 15,30,31 * *", "15/10/2000 00:00:00", false)]
+
+        [TestCase("15/10/2000 00:00:00", "0 0 15,30,31 * *", "30/10/2000 00:00:00", false)]
+        [TestCase("30/10/2000 00:00:00", "0 0 15,30,31 * *", "31/10/2000 00:00:00", false)]
+        [TestCase("31/10/2000 00:00:00", "0 0 15,30,31 * *", "15/11/2000 00:00:00", false)]
+
+        [TestCase("15/11/2000 00:00:00", "0 0 15,30,31 * *", "30/11/2000 00:00:00", false)]
+        [TestCase("30/11/2000 00:00:00", "0 0 15,30,31 * *", "15/12/2000 00:00:00", false)]
+
+        [TestCase("15/12/2000 00:00:00", "0 0 15,30,31 * *", "30/12/2000 00:00:00", false)]
+        [TestCase("30/12/2000 00:00:00", "0 0 15,30,31 * *", "31/12/2000 00:00:00", false)]
+        [TestCase("31/12/2000 00:00:00", "0 0 15,30,31 * *", "15/01/2001 00:00:00", false)]
+
+        // Other month tests (including year rollover)
+
+        [TestCase("01/12/2003 05:00:00", "10 * * 6 *", "01/06/2004 00:10:00", false)]
+        [TestCase("04/01/2003 00:00:00", " 1 2 3 * *", "03/02/2003 02:01:00", false)]
+        [TestCase("01/07/2002 05:00:00", "10 * * February,April-Jun *", "01/02/2003 00:10:00", false)]
+        [TestCase("01/01/2003 00:00:00", "0 12 1 6 *", "01/06/2003 12:00:00", false)]
+        [TestCase("11/09/1988 14:23:00", "* 12 1 6 *", "01/06/1989 12:00:00", false)]
+        [TestCase("11/03/1988 14:23:00", "* 12 1 6 *", "01/06/1988 12:00:00", false)]
+        [TestCase("11/03/1988 14:23:00", "* 2,4-8,15 * 6 *", "01/06/1988 02:00:00", false)]
+        [TestCase("11/03/1988 14:23:00", "20 * * january,FeB,Mar,april,May,JuNE,July,Augu,SEPT-October,Nov,DECEM *", "11/03/1988 15:20:00", false)]
+
+        // Day of week tests
+
+        [TestCase("26/06/2003 10:00:00", "30 6 * * 0",      "29/06/2003 06:30:00", false)]
+        [TestCase("26/06/2003 10:00:00", "30 6 * * sunday", "29/06/2003 06:30:00", false)]
+        [TestCase("26/06/2003 10:00:00", "30 6 * * SUNDAY", "29/06/2003 06:30:00", false)]
+        [TestCase("19/06/2003 00:00:00", "1 12 * * 2",      "24/06/2003 12:01:00", false)]
+        [TestCase("24/06/2003 12:01:00", "1 12 * * 2",      "01/07/2003 12:01:00", false)]
+
+        [TestCase("01/06/2003 14:55:00", "15 18 * * Mon", "02/06/2003 18:15:00", false)]
+        [TestCase("02/06/2003 18:15:00", "15 18 * * Mon", "09/06/2003 18:15:00", false)]
+        [TestCase("09/06/2003 18:15:00", "15 18 * * Mon", "16/06/2003 18:15:00", false)]
+        [TestCase("16/06/2003 18:15:00", "15 18 * * Mon", "23/06/2003 18:15:00", false)]
+        [TestCase("23/06/2003 18:15:00", "15 18 * * Mon", "30/06/2003 18:15:00", false)]
+        [TestCase("30/06/2003 18:15:00", "15 18 * * Mon", "07/07/2003 18:15:00", false)]
+
+        [TestCase("01/01/2003 00:00:00", "* * * * Mon",   "06/01/2003 00:00:00", false)]
+        [TestCase("01/01/2003 12:00:00", "45 16 1 * Mon", "01/09/2003 16:45:00", false)]
+        [TestCase("01/09/2003 23:45:00", "45 16 1 * Mon", "01/12/2003 16:45:00", false)]
+
+        // Leap year tests
+
+        [TestCase("01/01/2000 12:00:00", "1 12 29 2 *", "29/02/2000 12:01:00", false)]
+        [TestCase("29/02/2000 12:01:00", "1 12 29 2 *", "29/02/2004 12:01:00", false)]
+        [TestCase("29/02/2004 12:01:00", "1 12 29 2 *", "29/02/2008 12:01:00", false)]
+
+        // Non-leap year tests
+
+        [TestCase("01/01/2000 12:00:00", "1 12 28 2 *", "28/02/2000 12:01:00", false)]
+        [TestCase("28/02/2000 12:01:00", "1 12 28 2 *", "28/02/2001 12:01:00", false)]
+        [TestCase("28/02/2001 12:01:00", "1 12 28 2 *", "28/02/2002 12:01:00", false)]
+        [TestCase("28/02/2002 12:01:00", "1 12 28 2 *", "28/02/2003 12:01:00", false)]
+        [TestCase("28/02/2003 12:01:00", "1 12 28 2 *", "28/02/2004 12:01:00", false)]
+        [TestCase("29/02/2004 12:01:00", "1 12 28 2 *", "28/02/2005 12:01:00", false)]
+
+        public void Evaluations(string startTimeString, string cronExpression, string nextTimeString, bool includingSeconds)
         {
-            CronCall("01/01/2003 00:00:00", "* * * * *", "01/01/2003 00:01:00", false);
-            CronCall("01/01/2003 00:01:00", "* * * * *", "01/01/2003 00:02:00", false);
-            CronCall("01/01/2003 00:02:00", "* * * * *", "01/01/2003 00:03:00", false);
-            CronCall("01/01/2003 00:59:00", "* * * * *", "01/01/2003 01:00:00", false);
-            CronCall("01/01/2003 01:59:00", "* * * * *", "01/01/2003 02:00:00", false);
-            CronCall("01/01/2003 23:59:00", "* * * * *", "02/01/2003 00:00:00", false);
-            CronCall("31/12/2003 23:59:00", "* * * * *", "01/01/2004 00:00:00", false);
-
-            CronCall("28/02/2003 23:59:00", "* * * * *", "01/03/2003 00:00:00", false);
-            CronCall("28/02/2004 23:59:00", "* * * * *", "29/02/2004 00:00:00", false);
-
-            // Second tests
-
-            var cronCall = CronCall(new ParseOptions { IncludingSeconds = true });
-
-            cronCall("01/01/2003 00:00:00", "45 * * * * *", "01/01/2003 00:00:45", false);
-
-            cronCall("01/01/2003 00:00:00", "45-47,48,49 * * * * *", "01/01/2003 00:00:45", false);
-            cronCall("01/01/2003 00:00:45", "45-47,48,49 * * * * *", "01/01/2003 00:00:46", false);
-            cronCall("01/01/2003 00:00:46", "45-47,48,49 * * * * *", "01/01/2003 00:00:47", false);
-            cronCall("01/01/2003 00:00:47", "45-47,48,49 * * * * *", "01/01/2003 00:00:48", false);
-            cronCall("01/01/2003 00:00:48", "45-47,48,49 * * * * *", "01/01/2003 00:00:49", false);
-            cronCall("01/01/2003 00:00:49", "45-47,48,49 * * * * *", "01/01/2003 00:01:45", false);
-
-            cronCall("01/01/2003 00:00:00", "2/5 * * * * *", "01/01/2003 00:00:02", false);
-            cronCall("01/01/2003 00:00:02", "2/5 * * * * *", "01/01/2003 00:00:07", false);
-            cronCall("01/01/2003 00:00:50", "2/5 * * * * *", "01/01/2003 00:00:52", false);
-            cronCall("01/01/2003 00:00:52", "2/5 * * * * *", "01/01/2003 00:00:57", false);
-            cronCall("01/01/2003 00:00:57", "2/5 * * * * *", "01/01/2003 00:01:02", false);
-
-            // Minute tests
-
-            CronCall("01/01/2003 00:00:00", "45 * * * *", "01/01/2003 00:45:00", false);
-
-            CronCall("01/01/2003 00:00:00", "45-47,48,49 * * * *", "01/01/2003 00:45:00", false);
-            CronCall("01/01/2003 00:45:00", "45-47,48,49 * * * *", "01/01/2003 00:46:00", false);
-            CronCall("01/01/2003 00:46:00", "45-47,48,49 * * * *", "01/01/2003 00:47:00", false);
-            CronCall("01/01/2003 00:47:00", "45-47,48,49 * * * *", "01/01/2003 00:48:00", false);
-            CronCall("01/01/2003 00:48:00", "45-47,48,49 * * * *", "01/01/2003 00:49:00", false);
-            CronCall("01/01/2003 00:49:00", "45-47,48,49 * * * *", "01/01/2003 01:45:00", false);
-
-            CronCall("01/01/2003 00:00:00", "2/5 * * * *", "01/01/2003 00:02:00", false);
-            CronCall("01/01/2003 00:02:00", "2/5 * * * *", "01/01/2003 00:07:00", false);
-            CronCall("01/01/2003 00:50:00", "2/5 * * * *", "01/01/2003 00:52:00", false);
-            CronCall("01/01/2003 00:52:00", "2/5 * * * *", "01/01/2003 00:57:00", false);
-            CronCall("01/01/2003 00:57:00", "2/5 * * * *", "01/01/2003 01:02:00", false);
-
-            cronCall("01/01/2003 00:00:30", "3 45 * * * *", "01/01/2003 00:45:03", false);
-
-            cronCall("01/01/2003 00:00:30", "6 45-47,48,49 * * * *", "01/01/2003 00:45:06", false);
-            cronCall("01/01/2003 00:45:30", "6 45-47,48,49 * * * *", "01/01/2003 00:46:06", false);
-            cronCall("01/01/2003 00:46:30", "6 45-47,48,49 * * * *", "01/01/2003 00:47:06", false);
-            cronCall("01/01/2003 00:47:30", "6 45-47,48,49 * * * *", "01/01/2003 00:48:06", false);
-            cronCall("01/01/2003 00:48:30", "6 45-47,48,49 * * * *", "01/01/2003 00:49:06", false);
-            cronCall("01/01/2003 00:49:30", "6 45-47,48,49 * * * *", "01/01/2003 01:45:06", false);
-
-            cronCall("01/01/2003 00:00:30", "9 2/5 * * * *", "01/01/2003 00:02:09", false);
-            cronCall("01/01/2003 00:02:30", "9 2/5 * * * *", "01/01/2003 00:07:09", false);
-            cronCall("01/01/2003 00:50:30", "9 2/5 * * * *", "01/01/2003 00:52:09", false);
-            cronCall("01/01/2003 00:52:30", "9 2/5 * * * *", "01/01/2003 00:57:09", false);
-            cronCall("01/01/2003 00:57:30", "9 2/5 * * * *", "01/01/2003 01:02:09", false);
-
-            // Hour tests
-
-            CronCall("20/12/2003 10:00:00", " * 3/4 * * *", "20/12/2003 11:00:00", false);
-            CronCall("20/12/2003 00:30:00", " * 3   * * *", "20/12/2003 03:00:00", false);
-            CronCall("20/12/2003 01:45:00", "30 3   * * *", "20/12/2003 03:30:00", false);
-
-            // Day of month tests
-
-            CronCall("07/01/2003 00:00:00", "30  *  1 * *", "01/02/2003 00:30:00", false);
-            CronCall("01/02/2003 00:30:00", "30  *  1 * *", "01/02/2003 01:30:00", false);
-
-            CronCall("01/01/2003 00:00:00", "10  * 22    * *", "22/01/2003 00:10:00", false);
-            CronCall("01/01/2003 00:00:00", "30 23 19    * *", "19/01/2003 23:30:00", false);
-            CronCall("01/01/2003 00:00:00", "30 23 21    * *", "21/01/2003 23:30:00", false);
-            CronCall("01/01/2003 00:01:00", " *  * 21    * *", "21/01/2003 00:00:00", false);
-            CronCall("10/07/2003 00:00:00", " *  * 30,31 * *", "30/07/2003 00:00:00", false);
-
-            // Test month rollovers for months with 28,29,30 and 31 days
-
-            CronCall("28/02/2002 23:59:59", "* * * 3 *", "01/03/2002 00:00:00", false);
-            CronCall("29/02/2004 23:59:59", "* * * 3 *", "01/03/2004 00:00:00", false);
-            CronCall("31/03/2002 23:59:59", "* * * 4 *", "01/04/2002 00:00:00", false);
-            CronCall("30/04/2002 23:59:59", "* * * 5 *", "01/05/2002 00:00:00", false);
-
-            // Test month 30,31 days
-
-            CronCall("01/01/2000 00:00:00", "0 0 15,30,31 * *", "15/01/2000 00:00:00", false);
-            CronCall("15/01/2000 00:00:00", "0 0 15,30,31 * *", "30/01/2000 00:00:00", false);
-            CronCall("30/01/2000 00:00:00", "0 0 15,30,31 * *", "31/01/2000 00:00:00", false);
-            CronCall("31/01/2000 00:00:00", "0 0 15,30,31 * *", "15/02/2000 00:00:00", false);
-
-            CronCall("15/02/2000 00:00:00", "0 0 15,30,31 * *", "15/03/2000 00:00:00", false);
-
-            CronCall("15/03/2000 00:00:00", "0 0 15,30,31 * *", "30/03/2000 00:00:00", false);
-            CronCall("30/03/2000 00:00:00", "0 0 15,30,31 * *", "31/03/2000 00:00:00", false);
-            CronCall("31/03/2000 00:00:00", "0 0 15,30,31 * *", "15/04/2000 00:00:00", false);
-
-            CronCall("15/04/2000 00:00:00", "0 0 15,30,31 * *", "30/04/2000 00:00:00", false);
-            CronCall("30/04/2000 00:00:00", "0 0 15,30,31 * *", "15/05/2000 00:00:00", false);
-
-            CronCall("15/05/2000 00:00:00", "0 0 15,30,31 * *", "30/05/2000 00:00:00", false);
-            CronCall("30/05/2000 00:00:00", "0 0 15,30,31 * *", "31/05/2000 00:00:00", false);
-            CronCall("31/05/2000 00:00:00", "0 0 15,30,31 * *", "15/06/2000 00:00:00", false);
-
-            CronCall("15/06/2000 00:00:00", "0 0 15,30,31 * *", "30/06/2000 00:00:00", false);
-            CronCall("30/06/2000 00:00:00", "0 0 15,30,31 * *", "15/07/2000 00:00:00", false);
-
-            CronCall("15/07/2000 00:00:00", "0 0 15,30,31 * *", "30/07/2000 00:00:00", false);
-            CronCall("30/07/2000 00:00:00", "0 0 15,30,31 * *", "31/07/2000 00:00:00", false);
-            CronCall("31/07/2000 00:00:00", "0 0 15,30,31 * *", "15/08/2000 00:00:00", false);
-
-            CronCall("15/08/2000 00:00:00", "0 0 15,30,31 * *", "30/08/2000 00:00:00", false);
-            CronCall("30/08/2000 00:00:00", "0 0 15,30,31 * *", "31/08/2000 00:00:00", false);
-            CronCall("31/08/2000 00:00:00", "0 0 15,30,31 * *", "15/09/2000 00:00:00", false);
-
-            CronCall("15/09/2000 00:00:00", "0 0 15,30,31 * *", "30/09/2000 00:00:00", false);
-            CronCall("30/09/2000 00:00:00", "0 0 15,30,31 * *", "15/10/2000 00:00:00", false);
-
-            CronCall("15/10/2000 00:00:00", "0 0 15,30,31 * *", "30/10/2000 00:00:00", false);
-            CronCall("30/10/2000 00:00:00", "0 0 15,30,31 * *", "31/10/2000 00:00:00", false);
-            CronCall("31/10/2000 00:00:00", "0 0 15,30,31 * *", "15/11/2000 00:00:00", false);
-
-            CronCall("15/11/2000 00:00:00", "0 0 15,30,31 * *", "30/11/2000 00:00:00", false);
-            CronCall("30/11/2000 00:00:00", "0 0 15,30,31 * *", "15/12/2000 00:00:00", false);
-
-            CronCall("15/12/2000 00:00:00", "0 0 15,30,31 * *", "30/12/2000 00:00:00", false);
-            CronCall("30/12/2000 00:00:00", "0 0 15,30,31 * *", "31/12/2000 00:00:00", false);
-            CronCall("31/12/2000 00:00:00", "0 0 15,30,31 * *", "15/01/2001 00:00:00", false);
-
-            // Other month tests (including year rollover)
-
-            CronCall("01/12/2003 05:00:00", "10 * * 6 *", "01/06/2004 00:10:00", false);
-            CronCall("04/01/2003 00:00:00", " 1 2 3 * *", "03/02/2003 02:01:00", false);
-            CronCall("01/07/2002 05:00:00", "10 * * February,April-Jun *", "01/02/2003 00:10:00", false);
-            CronCall("01/01/2003 00:00:00", "0 12 1 6 *", "01/06/2003 12:00:00", false);
-            CronCall("11/09/1988 14:23:00", "* 12 1 6 *", "01/06/1989 12:00:00", false);
-            CronCall("11/03/1988 14:23:00", "* 12 1 6 *", "01/06/1988 12:00:00", false);
-            CronCall("11/03/1988 14:23:00", "* 2,4-8,15 * 6 *", "01/06/1988 02:00:00", false);
-            CronCall("11/03/1988 14:23:00", "20 * * january,FeB,Mar,april,May,JuNE,July,Augu,SEPT-October,Nov,DECEM *", "11/03/1988 15:20:00", false);
-
-            // Day of week tests
-
-            CronCall("26/06/2003 10:00:00", "30 6 * * 0",      "29/06/2003 06:30:00", false);
-            CronCall("26/06/2003 10:00:00", "30 6 * * sunday", "29/06/2003 06:30:00", false);
-            CronCall("26/06/2003 10:00:00", "30 6 * * SUNDAY", "29/06/2003 06:30:00", false);
-            CronCall("19/06/2003 00:00:00", "1 12 * * 2",      "24/06/2003 12:01:00", false);
-            CronCall("24/06/2003 12:01:00", "1 12 * * 2",      "01/07/2003 12:01:00", false);
-
-            CronCall("01/06/2003 14:55:00", "15 18 * * Mon", "02/06/2003 18:15:00", false);
-            CronCall("02/06/2003 18:15:00", "15 18 * * Mon", "09/06/2003 18:15:00", false);
-            CronCall("09/06/2003 18:15:00", "15 18 * * Mon", "16/06/2003 18:15:00", false);
-            CronCall("16/06/2003 18:15:00", "15 18 * * Mon", "23/06/2003 18:15:00", false);
-            CronCall("23/06/2003 18:15:00", "15 18 * * Mon", "30/06/2003 18:15:00", false);
-            CronCall("30/06/2003 18:15:00", "15 18 * * Mon", "07/07/2003 18:15:00", false);
-
-            CronCall("01/01/2003 00:00:00", "* * * * Mon",   "06/01/2003 00:00:00", false);
-            CronCall("01/01/2003 12:00:00", "45 16 1 * Mon", "01/09/2003 16:45:00", false);
-            CronCall("01/09/2003 23:45:00", "45 16 1 * Mon", "01/12/2003 16:45:00", false);
-
-            // Leap year tests
-
-            CronCall("01/01/2000 12:00:00", "1 12 29 2 *", "29/02/2000 12:01:00", false);
-            CronCall("29/02/2000 12:01:00", "1 12 29 2 *", "29/02/2004 12:01:00", false);
-            CronCall("29/02/2004 12:01:00", "1 12 29 2 *", "29/02/2008 12:01:00", false);
-
-            // Non-leap year tests
-
-            CronCall("01/01/2000 12:00:00", "1 12 28 2 *", "28/02/2000 12:01:00", false);
-            CronCall("28/02/2000 12:01:00", "1 12 28 2 *", "28/02/2001 12:01:00", false);
-            CronCall("28/02/2001 12:01:00", "1 12 28 2 *", "28/02/2002 12:01:00", false);
-            CronCall("28/02/2002 12:01:00", "1 12 28 2 *", "28/02/2003 12:01:00", false);
-            CronCall("28/02/2003 12:01:00", "1 12 28 2 *", "28/02/2004 12:01:00", false);
-            CronCall("29/02/2004 12:01:00", "1 12 28 2 *", "28/02/2005 12:01:00", false);
+            CronCall(startTimeString, cronExpression, nextTimeString, new ParseOptions
+            {
+                IncludingSeconds = includingSeconds
+            });
         }
 
-        [Test]
-        public void FiniteOccurrences()
-        {
-            CronFinite(" *  * * * *  ", "01/01/2003 00:00:00", "01/01/2003 00:00:00");
-            CronFinite(" *  * * * *  ", "31/12/2002 23:59:59", "01/01/2003 00:00:00");
-            CronFinite(" *  * * * Mon", "31/12/2002 23:59:59", "01/01/2003 00:00:00");
-            CronFinite(" *  * * * Mon", "01/01/2003 00:00:00", "02/01/2003 00:00:00");
-            CronFinite(" *  * * * Mon", "01/01/2003 00:00:00", "02/01/2003 12:00:00");
-            CronFinite("30 12 * * Mon", "01/01/2003 00:00:00", "06/01/2003 12:00:00");
+        [TestCase(" *  * * * *  ", "01/01/2003 00:00:00", "01/01/2003 00:00:00"   , false)]
+        [TestCase(" *  * * * *  ", "31/12/2002 23:59:59", "01/01/2003 00:00:00"   , false)]
+        [TestCase(" *  * * * Mon", "31/12/2002 23:59:59", "01/01/2003 00:00:00"   , false)]
+        [TestCase(" *  * * * Mon", "01/01/2003 00:00:00", "02/01/2003 00:00:00"   , false)]
+        [TestCase(" *  * * * Mon", "01/01/2003 00:00:00", "02/01/2003 12:00:00"   , false)]
+        [TestCase("30 12 * * Mon", "01/01/2003 00:00:00", "06/01/2003 12:00:00"   , false)]
 
-            var cronFinite = CronFinite(new ParseOptions { IncludingSeconds = true });
-            cronFinite(" *  *  * * * *  ", "01/01/2003 00:00:00", "01/01/2003 00:00:00");
-            cronFinite(" *  *  * * * *  ", "31/12/2002 23:59:59", "01/01/2003 00:00:00");
-            cronFinite(" *  *  * * * Mon", "31/12/2002 23:59:59", "01/01/2003 00:00:00");
-            cronFinite(" *  *  * * * Mon", "01/01/2003 00:00:00", "02/01/2003 00:00:00");
-            cronFinite(" *  *  * * * Mon", "01/01/2003 00:00:00", "02/01/2003 12:00:00");
-            cronFinite("10 30 12 * * Mon", "01/01/2003 00:00:00", "06/01/2003 12:00:10");
+        [TestCase(" *  *  * * * *  ", "01/01/2003 00:00:00", "01/01/2003 00:00:00", true )]
+        [TestCase(" *  *  * * * *  ", "31/12/2002 23:59:59", "01/01/2003 00:00:00", true )]
+        [TestCase(" *  *  * * * Mon", "31/12/2002 23:59:59", "01/01/2003 00:00:00", true )]
+        [TestCase(" *  *  * * * Mon", "01/01/2003 00:00:00", "02/01/2003 00:00:00", true )]
+        [TestCase(" *  *  * * * Mon", "01/01/2003 00:00:00", "02/01/2003 12:00:00", true )]
+        [TestCase("10 30 12 * * Mon", "01/01/2003 00:00:00", "06/01/2003 12:00:10", true )]
+
+        public void FiniteOccurrences(string cronExpression, string startTimeString, string endTimeString, bool includingSeconds)
+        {
+            CronFinite(cronExpression, startTimeString, endTimeString, new ParseOptions
+            {
+                IncludingSeconds = includingSeconds
+            });
         }
 
         [Test, Category("Performance")]
@@ -295,77 +300,60 @@ namespace NCrontab.Tests
             TimeCron(TimeSpan.FromSeconds(1), () =>
                 CronFinite("* * 31 Feb *", "01/01/2001 00:00:00", "01/01/2010 00:00:00"));
             TimeCron(TimeSpan.FromSeconds(1), () =>
-                CronFinite(new ParseOptions { IncludingSeconds = true })("* * * 31 Feb *", "01/01/2001 00:00:00", "01/01/2010 00:00:00"));
+                CronFinite("* * * 31 Feb *", "01/01/2001 00:00:00", "01/01/2010 00:00:00", new ParseOptions
+                {
+                    IncludingSeconds = true
+                }));
         }
 
-        [Test]
-        public void BadSecondsField()
-        {
-            Assert.Throws<CrontabException>(() => CrontabSchedule.Parse("bad * * * * *"));
-        }
+        [TestCase("bad * * * * *")]
+        public void BadSecondsField(string expression) =>
+            Assert.Throws<CrontabException>(() => CrontabSchedule.Parse(expression));
 
-        [Test]
-        public void BadMinutesField()
-        {
-            Assert.Throws<CrontabException>(() => CrontabSchedule.Parse("bad * * * *"));
-            Assert.Throws<CrontabException>(() => CrontabSchedule.Parse("* bad * * * *"));
-        }
+        [TestCase("bad * * * *")]
+        [TestCase("* bad * * * *")]
+        public void BadMinutesField(string expression) =>
+            Assert.Throws<CrontabException>(() => CrontabSchedule.Parse(expression));
 
-        [Test]
-        public void BadHoursField()
-        {
-            Assert.Throws<CrontabException>(() => CrontabSchedule.Parse("* bad * * *"));
-            Assert.Throws<CrontabException>(() => CrontabSchedule.Parse("* * bad * * *"));
-        }
+        [TestCase("* bad * * *")]
+        [TestCase("* * bad * * *")]
+        public void BadHoursField(string expression) =>
+            Assert.Throws<CrontabException>(() => CrontabSchedule.Parse(expression));
 
-        [Test]
-        public void BadDayField()
-        {
-            Assert.Throws<CrontabException>(() => CrontabSchedule.Parse("* * bad * *"));
-            Assert.Throws<CrontabException>(() => CrontabSchedule.Parse("* * * bad * *"));
-        }
+        [TestCase("* * bad * *")]
+        [TestCase("* * * bad * *")]
+        public void BadDayField(string expression) =>
+            Assert.Throws<CrontabException>(() => CrontabSchedule.Parse(expression));
 
-        [Test]
-        public void BadMonthField()
-        {
-            Assert.Throws<CrontabException>(() => CrontabSchedule.Parse("* * * bad *"));
-            Assert.Throws<CrontabException>(() => CrontabSchedule.Parse("* * * * bad *"));
-        }
+        [TestCase("* * * bad *")]
+        [TestCase("* * * * bad *")]
+        public void BadMonthField(string expression) =>
+            Assert.Throws<CrontabException>(() => CrontabSchedule.Parse(expression));
 
-        [Test]
-        public void BadDayOfWeekField()
-        {
-            Assert.Throws<CrontabException>(() => CrontabSchedule.Parse("* * * * mon,bad,wed"));
-            Assert.Throws<CrontabException>(() => CrontabSchedule.Parse("* * * * * mon,bad,wed"));
-        }
+        [TestCase("* * * * mon,bad,wed")]
+        [TestCase("* * * * * mon,bad,wed")]
+        public void BadDayOfWeekField(string expression) =>
+            Assert.Throws<CrontabException>(() => CrontabSchedule.Parse(expression));
 
-        [Test]
-        public void OutOfRangeField()
-        {
-            Assert.Throws<CrontabException>(() => CrontabSchedule.Parse("* 1,2,3,456,7,8,9 * * *"));
-            Assert.Throws<CrontabException>(() => CrontabSchedule.Parse("* * 1,2,3,456,7,8,9 * * *"));
-        }
+        [TestCase("* 1,2,3,456,7,8,9 * * *")]
+        [TestCase("* * 1,2,3,456,7,8,9 * * *")]
+        public void OutOfRangeField(string expression) =>
+            Assert.Throws<CrontabException>(() => CrontabSchedule.Parse(expression));
 
-        [Test]
-        public void NonNumberValueInNumericOnlyField()
-        {
-            Assert.Throws<CrontabException>(() => CrontabSchedule.Parse("* 1,Z,3,4 * * *"));
-            Assert.Throws<CrontabException>(() => CrontabSchedule.Parse("* * 1,Z,3,4 * * *"));
-        }
+        [TestCase("* 1,Z,3,4 * * *")]
+        [TestCase("* * 1,Z,3,4 * * *")]
+        public void NonNumberValueInNumericOnlyField(string expression) =>
+            Assert.Throws<CrontabException>(() => CrontabSchedule.Parse(expression));
 
-        [Test]
-        public void NonNumericFieldInterval()
-        {
-            Assert.Throws<CrontabException>(() => CrontabSchedule.Parse("* 1/Z * * *"));
-            Assert.Throws<CrontabException>(() => CrontabSchedule.Parse("* * 1/Z * * *"));
-        }
+        [TestCase("* 1/Z * * *")]
+        [TestCase("* * 1/Z * * *")]
+        public void NonNumericFieldInterval(string expression) =>
+            Assert.Throws<CrontabException>(() => CrontabSchedule.Parse(expression));
 
-        [Test]
-        public void NonNumericFieldRangeComponent()
-        {
-            Assert.Throws<CrontabException>(() => CrontabSchedule.Parse("* 3-l2 * * *"));
-            Assert.Throws<CrontabException>(() => CrontabSchedule.Parse("* * 3-l2 * * *"));
-        }
+        [TestCase("* 3-l2 * * *")]
+        [TestCase("* * 3-l2 * * *")]
+        public void NonNumericFieldRangeComponent(string expression) =>
+            Assert.Throws<CrontabException>(() => CrontabSchedule.Parse(expression));
 
         static void TimeCron(TimeSpan limit, ThreadStart test)
         {
@@ -391,46 +379,24 @@ namespace NCrontab.Tests
                         "Check there is not an infinite loop somewhere.", limit);
         }
 
-        static void CronCall(string startTimeString, string cronExpression, string nextTimeString, bool expectException) =>
-            CronCall(null)(startTimeString, cronExpression, nextTimeString, expectException);
+        static void CronCall(string startTimeString, string cronExpression, string nextTimeString, ParseOptions options)
+        {
+            var schedule = CrontabSchedule.Parse(cronExpression, options);
+            var next = schedule.GetNextOccurrence(Time(startTimeString));
 
-        static Action<string, string, string, bool> CronCall(ParseOptions options) =>
-            (startTimeString, cronExpression, nextTimeString, expectException) =>
-            {
-                var start = Time(startTimeString);
+            Assert.AreEqual(nextTimeString, TimeString(next),
+                "Occurrence of <{0}> after <{1}>.", cronExpression, startTimeString);
+        }
 
-                try
-                {
-                    var schedule = CrontabSchedule.Parse(cronExpression, options);
+        static void CronFinite(string cronExpression, string startTimeString, string endTimeString, ParseOptions options)
+        {
+            var schedule = CrontabSchedule.Parse(cronExpression, options);
+            var occurrence = schedule.GetNextOccurrence(Time(startTimeString), Time(endTimeString));
 
-                    if (expectException)
-                        Assert.Fail("The expression <{0}> cannot be valid.", cronExpression);
-
-                    var next = schedule.GetNextOccurrence(start);
-
-                    Assert.AreEqual(nextTimeString, TimeString(next),
-                        "Occurrence of <{0}> after <{1}>.", cronExpression, startTimeString);
-                }
-                catch (CrontabException e)
-                {
-                    if (!expectException)
-                        Assert.Fail("Unexpected ParseException while parsing <{0}>: {1}", cronExpression, e.ToString());
-                }
-            };
-
-        static void CronFinite(string cronExpression, string startTimeString, string endTimeString) =>
-            CronFinite(null)(cronExpression, startTimeString, endTimeString);
-
-        static Action<string, string, string> CronFinite(ParseOptions options) =>
-            (cronExpression, startTimeString, endTimeString) =>
-            {
-                var schedule = CrontabSchedule.Parse(cronExpression, options);
-                var occurrence = schedule.GetNextOccurrence(Time(startTimeString), Time(endTimeString));
-
-                Assert.AreEqual(endTimeString, TimeString(occurrence),
-                    "Occurrence of <{0}> after <{1}> did not terminate with <{2}>.",
-                    cronExpression, startTimeString, endTimeString);
-            };
+            Assert.AreEqual(endTimeString, TimeString(occurrence),
+                "Occurrence of <{0}> after <{1}> did not terminate with <{2}>.",
+                cronExpression, startTimeString, endTimeString);
+        }
 
         static string TimeString(DateTime time) => time.ToString(TimeFormat, CultureInfo.InvariantCulture);
         static DateTime Time(string str) => DateTime.ParseExact(str, TimeFormat, CultureInfo.InvariantCulture);
