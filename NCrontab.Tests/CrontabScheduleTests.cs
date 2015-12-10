@@ -391,14 +391,12 @@ namespace NCrontab.Tests
                         "Check there is not an infinite loop somewhere.", limit);
         }
 
-        delegate void CronCallHandler(string startTimeString, string cronExpression, string nextTimeString, bool expectException);
-
         static void CronCall(string startTimeString, string cronExpression, string nextTimeString, bool expectException)
         {
             CronCall(null)(startTimeString, cronExpression, nextTimeString, expectException);
         }
 
-        static CronCallHandler CronCall(ParseOptions options)
+        static Action<string, string, string, bool> CronCall(ParseOptions options)
         {
             return (startTimeString, cronExpression, nextTimeString, expectException) =>
             {
@@ -429,9 +427,7 @@ namespace NCrontab.Tests
             CronFinite(null)(cronExpression, startTimeString, endTimeString);
         }
 
-        delegate void CronFiniteHandler(string cronExpression, string startTimeString, string endTimeString);
-
-        static CronFiniteHandler CronFinite(ParseOptions options)
+        static Action<string, string, string> CronFinite(ParseOptions options)
         {
             return (cronExpression, startTimeString, endTimeString) =>
             {
