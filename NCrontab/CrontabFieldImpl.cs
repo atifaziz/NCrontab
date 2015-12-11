@@ -29,11 +29,11 @@ namespace NCrontab
 
     #endregion
 
-    public delegate T CrontabFieldAccumulator<T>(int start, int end, int interval, T successs, Func<ExceptionProvider, T> onError);
+    delegate T CrontabFieldAccumulator<T>(int start, int end, int interval, T successs, Func<ExceptionProvider, T> onError);
 
     // ReSharper disable once PartialTypeWithSinglePart
 
-    public sealed partial class CrontabFieldImpl
+    sealed partial class CrontabFieldImpl
     {
         public static readonly CrontabFieldImpl Second    = new CrontabFieldImpl(CrontabFieldKind.Second, 0, 59, null);
         public static readonly CrontabFieldImpl Minute    = new CrontabFieldImpl(CrontabFieldKind.Minute, 0, 59, null);
