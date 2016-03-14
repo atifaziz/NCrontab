@@ -6,7 +6,11 @@ if "%nuget%"=="" (
     echo For more on NuGet, see https://github.com/nuget/home
 )
 pushd "%~dp0"
-nuget restore && call :build Debug %* && call :build Release %*
+nuget restore ^
+ && call :build Debug         %* ^
+ && call :build Release       %* ^
+ && call :build DebugSigned   %* ^
+ && call :build ReleaseSigned %*
 popd
 goto :EOF
 

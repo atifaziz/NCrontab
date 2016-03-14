@@ -1,8 +1,8 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <package>
     <metadata>
-        <id>ncrontab</id>
-        <title>NCrontab</title>
+        <id>ncrontab.signed</id>
+        <title>NCrontab (Signed)</title>
         <version>3.1.0</version>
         <authors>Atif Aziz</authors>
         <description>NCrontab is crontab for Microsoft .NET Framework 3.5 and above. It provides parsing and formatting of crontab expressions as well as calculation of occurrences of time based on a schedule expressed in the crontab format.</description>
@@ -10,7 +10,7 @@
         <copyright>Copyright &#169; 2008 Atif Aziz. All rights reserved.</copyright>
         <licenseUrl>http://www.apache.org/licenses/LICENSE-2.0</licenseUrl>
         <projectUrl>https://github.com/atifaziz/NCrontab</projectUrl>
-        <tags>cron schedule time</tags>
+        <tags>cron schedule time signed</tags>
         <releaseNotes>3.1: CrontabFieldImpl and CrontabFieldAccumulator are now private.
 3.0: Replaces uses of Converter with Func and therefore requires .NET Framework 3.5 as a minimum.
 
@@ -21,10 +21,10 @@ Release 3.x also makes the library available as a PCL for:
 - Microsoft Windows Phone Silverlight 8.0</releaseNotes>
     </metadata>
     <files>
-        <file src="bin\Release\NCrontab.*" target="lib\net35-client" exclude="bin\**\NCrontab.Signed.*" />
-        <file src="bin\Release\NCrontab.*" target="lib\net40-client" exclude="bin\**\NCrontab.Signed.*" />
-        <file src="bin\Release\NCrontab.*" target="lib\net45" exclude="bin\Release\NCrontab.Signed.*" />
-        <file src="bin\Portable\Release\NCrontab.*" target="lib\portable-net45+netcore45+wpa81+wp8" exclude="bin\**\NCrontab.Signed.*" />
+        <file src="bin\Release\NCrontab.Signed.*" target="lib\net35-client" />
+        <file src="bin\Release\NCrontab.Signed.*" target="lib\net40-client" />
+        <file src="bin\Release\NCrontab.Signed.*" target="lib\net45" />
+        <file src="bin\Portable\Release\NCrontab.Signed.*" target="lib\portable-net45+netcore45+wpa81+wp8" />
         <file src="COPYING.txt" target="COPYING.txt" />
         <file src="*.cs" target="src" />
         <file src="NCrontab\**\*.cs" target="src\NCrontab" exclude="**\obj*\**\*.cs" />

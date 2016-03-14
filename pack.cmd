@@ -10,8 +10,11 @@ for %%i in (NuGet.exe) do set nuget=%%~dpnx$PATH:i
 if "%nuget%"=="" goto :nonuget
 if not exist dist md dist
 if not %errorlevel%==0 exit /b %errorlevel%
-call build /v:m ^
-    && nuget pack ncrontab.nuspec -OutputDirectory dist -Symbols
+call build /v:m && call :pack ncrontab && call :pack ncrontab.signed
+goto :EOF
+
+:pack
+nuget pack %1.nuspec -OutputDirectory dist -Symbols
 goto :EOF
 
 :nonuget
