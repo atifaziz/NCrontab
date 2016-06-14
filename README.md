@@ -124,10 +124,48 @@ Below is the same example in [F#][f#] Interactive (`fsi.exe`):
     Mon, 20 Nov 2000 12:00
     Mon, 27 Nov 2000 12:00
 
-    val schedule : NCrontab.CrontabSchedule = 0 12 * 1,3,5,7,9,11 1
-    val startDate : System.DateTime = 1/1/2000 12:00:00 AM
-    val endDate : System.DateTime = 1/1/2001 12:00:00 AM
-    val occurrences : seq<System.DateTime>
+Below is the same example in C# Interactive (`csi.exe`):
+
+    Microsoft (R) Visual C# Interactive Compiler version 1.2.0.60317
+    Copyright (C) Microsoft Corporation. All rights reserved.
+
+    Type "#help" for more information.
+    > #r "NCrontab.dll"
+    > using NCrontab;
+    > var s = CrontabSchedule.Parse("0 12 * */2 Mon");
+    > var start = new DateTime(2000, 1, 1);
+    > var end = start.AddYears(1);
+    > var occurrences = s.GetNextOccurrences(start, end);
+    > Console.WriteLine(string.Join(Environment.NewLine, 
+    .     from t in occurrences
+    .     select $"{t:ddd, dd MMM yyyy HH:mm}"));
+    Mon, 03 Jan 2000 12:00
+    Mon, 10 Jan 2000 12:00
+    Mon, 17 Jan 2000 12:00
+    Mon, 24 Jan 2000 12:00
+    Mon, 31 Jan 2000 12:00
+    Mon, 06 Mar 2000 12:00
+    Mon, 13 Mar 2000 12:00
+    Mon, 20 Mar 2000 12:00
+    Mon, 27 Mar 2000 12:00
+    Mon, 01 May 2000 12:00
+    Mon, 08 May 2000 12:00
+    Mon, 15 May 2000 12:00
+    Mon, 22 May 2000 12:00
+    Mon, 29 May 2000 12:00
+    Mon, 03 Jul 2000 12:00
+    Mon, 10 Jul 2000 12:00
+    Mon, 17 Jul 2000 12:00
+    Mon, 24 Jul 2000 12:00
+    Mon, 31 Jul 2000 12:00
+    Mon, 04 Sep 2000 12:00
+    Mon, 11 Sep 2000 12:00
+    Mon, 18 Sep 2000 12:00
+    Mon, 25 Sep 2000 12:00
+    Mon, 06 Nov 2000 12:00
+    Mon, 13 Nov 2000 12:00
+    Mon, 20 Nov 2000 12:00
+    Mon, 27 Nov 2000 12:00
 
 
   [ipy]: http://en.wikipedia.org/wiki/IronPython
