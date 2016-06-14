@@ -44,7 +44,7 @@ throughout the year 2000:
     >>> start = DateTime(2000, 1, 1)
     >>> end = start.AddYears(1)
     >>> occurrences = s.GetNextOccurrences(start, end)
-    >>> print '\n'.join([t.ToString('ddd, dd MMM yyyy hh:mm') for t in occurrences])
+    >>> print '\n'.join([t.ToString('ddd, dd MMM yyyy HH:mm') for t in occurrences])
     Mon, 03 Jan 2000 12:00
     Mon, 10 Jan 2000 12:00
     Mon, 17 Jan 2000 12:00
@@ -90,7 +90,7 @@ Below is the same example in [F#][f#] Interactive (`fsi.exe`):
     - let endDate = startDate.AddYears(1)
     -
     - let occurrences = schedule.GetNextOccurrences(startDate, endDate)
-    - occurrences |> Seq.map (fun t -> t.ToString("ddd, dd MMM yyy hh:mm"))
+    - occurrences |> Seq.map (fun t -> t.ToString("ddd, dd MMM yyy HH:mm"))
     -             |> String.concat "\n"
     -             |> printfn "%s";;
 
