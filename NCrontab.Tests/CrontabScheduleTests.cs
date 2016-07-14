@@ -43,12 +43,6 @@ namespace NCrontab.Tests
         }
 
         [Test]
-        public void AllTimeString()
-        {
-            Assert.AreEqual("* * * * *", CrontabSchedule.Parse("* * * * *").ToString());
-        }
-
-        [Test]
         public void SixPartAllTimeString()
         {
             Assert.AreEqual("* * * * * *", CrontabSchedule.Parse("* * * * * *", new ParseOptions { IncludingSeconds = true }).ToString());
@@ -60,18 +54,21 @@ namespace NCrontab.Tests
             Assert.Throws<CrontabException>(() => CrontabSchedule.Parse("* * * * *", new ParseOptions { IncludingSeconds = true }));
         }
 
-        [TestCase("* 1-3 * * *"            , "* 1-2,3 * * *"                   , false)]
-        [TestCase("* * * 1,3,5,7,9,11 *"   , "* * * */2 *"                     , false)]
-        [TestCase("10,25,40 * * * *"       , "10-40/15 * * * *"                , false)]
-        [TestCase("* * * 1,3,8 1-2,5"      , "* * * Mar,Jan,Aug Fri,Mon-Tue"   , false)]
-        [TestCase("1 * 1-3 * * *"          , "1 * 1-2,3 * * *"                 , true )]
-        [TestCase("22 * * * 1,3,5,7,9,11 *", "22 * * * */2 *"                  , true )]
-        [TestCase("33 10,25,40 * * * *"    , "33 10-40/15 * * * *"             , true )]
-        [TestCase("55 * * * 1,3,8 1-2,5"   , "55 * * * Mar,Jan,Aug Fri,Mon-Tue", true )]
-        public void Formatting(string format, string expression, bool includingSeconds)
+        [TestCase("* * * * *"                       , false)]
+        [TestCase("* 1-3 * * *"                     , false)]
+        [TestCase("* * * 1,3,5,7,9,11 *"            , false)]
+        [TestCase("10,25,40 * * * *"                , false)]
+        [TestCase("* * * 1,3,8 1-2,5"               , false)]
+        [TestCase("* * * Mar,Jan,Aug Fri,Mon-Tue"   , false)]
+        [TestCase("1 * 1-3 * * *"                   , true )]
+        [TestCase("22 * * * 1,3,5,7,9,11 *"         , true )]
+        [TestCase("33 10,25,40 * * * *"             , true )]
+        [TestCase("55 * * * 1,3,8 1-2,5"            , true )]
+        [TestCase("55 * * * Mar,Jan,Aug Fri,Mon-Tue", true)]
+        public void Formatting(string expression, bool includingSeconds)
         {
             var options = new ParseOptions { IncludingSeconds = includingSeconds };
-            Assert.AreEqual(format, CrontabSchedule.Parse(expression, options).ToString());
+            Assert.AreEqual(expression, CrontabSchedule.Parse(expression, options).ToString());
         }
 
         /// <summary>
