@@ -37,6 +37,7 @@ namespace NCrontab
 
     public sealed partial class CrontabSchedule
     {
+        readonly string _expression;
         readonly CrontabField _seconds;
         readonly CrontabField _minutes;
         readonly CrontabField _hours;
@@ -137,21 +138,24 @@ namespace NCrontab
                 fields[i + offset] = field.Value;
             }
 
-            return valueSelector(new CrontabSchedule(fields[0], fields[1], fields[2], fields[3], fields[4], fields[5]));
+            return valueSelector(new CrontabSchedule(expression, fields[0], fields[1], fields[2], fields[3], fields[4], fields[5]));
         }
 
         CrontabSchedule(
+            string expression,
             CrontabField seconds,
             CrontabField minutes, CrontabField hours,
             CrontabField days, CrontabField months,
             CrontabField daysOfWeek)
         {
+            Debug.Assert(!string.IsNullOrEmpty(expression));
             Debug.Assert(minutes != null);
             Debug.Assert(hours != null);
             Debug.Assert(days != null);
             Debug.Assert(months != null);
             Debug.Assert(daysOfWeek != null);
 
+            _expression = expression;
             _seconds = seconds;
             _minutes = minutes;
             _hours = hours;
@@ -369,20 +373,7 @@ namespace NCrontab
 
         public override string ToString()
         {
-            var writer = new StringWriter(CultureInfo.InvariantCulture);
-
-            if (_seconds != null)
-            {
-                _seconds.Format(writer, true);
-                writer.Write(' ');
-            }
-            _minutes.Format(writer, true); writer.Write(' ');
-            _hours.Format(writer, true); writer.Write(' ');
-            _days.Format(writer, true); writer.Write(' ');
-            _months.Format(writer, true); writer.Write(' ');
-            _daysOfWeek.Format(writer, true);
-
-            return writer.ToString();
+            return _expression;
         }
 
         static Calendar Calendar => CultureInfo.InvariantCulture.Calendar;
