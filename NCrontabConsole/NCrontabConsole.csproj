@@ -54,12 +54,6 @@
     <Compile Include="Program.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\NCrontab\NCrontab.csproj">
-      <Project>{1948D266-8DCB-4AC5-98E6-A609713011CB}</Project>
-      <Name>NCrontab</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
     <None Include="App.config" />
     <None Include="AssemblyInfo.g.tt">
       <Generator>TextTemplatingFileGenerator</Generator>

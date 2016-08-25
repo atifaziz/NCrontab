@@ -17,23 +17,25 @@
 //
 #endregion
 
-namespace NCrontabViewer
-{
-    #region Imports
+#region Imports
 
-    using System;
-    using System.Windows.Forms;
+using System.Reflection;
 
-    #endregion
+using ComVisible = System.Runtime.InteropServices.ComVisibleAttribute;
 
-    static class Program
-    {
-        [STAThread]
-        static void Main()
-        {
-            Application.EnableVisualStyles();
-            Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new MainForm());
-        }
-    }
-}
+#endregion
+
+[assembly: AssemblyProduct("NCrontab")]
+
+[assembly: AssemblyCopyright("Copyright (c) 2008, Atif Aziz. All rights reserved.")]
+[assembly: AssemblyCompany("")]
+[assembly: AssemblyTrademark("")]
+[assembly: AssemblyCulture("")]
+
+#if DEBUG
+[assembly: AssemblyConfiguration("DEBUG")]
+#else
+[assembly: AssemblyConfiguration("RELEASE")]
+#endif
+
+[assembly: ComVisible(false)]
