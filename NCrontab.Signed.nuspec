@@ -3,7 +3,7 @@
     <metadata>
         <id>ncrontab.signed</id>
         <title>NCrontab (Signed)</title>
-        <version>3.1.0</version>
+        <version>3.2.0</version>
         <authors>Atif Aziz</authors>
         <description>NCrontab is crontab for Microsoft .NET Framework 3.5 and above. It provides parsing and formatting of crontab expressions as well as calculation of occurrences of time based on a schedule expressed in the crontab format.</description>
         <language>en-US</language>

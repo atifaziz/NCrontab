@@ -3,7 +3,7 @@
     <metadata>
         <id>ncrontab</id>
         <title>NCrontab</title>
-        <version>3.1.0</version>
+        <version>3.2.0</version>
         <authors>Atif Aziz</authors>
         <description>NCrontab is crontab for Microsoft .NET Framework 3.5 and above. It provides parsing and formatting of crontab expressions as well as calculation of occurrences of time based on a schedule expressed in the crontab format.</description>
         <language>en-US</language>
@@ -11,7 +11,10 @@
         <licenseUrl>http://www.apache.org/licenses/LICENSE-2.0</licenseUrl>
         <projectUrl>https://github.com/atifaziz/NCrontab</projectUrl>
         <tags>cron schedule time</tags>
-        <releaseNotes>3.1: CrontabFieldImpl and CrontabFieldAccumulator are now private.
+        <releaseNotes>3.2: Fixes the following issues:
+     - Wrong schedule when a crontab field is of the form N/1; remaining values of that field were being ignored.
+     - CrontabSchedule.TryParse doesn't throw if given a null string as input.
+3.1: CrontabFieldImpl and CrontabFieldAccumulator are now private.
 3.0: Replaces uses of Converter with Func and therefore requires .NET Framework 3.5 as a minimum.
 
 Release 3.x also makes the library available as a PCL for:
