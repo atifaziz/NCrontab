@@ -253,6 +253,9 @@ namespace NCrontab.Tests
         [TestCase("28/02/2003 12:01:00", "1 12 28 2 *", "28/02/2004 12:01:00", false)]
         [TestCase("29/02/2004 12:01:00", "1 12 28 2 *", "28/02/2005 12:01:00", false)]
 
+        [TestCase("01/01/2000 12:00:00", "40 14/1 * * *", "01/01/2000 14:40:00", false)]
+        [TestCase("01/01/2000 14:40:00", "40 14/1 * * *", "01/01/2000 15:40:00", false)]
+
         public void Evaluations(string startTimeString, string cronExpression, string nextTimeString, bool includingSeconds)
         {
             CronCall(startTimeString, cronExpression, nextTimeString, new ParseOptions

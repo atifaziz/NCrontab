@@ -220,7 +220,7 @@ namespace NCrontab
                 return result;
             }
 
-            var every = 1;
+            int? every = null;
 
             //
             // Look for stepping first (e.g. */2 = every 2nd).
@@ -240,7 +240,7 @@ namespace NCrontab
 
             if (str.Length == 1 && str[0]== '*')
             {
-                return acc(-1, -1, every, success, errorSelector);
+                return acc(-1, -1, every ?? 1, success, errorSelector);
             }
 
             //
@@ -254,7 +254,7 @@ namespace NCrontab
                 var first = ParseValue(str.Substring(0, dashIndex));
                 var last = ParseValue(str.Substring(dashIndex + 1));
 
-                return acc(first, last, every, success, errorSelector);
+                return acc(first, last, every ?? 1, success, errorSelector);
             }
 
             //
@@ -263,11 +263,11 @@ namespace NCrontab
 
             var value = ParseValue(str);
 
-            if (every == 1)
+            if (every == null)
                 return acc(value, value, 1, success, errorSelector);
 
             Debug.Assert(every != 0);
-            return acc(value, MaxValue, every, success, errorSelector);
+            return acc(value, MaxValue, every.Value, success, errorSelector);
         }
 
         int ParseValue(string str)
