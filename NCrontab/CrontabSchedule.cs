@@ -99,10 +99,10 @@ namespace NCrontab
         public static CrontabSchedule TryParse(string expression) => TryParse(expression, null);
 
         public static CrontabSchedule TryParse(string expression, ParseOptions options) =>
-            TryParse(expression, options, v => v, _ => null);
+            TryParse(expression ?? string.Empty, options, v => v, _ => null);
 
         public static T TryParse<T>(string expression, Func<CrontabSchedule, T> valueSelector, Func<ExceptionProvider, T> errorSelector) =>
-            TryParse(expression, null, valueSelector, errorSelector);
+            TryParse(expression ?? string.Empty, null, valueSelector, errorSelector);
 
         public static T TryParse<T>(string expression, ParseOptions options, Func<CrontabSchedule, T> valueSelector, Func<ExceptionProvider, T> errorSelector)
         {

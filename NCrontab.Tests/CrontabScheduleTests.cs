@@ -43,6 +43,14 @@ namespace NCrontab.Tests
         }
 
         [Test]
+        public void TryParseNullString() =>
+            Assert.That(CrontabSchedule.TryParse(null), Is.Null);
+
+        [Test]
+        public void TryParseEmptyString() =>
+            Assert.That(CrontabSchedule.TryParse(string.Empty), Is.Null);
+
+        [Test]
         public void AllTimeString()
         {
             Assert.AreEqual("* * * * *", CrontabSchedule.Parse("* * * * *").ToString());
@@ -309,6 +317,10 @@ namespace NCrontab.Tests
             {
                 IncludingSeconds = includingSeconds
             }));
+            Assert.That(CrontabSchedule.TryParse(expression, new ParseOptions
+            {
+                IncludingSeconds = includingSeconds
+            }), Is.Null);
         }
 
         [TestCase("bad * * * * *", false)]
