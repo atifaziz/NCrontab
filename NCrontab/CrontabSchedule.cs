@@ -37,14 +37,14 @@ namespace NCrontab
 
     public sealed partial class CrontabSchedule
     {
-        readonly CrontabField _seconds;
-        readonly CrontabField _minutes;
-        readonly CrontabField _hours;
-        readonly CrontabField _days;
-        readonly CrontabField _months;
-        readonly CrontabField _daysOfWeek;
+        public readonly CrontabField Seconds;
+        public readonly CrontabField Minutes;
+        public readonly CrontabField Hours;
+        public readonly CrontabField Days;
+        public readonly CrontabField Months;
+        public readonly CrontabField DaysOfWeek;
 
-        static readonly CrontabField SecondZero = CrontabField.Seconds("0");
+        private static readonly CrontabField SecondZero = CrontabField.Seconds("0");
 
         // ReSharper disable once PartialTypeWithSinglePart
 
@@ -152,12 +152,12 @@ namespace NCrontab
             Debug.Assert(months != null);
             Debug.Assert(daysOfWeek != null);
 
-            _seconds = seconds;
-            _minutes = minutes;
-            _hours = hours;
-            _days = days;
-            _months = months;
-            _daysOfWeek = daysOfWeek;
+            Seconds = seconds;
+            Minutes = minutes;
+            Hours = hours;
+            Days = days;
+            Months = months;
+            DaysOfWeek = daysOfWeek;
         }
 
         /// <summary>
@@ -235,7 +235,7 @@ namespace NCrontab
             // Second
             //
 
-            var seconds = _seconds ?? SecondZero;
+            var seconds = Seconds ?? SecondZero;
             second = seconds.Next(second);
 
             if (second == nil)
@@ -248,11 +248,11 @@ namespace NCrontab
             // Minute
             //
 
-            minute = _minutes.Next(minute);
+            minute = Minutes.Next(minute);
 
             if (minute == nil)
             {
-                minute = _minutes.GetFirst();
+                minute = Minutes.GetFirst();
                 hour++;
             }
 
@@ -260,63 +260,63 @@ namespace NCrontab
             // Hour
             //
 
-            hour = _hours.Next(hour);
+            hour = Hours.Next(hour);
 
             if (hour == nil)
             {
-                minute = _minutes.GetFirst();
-                hour = _hours.GetFirst();
+                minute = Minutes.GetFirst();
+                hour = Hours.GetFirst();
                 day++;
             }
             else if (hour > baseHour)
             {
-                minute = _minutes.GetFirst();
+                minute = Minutes.GetFirst();
             }
 
             //
             // Day
             //
 
-            day = _days.Next(day);
+            day = Days.Next(day);
 
             RetryDayMonth:
 
             if (day == nil)
             {
                 second = seconds.GetFirst();
-                minute = _minutes.GetFirst();
-                hour = _hours.GetFirst();
-                day = _days.GetFirst();
+                minute = Minutes.GetFirst();
+                hour = Hours.GetFirst();
+                day = Days.GetFirst();
                 month++;
             }
             else if (day > baseDay)
             {
                 second = seconds.GetFirst();
-                minute = _minutes.GetFirst();
-                hour = _hours.GetFirst();
+                minute = Minutes.GetFirst();
+                hour = Hours.GetFirst();
             }
 
             //
             // Month
             //
 
-            month = _months.Next(month);
+            month = Months.Next(month);
 
             if (month == nil)
             {
                 second = seconds.GetFirst();
-                minute = _minutes.GetFirst();
-                hour = _hours.GetFirst();
-                day = _days.GetFirst();
-                month = _months.GetFirst();
+                minute = Minutes.GetFirst();
+                hour = Hours.GetFirst();
+                day = Days.GetFirst();
+                month = Months.GetFirst();
                 year++;
             }
             else if (month > baseMonth)
             {
                 second = seconds.GetFirst();
-                minute = _minutes.GetFirst();
-                hour = _hours.GetFirst();
-                day = _days.GetFirst();
+                minute = Minutes.GetFirst();
+                hour = Hours.GetFirst();
+                day = Days.GetFirst();
             }
 
             //
@@ -356,7 +356,7 @@ namespace NCrontab
             // Day of week
             //
 
-            if (_daysOfWeek.Contains((int) nextTime.DayOfWeek))
+            if (DaysOfWeek.Contains((int) nextTime.DayOfWeek))
                 return nextTime;
 
             return GetNextOccurrence(new DateTime(year, month, day, 23, 59, 59, 0, baseTime.Kind), endTime);
@@ -371,16 +371,16 @@ namespace NCrontab
         {
             var writer = new StringWriter(CultureInfo.InvariantCulture);
 
-            if (_seconds != null)
+            if (Seconds != null)
             {
-                _seconds.Format(writer, true);
+                Seconds.Format(writer, true);
                 writer.Write(' ');
             }
-            _minutes.Format(writer, true); writer.Write(' ');
-            _hours.Format(writer, true); writer.Write(' ');
-            _days.Format(writer, true); writer.Write(' ');
-            _months.Format(writer, true); writer.Write(' ');
-            _daysOfWeek.Format(writer, true);
+            Minutes.Format(writer, true); writer.Write(' ');
+            Hours.Format(writer, true); writer.Write(' ');
+            Days.Format(writer, true); writer.Write(' ');
+            Months.Format(writer, true); writer.Write(' ');
+            DaysOfWeek.Format(writer, true);
 
             return writer.ToString();
         }
