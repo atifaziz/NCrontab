@@ -1,30 +1,50 @@
 @echo off
-setlocal
-for %%i in (NuGet.exe) do set nuget=%%~dpnx$PATH:i
-if "%nuget%"=="" (
-    echo WARNING! NuGet executable not found in PATH so build may fail!
-    echo For more on NuGet, see https://github.com/nuget/home
-)
 pushd "%~dp0"
-nuget restore ^
- && call :build Debug         %* ^
- && call :build Release       %* ^
- && call :build DebugSigned   %* ^
- && call :build ReleaseSigned %*
+call :main
 popd
 goto :EOF
 
-:build
+:main
 setlocal
 if "%PROCESSOR_ARCHITECTURE%"=="x86" set MSBUILD=%ProgramFiles%
 if defined ProgramFiles(x86) set MSBUILD=%ProgramFiles(x86)%
 set MSBUILD=%MSBUILD%\MSBuild\14.0\bin\msbuild
 if not exist "%MSBUILD%" (
+    echo ----------------------------------------------------------------------
+    echo  WARNING!
+    echo.
     echo Microsoft Build Tools 2015 does not appear to be installed on this
-    echo machine, which is required to build the solution. You can install
-    echo it from the URL below and then try building again:
+    echo machine, which is required to build WinForms-based demo application.
+    echo You can install it from the URL below and then try building again:
     echo https://www.microsoft.com/en-us/download/details.aspx?id=48159
+    echo ----------------------------------------------------------------------
+    echo.
+    goto buildlib
+)
+for %%c in (Debug Release) do (
+    "%MSBUILD%" /p:Configuration=%%c /v:m NCrontabViewer\NCrontabViewer.csproj || exit /b 1
+)
+:buildlib
+set DOTNETEXE=
+for %%f in (dotnet.exe) do set DOTNETEXE=%%~dpnx$PATH:f
+if not defined DOTNETEXE set DOTNETEXE=%ProgramFiles%\dotnet
+if not exist "%DOTNETEXE%" (
+    echo .NET Core does not appear to be installed on this machine, which is
+    echo required to build the solution. You can install it from the URL below
+    echo and then try building again:
+    echo https://dot.net
     exit /b 1
 )
-"%MSBUILD%" /p:Configuration=%1 /v:m %2 %3 %4 %5 %6 %7 %8 %9
+"%DOTNETEXE%" --info                     ^
+  && "%DOTNETEXE%" restore               ^
+  && call :build NCrontab        Debug   ^
+  && call :build NCrontab        Release ^
+  && call :build NCrontab.Tests  Debug   ^
+  && call :build NCrontab.Tests  Release ^
+  && call :build NCrontabConsole Debug   ^
+  && call :build NCrontabConsole Release
+goto :EOF
+
+:build
+"%DOTNETEXE%" build -c %2 %1
 goto :EOF

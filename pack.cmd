@@ -1,23 +1,22 @@
 @echo off
-setlocal
 pushd "%~dp0"
 call :main %*
 popd
 goto :EOF
 
 :main
-for %%i in (NuGet.exe) do set nuget=%%~dpnx$PATH:i
-if "%nuget%"=="" goto :nonuget
-if not exist dist md dist
-if not %errorlevel%==0 exit /b %errorlevel%
-call build /v:m && call :pack ncrontab && call :pack ncrontab.signed
+setlocal
+set DOTNETEXE=
+for %%f in (dotnet.exe) do set DOTNETEXE=%%~dpnx$PATH:f
+if not defined DOTNETEXE set DOTNETEXE=%ProgramFiles%\dotnet
+if not exist "%DOTNETEXE%" (
+    echo .NET Core does not appear to be installed on this machine, which is
+    echo required to build the solution. You can install it from the URL below
+    echo and then try building again:
+    echo https://dot.net
+    exit /b 1
+)
+set VERSION_SUFFIX=
+if not "%~1"=="" set VERSION_SUFFIX=--version-suffix %1
+call build && dotnet pack -c Release %VERSION_SUFFIX% NCrontab
 goto :EOF
-
-:pack
-nuget pack %1.nuspec -OutputDirectory dist -Symbols
-goto :EOF
-
-:nonuget
-echo NuGet executable not found in PATH
-echo For more on NuGet, see http://nuget.codeplex.com
-exit /b 2
