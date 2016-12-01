@@ -7,7 +7,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 	ProjectSection(SolutionItems) = preProject
 		build.cmd = build.cmd
 		buildw.cmd = buildw.cmd
-		clean.cmd = clean.cmd
 		COPYING.txt = COPYING.txt
 		NCrontab.nuspec = NCrontab.nuspec
 		NCrontab.Signed.nuspec = NCrontab.Signed.nuspec
