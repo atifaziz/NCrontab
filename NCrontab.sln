@@ -17,6 +17,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		SolutionInfo.cs = SolutionInfo.cs
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NCrontabViewer", "NCrontabViewer\NCrontabViewer.csproj", "{02F42DAC-8A9F-45BB-B734-BB08F0D194C4}"
+EndProject
 Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "NCrontab", "NCrontab\NCrontab.xproj", "{1B6D7AA9-38DE-45B3-8E90-7FC08E83173F}"
 EndProject
 Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "NCrontab.Tests", "NCrontab.Tests\NCrontab.Tests.xproj", "{C0786FAF-E9C1-411C-B70D-5B3339973E57}"
@@ -31,6 +33,14 @@ Global
 		ReleaseSigned|Any CPU = ReleaseSigned|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{02F42DAC-8A9F-45BB-B734-BB08F0D194C4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{02F42DAC-8A9F-45BB-B734-BB08F0D194C4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{02F42DAC-8A9F-45BB-B734-BB08F0D194C4}.DebugSigned|Any CPU.ActiveCfg = Debug|Any CPU
+		{02F42DAC-8A9F-45BB-B734-BB08F0D194C4}.DebugSigned|Any CPU.Build.0 = Debug|Any CPU
+		{02F42DAC-8A9F-45BB-B734-BB08F0D194C4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{02F42DAC-8A9F-45BB-B734-BB08F0D194C4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{02F42DAC-8A9F-45BB-B734-BB08F0D194C4}.ReleaseSigned|Any CPU.ActiveCfg = Release|Any CPU
+		{02F42DAC-8A9F-45BB-B734-BB08F0D194C4}.ReleaseSigned|Any CPU.Build.0 = Release|Any CPU
 		{1B6D7AA9-38DE-45B3-8E90-7FC08E83173F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{1B6D7AA9-38DE-45B3-8E90-7FC08E83173F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1B6D7AA9-38DE-45B3-8E90-7FC08E83173F}.DebugSigned|Any CPU.ActiveCfg = Debug|Any CPU
