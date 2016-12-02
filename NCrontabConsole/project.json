@@ -5,7 +5,7 @@
     "emitEntryPoint": true
   },
   "dependencies": {
-    "ncrontab": "3.2.1-*"
+    "NCrontab": "3.2.1-*"
   },
   "frameworks": {
     "netcoreapp1.0": {
