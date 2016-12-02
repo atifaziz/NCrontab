@@ -5,7 +5,7 @@
   },
   "dependencies": {
     "System.Runtime.Serialization.Primitives": "4.1.1",
-    "NCrontab": "1.0.0-*",
+    "ncrontab": "3.2.0-*",
     "NUnit": "3.4.1",
     "dotnet-test-nunit": "3.4.0-*"
   },
