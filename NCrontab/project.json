@@ -31,7 +31,10 @@
 
   "buildOptions": {
     "outputName": "NCrontab",
-    "keyFile": "key.snk"
+    "debugType": "portable",
+    "keyFile": "key.snk",
+    "warningsAsErrors": true,
+    "emitEntryPoint": false
   },
 
   "frameworks": {
