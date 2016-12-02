@@ -1,7 +1,7 @@
 {
   "name": "ncrontab",
   "title": "NCrontab",
-  "version": "3.2.0-*",
+  "version": "3.2.1-*",
   "description": "NCrontab is crontab for Microsoft .NET Framework 3.5 and above. It provides parsing and formatting of crontab expressions as well as calculation of occurrences of time based on a schedule expressed in the crontab format.",
 
   "language": "en-US",
