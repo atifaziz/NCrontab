@@ -39,6 +39,8 @@ if not exist "%DOTNETEXE%" (
   && "%DOTNETEXE%" restore               ^
   && call :build NCrontab        Debug   ^
   && call :build NCrontab        Release ^
+  && call :build NCrontab.Signed Debug   ^
+  && call :build NCrontab.Signed Release ^
   && call :build NCrontab.Tests  Debug   ^
   && call :build NCrontab.Tests  Release ^
   && call :build NCrontabConsole Debug   ^

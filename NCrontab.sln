@@ -24,6 +24,8 @@ Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "NCrontab.Tests", "NCrontab.
 EndProject
 Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "NCrontabConsole", "NCrontabConsole\NCrontabConsole.xproj", "{F7B12090-E4FE-41F8-B7BD-816E4BC11DB4}"
 EndProject
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "NCrontab.Signed", "NCrontab.Signed\NCrontab.Signed.xproj", "{00415F52-1635-4DC7-AA50-4750DC928F89}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -64,6 +66,14 @@ Global
 		{F7B12090-E4FE-41F8-B7BD-816E4BC11DB4}.Release|Any CPU.Build.0 = Release|Any CPU
 		{F7B12090-E4FE-41F8-B7BD-816E4BC11DB4}.ReleaseSigned|Any CPU.ActiveCfg = Release|Any CPU
 		{F7B12090-E4FE-41F8-B7BD-816E4BC11DB4}.ReleaseSigned|Any CPU.Build.0 = Release|Any CPU
+		{00415F52-1635-4DC7-AA50-4750DC928F89}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{00415F52-1635-4DC7-AA50-4750DC928F89}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{00415F52-1635-4DC7-AA50-4750DC928F89}.DebugSigned|Any CPU.ActiveCfg = Debug|Any CPU
+		{00415F52-1635-4DC7-AA50-4750DC928F89}.DebugSigned|Any CPU.Build.0 = Debug|Any CPU
+		{00415F52-1635-4DC7-AA50-4750DC928F89}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{00415F52-1635-4DC7-AA50-4750DC928F89}.Release|Any CPU.Build.0 = Release|Any CPU
+		{00415F52-1635-4DC7-AA50-4750DC928F89}.ReleaseSigned|Any CPU.ActiveCfg = Release|Any CPU
+		{00415F52-1635-4DC7-AA50-4750DC928F89}.ReleaseSigned|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -18,5 +18,10 @@ if not exist "%DOTNETEXE%" (
 )
 set VERSION_SUFFIX=
 if not "%~1"=="" set VERSION_SUFFIX=--version-suffix %1
-call build && dotnet pack -c Release %VERSION_SUFFIX% NCrontab
+call build && call :pack NCrontab && call :pack NCrontab.Signed
+goto :EOF
+
+:pack
+setlocal
+dotnet pack -c Release %VERSION_SUFFIX% %1
 goto :EOF

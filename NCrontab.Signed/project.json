@@ -1,6 +1,6 @@
 {
-  "name": "ncrontab",
-  "title": "NCrontab",
+  "name": "ncrontab.signed",
+  "title": "NCrontab (Signed)",
   "version": "3.2.1-*",
   "description": "NCrontab is crontab for Microsoft .NET Framework 3.5 and above. It provides parsing and formatting of crontab expressions as well as calculation of occurrences of time based on a schedule expressed in the crontab format.",
 
@@ -26,10 +26,17 @@
   },
 
   "buildOptions": {
-    "outputName": "NCrontab",
+    "outputName": "NCrontab.Signed",
+    "define": [ "SIGNED" ],
     "debugType": "portable",
+    "keyFile": "key.snk",
     "warningsAsErrors": true,
-    "emitEntryPoint": false
+    "emitEntryPoint": false,
+    "compile": {
+      "include": [
+        "../NCrontab/*.cs"
+      ]
+    }
   },
 
   "frameworks": {
