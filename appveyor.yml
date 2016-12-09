@@ -6,7 +6,7 @@ skip_tags: true
 build_script:
 - cmd: pack.cmd
 test_script:
-- cmd: dotnet test NCrontab.Tests
+- cmd: test.cmd
 artifacts:
 - path: NCrontab\bin\Release\*.nupkg
 notifications:

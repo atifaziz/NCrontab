@@ -13,6 +13,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		packw.cmd = packw.cmd
 		README.md = README.md
 		SolutionInfo.cs = SolutionInfo.cs
+		test.cmd = test.cmd
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NCrontabViewer", "NCrontabViewer\NCrontabViewer.csproj", "{02F42DAC-8A9F-45BB-B734-BB08F0D194C4}"
