@@ -9,6 +9,7 @@ test_script:
 - cmd: test.cmd
 artifacts:
 - path: NCrontab\bin\Release\*.nupkg
+- path: NCrontab.Signed\bin\Release\*.nupkg
 notifications:
 - provider: Email
   to:
