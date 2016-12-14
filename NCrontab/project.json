@@ -29,7 +29,12 @@
     "outputName": "NCrontab",
     "debugType": "portable",
     "warningsAsErrors": true,
-    "emitEntryPoint": false
+    "emitEntryPoint": false,
+    "compile": {
+      "includeFiles": [
+        "../SolutionInfo.cs"
+      ]
+    }
   },
 
   "frameworks": {

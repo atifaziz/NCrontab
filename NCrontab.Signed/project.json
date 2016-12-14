@@ -35,6 +35,9 @@
     "compile": {
       "include": [
         "../NCrontab/*.cs"
+      ],
+      "includeFiles": [
+        "../SolutionInfo.cs"
       ]
     }
   },
