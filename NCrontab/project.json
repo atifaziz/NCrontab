@@ -33,7 +33,7 @@
   },
 
   "frameworks": {
-    "net35": {
+    "net35-client": {
       "buildOptions": {
         "define": [
           "SERIALIZATION"
