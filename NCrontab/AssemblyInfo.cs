@@ -24,7 +24,6 @@ using CLSCompliantAttribute = System.CLSCompliantAttribute;
 
 #endregion
 
-[assembly: AssemblyTitle("NCrontab")]
 [assembly: AssemblyDescription("Crontab for .NET")]
 
 [assembly: CLSCompliant(true)]
