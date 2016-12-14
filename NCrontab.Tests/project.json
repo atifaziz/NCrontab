@@ -4,7 +4,9 @@
     "debugType": "portable"
   },
   "dependencies": {
-    "NCrontab": "3.2.1-*",
+    "NCrontab": {
+      "target": "project"
+    },
     "NUnit": "3.4.1",
     "dotnet-test-nunit": "3.4.0-*"
   },
