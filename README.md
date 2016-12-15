@@ -180,6 +180,54 @@ Below is the same example in C# Interactive (`csi.exe`):
     Mon, 20 Nov 2000 12:00
     Mon, 27 Nov 2000 12:00
 
+Some complex schedules cannot be expressed in a single crontab expression so
+NCrontab can produce _distinct occurrences_ given a sequence of
+`CrontabSchedule` instances. In the C# example below, two schedules are merged
+to produce a single set of occurrences over a week. The first schedule occurs
+every 6 hours on weekdays while the second occurs every 12 hours on weekends.
+
+    Microsoft (R) Visual C# Interactive Compiler version 1.2.0.60317
+    Copyright (C) Microsoft Corporation. All rights reserved.
+
+    Type "#help" for more information.
+    > using NCrontab;
+    > var s1 = CrontabSchedule.Parse("0 */6 * * Mon-Fri");
+    > var s2 = CrontabSchedule.Parse("0 */12 * * Sat,Sun");
+    > var s = new[] { s1, s2 };
+    > var start = new DateTime(2000, 1, 1);
+    > var end = start.AddDays(7);
+    > var occurrences = s.GetNextOccurrences(start, end);
+    > // `Sat, 01 Jan 2000 10:00` won't appear because `start` is exclusive
+    > Console.WriteLine(string.Join(Environment.NewLine,
+    .     from t in occurrences
+    .     select $"{t:ddd, dd MMM yyyy HH:mm}"));
+    Sat, 01 Jan 2000 12:00
+    Sun, 02 Jan 2000 00:00
+    Sun, 02 Jan 2000 12:00
+    Mon, 03 Jan 2000 00:00
+    Mon, 03 Jan 2000 06:00
+    Mon, 03 Jan 2000 12:00
+    Mon, 03 Jan 2000 18:00
+    Tue, 04 Jan 2000 00:00
+    Tue, 04 Jan 2000 06:00
+    Tue, 04 Jan 2000 12:00
+    Tue, 04 Jan 2000 18:00
+    Wed, 05 Jan 2000 00:00
+    Wed, 05 Jan 2000 06:00
+    Wed, 05 Jan 2000 12:00
+    Wed, 05 Jan 2000 18:00
+    Thu, 06 Jan 2000 00:00
+    Thu, 06 Jan 2000 06:00
+    Thu, 06 Jan 2000 12:00
+    Thu, 06 Jan 2000 18:00
+    Fri, 07 Jan 2000 00:00
+    Fri, 07 Jan 2000 06:00
+    Fri, 07 Jan 2000 12:00
+    Fri, 07 Jan 2000 18:00
+
+If one or more schedules produce the same occurrence then only one of them
+if returned.
+
 ---
 
 This product includes software developed by the OpenSymphony Group (http://www.opensymphony.com/).

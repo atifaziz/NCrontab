@@ -419,6 +419,43 @@ namespace NCrontab.Tests
             Assert.AreEqual(expected, occurrence);
         }
 
+        [TestCase("0 * * * *", null,
+                  "01/01/2003 01:00:00; 01/01/2003 02:00:00; 01/01/2003 03:00:00")]
+        [TestCase("0 1 * * *; 0 2 * * *; 0 3 * * *", null,
+                  "01/01/2003 01:00:00; 01/01/2003 02:00:00; 01/01/2003 03:00:00")]
+        [TestCase("0 2 * * *; 0 3 * * *; 0 1 * * *", null,
+                  "01/01/2003 01:00:00; 01/01/2003 02:00:00; 01/01/2003 03:00:00")]
+        [TestCase("0 * * * *; 0 * * * *", "01/01/2003 03:30:00",
+                  "01/01/2003 01:00:00; 01/01/2003 02:00:00; 01/01/2003 03:00:00")]
+        [TestCase("0 7-9 * * Mon; 0 6,18 * * Tue; 0 3,*/6 * * Fri", null,
+                  "03/01/2003 00:00:00; 03/01/2003 03:00:00; 03/01/2003 06:00:00; 03/01/2003 12:00:00; 03/01/2003 18:00:00; " +
+                  "06/01/2003 07:00:00; 06/01/2003 08:00:00; 06/01/2003 09:00:00; " +
+                  "07/01/2003 06:00:00; 07/01/2003 18:00:00")]
+        public void NextOccurrencesFromMultipleSchedules(string delimitedExpressions, string endTimeString, string delimitedTimes)
+        {
+            const char separator = ';';
+
+            var times =
+                delimitedTimes
+                    .Split(separator)
+                    .Select(s => s.Trim())
+                    .Where(s => s.Length > 0)
+                    .ToArray();
+
+            var occurrences =
+                delimitedExpressions
+                    .Split(separator)
+                    .Select(CrontabSchedule.Parse)
+                    .GetNextOccurrences(new DateTime(2003, 1, 1),
+                                        string.IsNullOrEmpty(endTimeString)
+                                            ? DateTime.MaxValue
+                                            : Time(endTimeString))
+                    .Select(TimeString);
+
+            Assert.That(endTimeString == null ? occurrences.Take(times.Length)
+                                              : occurrences,
+                        Is.EquivalentTo(times));
+        }
 
         static void CronCall(string startTimeString, string cronExpression, string nextTimeString, ParseOptions options)
         {
