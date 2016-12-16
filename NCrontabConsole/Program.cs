@@ -1,4 +1,4 @@
-#region License and Terms
+﻿#region License and Terms
 //
 // NCrontab - Crontab for .NET
 // Copyright (c) 2008 Atif Aziz. All rights reserved.
@@ -35,7 +35,7 @@ namespace NCrontabConsole
             try
             {
                 if (args.Length < 3)
-                    throw new ApplicationException("Missing required arguments. You must at least supply CRONTAB-EXPRESSION START-DATE END-DATE.");
+                    throw new /* TODO Application*/Exception("Missing required arguments. You must at least supply CRONTAB-EXPRESSION START-DATE END-DATE.");
 
                 var expression = args[0];
                 var start = ParseDateArgument(args[1], "start");
@@ -51,7 +51,7 @@ namespace NCrontabConsole
             catch (Exception e)
             {
                 Console.Error.WriteLine(e.Message);
-                Trace.WriteLine(e.ToString());
+                // TODO Trace.WriteLine(e.ToString());
                 return 1;
             }
         }
@@ -64,7 +64,7 @@ namespace NCrontabConsole
             }
             catch (FormatException e)
             {
-                throw new ApplicationException("Invalid " + hint + " date or date format argument.", e);
+                throw new /* TODO Application*/Exception("Invalid " + hint + " date or date format argument.", e);
             }
         }
     }

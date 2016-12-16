@@ -1,0 +1,64 @@
+{
+  "name": "ncrontab.signed",
+  "title": "NCrontab (Signed)",
+  "version": "3.2.1-*",
+  "description": "NCrontab is crontab for Microsoft .NET Framework 3.5 and above. It provides parsing and formatting of crontab expressions as well as calculation of occurrences of time based on a schedule expressed in the crontab format.",
+
+  "language": "en-US",
+  "authors": [ "Atif Aziz" ],
+  "copyright": "Copyright \u00a9 2008 Atif Aziz. All rights reserved.",
+  "packOptions": {
+    "owners": [ "Atif Aziz" ],
+    "projectUrl": "https://github.com/atifaziz/NCrontab",
+    "licenseUrl": "http://www.apache.org/licenses/LICENSE-2.0",
+    "requireLicenseAcceptance": false,
+    "tags": [
+      "cron",
+      "schedule",
+      "time"
+    ],
+    "files": {
+      "include": [
+        "../COPYING.txt"
+      ]
+    },
+    "releaseNotes": "3.2: Fixes the following issues:\n     - Wrong schedule when a crontab field is of the form N/1; remaining values of that field were being ignored.\n     - CrontabSchedule.TryParse doesn't throw if given a null string as input.\n3.1: CrontabFieldImpl and CrontabFieldAccumulator are now private.\n3.0: Replaces uses of Converter with Func and therefore requires .NET Framework 3.5 as a minimum.\n\nRelease 3.x also makes the library available as a PCL for:\n- Microsoft .NET Framework 4.5\n- Microsoft Windows 8.0\n- Microsoft Windows Phone 8.1\n- Microsoft Windows Phone Silverlight 8.0"
+  },
+
+  "buildOptions": {
+    "outputName": "NCrontab.Signed",
+    "define": [ "SIGNED" ],
+    "debugType": "portable",
+    "keyFile": "key.snk",
+    "warningsAsErrors": true,
+    "emitEntryPoint": false,
+    "compile": {
+      "include": [
+        "../NCrontab/*.cs"
+      ],
+      "includeFiles": [
+        "../SolutionInfo.cs"
+      ]
+    }
+  },
+
+  "frameworks": {
+    "net35-client": {
+      "buildOptions": {
+        "define": [
+          "SERIALIZATION"
+        ]
+      }
+    },
+    "netstandard1.0": {
+      "dependencies": {
+        "System.Collections": "4.0.11",
+        "System.Diagnostics.Debug": "4.0.11",
+        "System.Globalization": "4.0.11",
+        "System.IO": "4.1.0",
+        "System.Resources.ResourceManager": "4.0.1",
+        "System.Net.Primitives": "4.0.11"
+      }
+    }
+  }
+}

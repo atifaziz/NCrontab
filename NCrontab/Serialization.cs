@@ -17,6 +17,8 @@
 //
 #endregion
 
+#if SERIALIZATION
+
 namespace NCrontab
 {
     using System;
@@ -45,3 +47,5 @@ namespace NCrontab
         object IObjectReference.GetRealObject(StreamingContext context) => FromKind(Kind);
     }
 }
+
+#endif

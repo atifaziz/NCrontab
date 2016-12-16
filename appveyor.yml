@@ -1,0 +1,19 @@
+version: '{build}'
+branches:
+  only:
+  - master
+skip_tags: true
+build_script:
+- cmd: pack.cmd
+test_script:
+- cmd: test.cmd
+artifacts:
+- path: NCrontab\bin\Release\*.nupkg
+- path: NCrontab.Signed\bin\Release\*.nupkg
+notifications:
+- provider: Email
+  to:
+  - ncrontab-builds@googlegroups.com
+  on_build_success: true
+  on_build_failure: true
+  on_build_status_changed: false

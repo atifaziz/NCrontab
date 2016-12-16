@@ -3,7 +3,8 @@
 [![Build Status][build-badge]][builds]
 [![NuGet][nuget-badge]][nuget-pkg]
 
-NCrontab is a library written in C# 6.0 that provides the following facilities:
+NCrontab is a library written in C# targeting [.NET Standard Library][netstd]
+1.0 and that provides the following facilities:
 
 * Parsing of crontab expressions
 * Formatting of crontab expressions
@@ -174,3 +175,4 @@ Below is the same example in C# Interactive (`csi.exe`):
   [nuget-badge]: https://img.shields.io/nuget/v/ncrontab.svg
   [nuget-pkg]: https://www.nuget.org/packages/ncrontab
   [builds]: https://ci.appveyor.com/project/raboof/ncrontab
+  [netstd]: https://docs.microsoft.com/en-us/dotnet/articles/standard/library
