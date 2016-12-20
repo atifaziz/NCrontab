@@ -209,7 +209,7 @@ namespace NCrontab
             // Next, look for a list of values (e.g. 1,2,3).
             //
 
-            var commaIndex = str.IndexOf(",");
+            var commaIndex = str.IndexOf(',');
 
             if (commaIndex > 0)
             {
@@ -226,7 +226,7 @@ namespace NCrontab
             // Look for stepping first (e.g. */2 = every 2nd).
             //
 
-            var slashIndex = str.IndexOf("/");
+            var slashIndex = str.IndexOf('/');
 
             if (slashIndex > 0)
             {
@@ -247,7 +247,7 @@ namespace NCrontab
             // Next, look for a range of values (e.g. 2-10).
             //
 
-            var dashIndex = str.IndexOf("-");
+            var dashIndex = str.IndexOf('-');
 
             if (dashIndex > 0)
             {
