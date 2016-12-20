@@ -64,6 +64,9 @@
     <Compile Include="..\NCrontab\ICrontabField.cs">
       <Link>ICrontabField.cs</Link>
     </Compile>
+    <Compile Include="..\NCrontab\Ref.cs">
+      <Link>Ref.cs</Link>
+    </Compile>
     <Compile Include="..\NCrontab\StringSeparatorStock.cs">
       <Link>StringSeparatorStock.cs</Link>
     </Compile>

@@ -37,8 +37,8 @@ namespace NCrontab
     public sealed partial class CrontabField : ICrontabField
     {
         readonly BitArray _bits;
-        /* readonly */ int _minValueSet;
-        /* readonly */ int _maxValueSet;
+        readonly int _minValueSet;
+        readonly int _maxValueSet;
         readonly CrontabFieldImpl _impl;
 
         /// <summary>
@@ -53,9 +53,13 @@ namespace NCrontab
 
         public static T TryParse<T>(CrontabFieldKind kind, string expression, Func<CrontabField, T> valueSelector, Func<ExceptionProvider, T> errorSelector)
         {
-            var field = new CrontabField(CrontabFieldImpl.FromKind(kind));
-            var error = field._impl.TryParse(expression, field.Accumulate, null, e => e);
-            return error == null ? valueSelector(field) : errorSelector(error);
+            var impl = CrontabFieldImpl.FromKind(kind);
+            var bits = new BitArray(impl.ValueCount);
+            bits.SetAll(false);
+            var minValueSet = Ref.Create(int.MaxValue);
+            var maxValueSet = Ref.Create(-1);
+            var error = impl.TryParse(expression, Accumulator<ExceptionProvider>(impl, bits, minValueSet, maxValueSet), null, e => e);
+            return error == null ? valueSelector(new CrontabField(impl, bits, minValueSet, maxValueSet)) : errorSelector(error);
         }
 
         /// <summary>
@@ -100,16 +104,14 @@ namespace NCrontab
         public static CrontabField DaysOfWeek(string expression) =>
             Parse(CrontabFieldKind.DayOfWeek, expression);
 
-        CrontabField(CrontabFieldImpl impl)
+        CrontabField(CrontabFieldImpl impl, BitArray bits, int minValueSet, int maxValueSet)
         {
             if (impl == null) throw new ArgumentNullException(nameof(impl));
 
             _impl = impl;
-            _bits = new BitArray(impl.ValueCount);
-
-            _bits.SetAll(false);
-            _minValueSet = int.MaxValue;
-            _maxValueSet = -1;
+            _bits = bits;
+            _minValueSet = minValueSet;
+            _maxValueSet = maxValueSet;
         }
 
         /// <summary>
@@ -150,118 +152,118 @@ namespace NCrontab
         public bool Contains(int value) => _bits[ValueToIndex(value)];
 
         /// <summary>
-        /// Accumulates the given range (start to end) and interval of values
-        /// into the current set of the field.
+        /// Creates an accumulator that accumulates the given range (start to
+        /// end) and interval of values  into the current set of the field.
         /// </summary>
         /// <remarks>
         /// To set the entire range of values representable by the field,
-        /// set <param name="start" /> and <param name="end" /> to -1 and
-        /// <param name="interval" /> to 1.
+        /// set <c>start</c> and <c>end</c> to -1 and <c>interval</c> to 1.
         /// </remarks>
 
-        T Accumulate<T>(int start, int end, int interval, T success, Func<ExceptionProvider, T> errorSelector)
-        {
-            var minValue = _impl.MinValue;
-            var maxValue = _impl.MaxValue;
-
-            if (start == end)
+        static CrontabFieldAccumulator<T> Accumulator<T>(CrontabFieldImpl impl, BitArray bits, Ref<int> minValueSet, Ref<int> maxValueSet) =>
+            (start, end, interval, success, errorSelector) =>
             {
-                if (start < 0)
+                var minValue = impl.MinValue;
+                var maxValue = impl.MaxValue;
+
+                if (start == end)
                 {
-                    //
-                    // We're setting the entire range of values.
-                    //
-
-                    if (interval <= 1)
+                    if (start < 0)
                     {
-                        _minValueSet = minValue;
-                        _maxValueSet = maxValue;
-                        _bits.SetAll(true);
-                        return success;
-                    }
+                        //
+                        // We're setting the entire range of values.
+                        //
 
-                    start = minValue;
-                    end = maxValue;
+                        if (interval <= 1)
+                        {
+                            minValueSet.Value = minValue;
+                            maxValueSet.Value = maxValue;
+                            bits.SetAll(true);
+                            return success;
+                        }
+
+                        start = minValue;
+                        end = maxValue;
+                    }
+                    else
+                    {
+                        //
+                        // We're only setting a single value - check that it is in range.
+                        //
+
+                        if (start < minValue)
+                            return OnValueBelowMinError(impl, start, errorSelector);
+
+                        if (start > maxValue)
+                            return OnValueAboveMaxError(impl, start, errorSelector);
+                    }
                 }
                 else
                 {
                     //
-                    // We're only setting a single value - check that it is in range.
+                    // For ranges, if the start is bigger than the end value then
+                    // swap them over.
                     //
 
-                    if (start < minValue)
-                        return OnValueBelowMinError(start, errorSelector);
+                    if (start > end)
+                    {
+                        end ^= start;
+                        start ^= end;
+                        end ^= start;
+                    }
 
-                    if (start > maxValue)
-                        return OnValueAboveMaxError(start, errorSelector);
-                }
-            }
-            else
-            {
-                //
-                // For ranges, if the start is bigger than the end value then
-                // swap them over.
-                //
+                    if (start < 0)
+                        start = minValue;
+                    else if (start < minValue)
+                        return OnValueBelowMinError(impl, start, errorSelector);
 
-                if (start > end)
-                {
-                    end ^= start;
-                    start ^= end;
-                    end ^= start;
+                    if (end < 0)
+                        end = maxValue;
+                    else if (end > maxValue)
+                        return OnValueAboveMaxError(impl, end, errorSelector);
                 }
 
-                if (start < 0)
-                    start = minValue;
-                else if (start < minValue)
-                    return OnValueBelowMinError(start, errorSelector);
+                if (interval < 1)
+                    interval = 1;
 
-                if (end < 0)
-                    end = maxValue;
-                else if (end > maxValue)
-                    return OnValueAboveMaxError(end, errorSelector);
-            }
+                int i;
 
-            if (interval < 1)
-                interval = 1;
+                //
+                // Populate the _bits table by setting all the bits corresponding to
+                // the valid field values.
+                //
 
-            int i;
+                for (i = start - minValue; i <= (end - minValue); i += interval)
+                    bits[i] = true;
 
-            //
-            // Populate the _bits table by setting all the bits corresponding to
-            // the valid field values.
-            //
+                //
+                // Make sure we remember the minimum value set so far Keep track of
+                // the highest and lowest values that have been added to this field
+                // so far.
+                //
 
-            for (i = start - minValue; i <= (end - minValue); i += interval)
-                _bits[i] = true;
+                if (minValueSet > start)
+                    minValueSet.Value = start;
 
-            //
-            // Make sure we remember the minimum value set so far Keep track of
-            // the highest and lowest values that have been added to this field
-            // so far.
-            //
+                i += (minValue - interval);
 
-            if (_minValueSet > start)
-                _minValueSet = start;
+                if (maxValueSet < i)
+                    maxValueSet.Value = i;
 
-            i += (minValue - interval);
+                return success;
+            };
 
-            if (_maxValueSet < i)
-                _maxValueSet = i;
-
-            return success;
-        }
-
-        T OnValueAboveMaxError<T>(int value, Func<ExceptionProvider, T> errorSelector) =>
+        static T OnValueAboveMaxError<T>(CrontabFieldImpl impl, int value, Func<ExceptionProvider, T> errorSelector) =>
             errorSelector(
                 () => new CrontabException(
-                    $"{value} is higher than the maximum allowable value for the [{_impl.Kind}] field. " +
-                    $"Value must be between {_impl.MinValue} and {_impl.MaxValue} (all inclusive)."));
+                    $"{value} is higher than the maximum allowable value for the [{impl.Kind}] field. " +
+                    $"Value must be between {impl.MinValue} and {impl.MaxValue} (all inclusive)."));
 
-        T OnValueBelowMinError<T>(int value, Func<ExceptionProvider, T> errorSelector) =>
+        static T OnValueBelowMinError<T>(CrontabFieldImpl impl, int value, Func<ExceptionProvider, T> errorSelector) =>
             errorSelector(
                 () => new CrontabException(
-                    $"{value} is lower than the minimum allowable value for the [{_impl.Kind}] field. " +
-                    $"Value must be between {_impl.MinValue} and {_impl.MaxValue} (all inclusive)."));
+                    $"{value} is lower than the minimum allowable value for the [{impl.Kind}] field. " +
+                    $"Value must be between {impl.MinValue} and {impl.MaxValue} (all inclusive)."));
 
         public override string ToString() => ToString(null);
 
