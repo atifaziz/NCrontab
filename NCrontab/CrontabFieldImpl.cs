@@ -214,9 +214,11 @@ namespace NCrontab
             if (commaIndex > 0)
             {
                 var result = success;
-                var token = ((IEnumerable<string>) str.Split(StringSeparatorStock.Comma)).GetEnumerator();
-                while (token.MoveNext() && result == null)
-                    result = InternalParse(token.Current, acc, success, errorSelector);
+                using (var token = ((IEnumerable<string>) str.Split(StringSeparatorStock.Comma)).GetEnumerator())
+                {
+                    while (token.MoveNext() && result == null)
+                        result = InternalParse(token.Current, acc, success, errorSelector);
+                }
                 return result;
             }
 
