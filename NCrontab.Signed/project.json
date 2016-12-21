@@ -1,8 +1,8 @@
 {
   "name": "ncrontab.signed",
   "title": "NCrontab (Signed)",
-  "version": "3.2.1-*",
-  "description": "NCrontab is crontab for Microsoft .NET Framework 3.5 and above. It provides parsing and formatting of crontab expressions as well as calculation of occurrences of time based on a schedule expressed in the crontab format.",
+  "version": "3.3.0-*",
+  "description": "NCrontab is crontab for all .NET runtimes supported by .NET Standard 1.0. It provides parsing and formatting of crontab expressions as well as calculation of occurrences of time based on a schedule expressed in the crontab format.",
 
   "language": "en-US",
   "authors": [ "Atif Aziz" ],
@@ -23,7 +23,7 @@
         "../lic/OpenSymphony.txt"
       ]
     },
-    "releaseNotes": "3.2: Fixes the following issues:\n     - Wrong schedule when a crontab field is of the form N/1; remaining values of that field were being ignored.\n     - CrontabSchedule.TryParse doesn't throw if given a null string as input.\n3.1: CrontabFieldImpl and CrontabFieldAccumulator are now private.\n3.0: Replaces uses of Converter with Func and therefore requires .NET Framework 3.5 as a minimum.\n\nRelease 3.x also makes the library available as a PCL for:\n- Microsoft .NET Framework 4.5\n- Microsoft Windows 8.0\n- Microsoft Windows Phone 8.1\n- Microsoft Windows Phone Silverlight 8.0"
+    "releaseNotes": "3.3: Targets .NET Standard 1.0\n3.2: Fixes the following issues:\n     - Wrong schedule when a crontab field is of the form N/1; remaining values of that field were being ignored.\n     - CrontabSchedule.TryParse doesn't throw if given a null string as input.\n3.1: CrontabFieldImpl and CrontabFieldAccumulator are now private.\n3.0: Replaces uses of Converter with Func and therefore requires .NET Framework 3.5 as a minimum.\n"
   },
 
   "buildOptions": {
