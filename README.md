@@ -168,6 +168,10 @@ Below is the same example in C# Interactive (`csi.exe`):
     Mon, 20 Nov 2000 12:00
     Mon, 27 Nov 2000 12:00
 
+---
+
+This product includes software developed by the OpenSymphony Group (http://www.opensymphony.com/).
+
 
   [ipy]: http://en.wikipedia.org/wiki/IronPython
   [f#]: http://msdn.microsoft.com/en-us/fsharp/cc742182

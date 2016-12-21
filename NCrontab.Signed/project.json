@@ -6,7 +6,7 @@
 
   "language": "en-US",
   "authors": [ "Atif Aziz" ],
-  "copyright": "Copyright \u00a9 2008 Atif Aziz. All rights reserved.",
+  "copyright": "Copyright \u00a9 2008 Atif Aziz. All rights reserved. Portions Copyright \u00a9 2001 The OpenSymphony Group. All rights reserved.",
   "packOptions": {
     "owners": [ "Atif Aziz" ],
     "projectUrl": "https://github.com/atifaziz/NCrontab",
@@ -19,7 +19,8 @@
     ],
     "files": {
       "include": [
-        "../COPYING.txt"
+        "../COPYING.txt",
+        "../lic/OpenSymphony.txt"
       ]
     },
     "releaseNotes": "3.2: Fixes the following issues:\n     - Wrong schedule when a crontab field is of the form N/1; remaining values of that field were being ignored.\n     - CrontabSchedule.TryParse doesn't throw if given a null string as input.\n3.1: CrontabFieldImpl and CrontabFieldAccumulator are now private.\n3.0: Replaces uses of Converter with Func and therefore requires .NET Framework 3.5 as a minimum.\n\nRelease 3.x also makes the library available as a PCL for:\n- Microsoft .NET Framework 4.5\n- Microsoft Windows 8.0\n- Microsoft Windows Phone 8.1\n- Microsoft Windows Phone Silverlight 8.0"

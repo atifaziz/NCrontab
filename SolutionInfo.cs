@@ -2,6 +2,7 @@
 //
 // NCrontab - Crontab for .NET
 // Copyright (c) 2008 Atif Aziz. All rights reserved.
+// Portions Copyright (c) 2001 The OpenSymphony Group. All rights reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -27,7 +28,9 @@ using ComVisible = System.Runtime.InteropServices.ComVisibleAttribute;
 
 [assembly: AssemblyProduct("NCrontab")]
 
-[assembly: AssemblyCopyright("Copyright (c) 2008, Atif Aziz. All rights reserved.")]
+[assembly: AssemblyCopyright(
+    "Copyright \u00a9 2008, Atif Aziz. All rights reserved. " +
+    "Portions Copyright \u00a9 2001 The OpenSymphony Group. All rights reserved.")]
 [assembly: AssemblyCompany("")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
