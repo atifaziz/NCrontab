@@ -37,11 +37,14 @@ namespace NCrontabConsole
                 if (args.Length < 3)
                     throw new /* TODO Application*/Exception("Missing required arguments. You must at least supply CRONTAB-EXPRESSION START-DATE END-DATE.");
 
-                var expression = args[0];
+                var expression = args[0].Trim();
                 var start = ParseDateArgument(args[1], "start");
                 var end = ParseDateArgument(args[2], "end");
                 var format = args.Length > 3 ? args[3] : "f";
-                var schedule = CrontabSchedule.Parse(expression);
+                var schedule = CrontabSchedule.Parse(expression, new CrontabSchedule.ParseOptions
+                {
+                    IncludingSeconds = expression.Split(' ').Length > 5,
+                });
 
                 foreach (var occurrence in schedule.GetNextOccurrences(start, end))
                     Console.Out.WriteLine(occurrence.ToString(format));
