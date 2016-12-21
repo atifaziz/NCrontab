@@ -46,13 +46,19 @@ namespace NCrontabConsole
                     throw new ApplicationException("Missing required arguments. You must at least supply CRONTAB-EXPRESSION START-DATE END-DATE.");
 
                 var expression = argList[0].Trim();
-                var start = ParseDateArgument(argList[1], "start");
-                var end = ParseDateArgument(argList[2], "end");
-                var format = argList.Count > 3 ? argList[3] : "f";
-                var schedule = CrontabSchedule.Parse(expression, new CrontabSchedule.ParseOptions
+                var options = new CrontabSchedule.ParseOptions
                 {
                     IncludingSeconds = expression.Split(' ').Length > 5,
-                });
+                };
+
+                var start = ParseDateArgument(argList[1], "start");
+                var end = ParseDateArgument(argList[2], "end");
+                var format =
+                    argList.Count > 3 ? argList[3]
+                    : options.IncludingSeconds ? "ddd, dd MMM yyyy HH:mm:ss"
+                    : "ddd, dd MMM yyyy HH:mm";
+
+                var schedule = CrontabSchedule.Parse(expression, options);
 
                 foreach (var occurrence in schedule.GetNextOccurrences(start, end))
                     Console.Out.WriteLine(occurrence.ToString(format));
