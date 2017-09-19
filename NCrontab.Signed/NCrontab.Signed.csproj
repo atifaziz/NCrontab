@@ -44,6 +44,14 @@
     </None>
   </ItemGroup>
 
+  <!--
+  Workaround to fix build error for .NET 3.5
+  See also: https://github.com/Microsoft/msbuild/issues/1333
+  -->
+  <PropertyGroup>
+    <FrameworkPathOverride Condition="'$(TargetFramework)' == 'net35'">C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v3.5\Profile\Client</FrameworkPathOverride>
+  </PropertyGroup>
+
   <ItemGroup Condition=" '$(TargetFramework)' == 'net35' ">
     <Reference Include="System" />
   </ItemGroup>
