@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 14
-VisualStudioVersion = 14.0.25420.1
+# Visual Studio 15
+VisualStudioVersion = 15.0.26430.16
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{A4109292-0FE5-4761-868A-31A5BEB1810A}"
 	ProjectSection(SolutionItems) = preProject
@@ -10,7 +10,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		build.sh = build.sh
 		buildw.cmd = buildw.cmd
 		COPYING.txt = COPYING.txt
-		global.json = global.json
 		lic\OpenSymphony.txt = lic\OpenSymphony.txt
 		pack.cmd = pack.cmd
 		pack.sh = pack.sh
@@ -23,13 +22,13 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NCrontabViewer", "NCrontabViewer\NCrontabViewer.csproj", "{02F42DAC-8A9F-45BB-B734-BB08F0D194C4}"
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "NCrontab", "NCrontab\NCrontab.xproj", "{1B6D7AA9-38DE-45B3-8E90-7FC08E83173F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NCrontab", "NCrontab\NCrontab.csproj", "{1B6D7AA9-38DE-45B3-8E90-7FC08E83173F}"
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "NCrontab.Tests", "NCrontab.Tests\NCrontab.Tests.xproj", "{C0786FAF-E9C1-411C-B70D-5B3339973E57}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NCrontab.Tests", "NCrontab.Tests\NCrontab.Tests.csproj", "{C0786FAF-E9C1-411C-B70D-5B3339973E57}"
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "NCrontabConsole", "NCrontabConsole\NCrontabConsole.xproj", "{F7B12090-E4FE-41F8-B7BD-816E4BC11DB4}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NCrontabConsole", "NCrontabConsole\NCrontabConsole.csproj", "{F7B12090-E4FE-41F8-B7BD-816E4BC11DB4}"
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "NCrontab.Signed", "NCrontab.Signed\NCrontab.Signed.xproj", "{00415F52-1635-4DC7-AA50-4750DC928F89}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NCrontab.Signed", "NCrontab.Signed\NCrontab.Signed.csproj", "{00415F52-1635-4DC7-AA50-4750DC928F89}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
