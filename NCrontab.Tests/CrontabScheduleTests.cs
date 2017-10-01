@@ -383,7 +383,7 @@ namespace NCrontab.Tests
         /// (GetNextOccurrence throws if next occurrence produces invalid time)
         /// </summary>
         [Test]
-        public void GetNextOccurence_NextOccurrenceInvalidTime_ShouldStopAtLastValidTime()
+        public void GetNextOccurrences_NextOccurrenceInvalidTime_ShouldStopAtLastValidTime()
         {
             var schedule = CrontabSchedule.Parse("0 0 29 Feb Mon");
             var occurrences = schedule.GetNextOccurrences(new DateTime(9988, 1, 1), DateTime.MaxValue);
