@@ -180,11 +180,11 @@ namespace NCrontab
 
         public IEnumerable<DateTime> GetNextOccurrences(DateTime baseTime, DateTime endTime)
         {
-            for (var occurrence = GetNextOccurrence(baseTime, endTime);
-                 occurrence < endTime;
-                 occurrence = GetNextOccurrence(occurrence, endTime))
+            for (var occurrence = TryGetNextOccurrence(baseTime, endTime);
+                 occurrence != null && occurrence < endTime;
+                 occurrence = TryGetNextOccurrence(occurrence.Value, endTime))
             {
-                yield return occurrence;
+                yield return occurrence.Value;
             }
         }
 
@@ -209,8 +209,10 @@ namespace NCrontab
         /// <paramref name="baseTime"/>. Also, <param name="endTime" /> is
         /// exclusive.
         /// </remarks>
-
         public DateTime GetNextOccurrence(DateTime baseTime, DateTime endTime)
+            => TryGetNextOccurrence(baseTime, endTime) ?? endTime;
+
+        private DateTime? TryGetNextOccurrence(DateTime baseTime, DateTime endTime)
         {
             const int nil = -1;
 
@@ -337,6 +339,9 @@ namespace NCrontab
             //  Jan 15, Jan 31, Feb 15, Mar 15, Apr 15, Apr 31, ...
             //
 
+            if (year > Calendar.MaxSupportedDateTime.Year)
+                return null;
+
             var dateChanged = day != baseDay || month != baseMonth || year != baseYear;
 
             if (day > 28 && dateChanged && day > Calendar.GetDaysInMonth(year, month))
@@ -360,7 +365,7 @@ namespace NCrontab
             if (_daysOfWeek.Contains((int) nextTime.DayOfWeek))
                 return nextTime;
 
-            return GetNextOccurrence(new DateTime(year, month, day, 23, 59, 59, 0, baseTime.Kind), endTime);
+            return TryGetNextOccurrence(new DateTime(year, month, day, 23, 59, 59, 0, baseTime.Kind), endTime);
         }
 
         /// <summary>

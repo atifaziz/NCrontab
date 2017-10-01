@@ -22,6 +22,7 @@ namespace NCrontab.Tests
 {
     using System;
     using System.Globalization;
+    using System.Linq;
     using NUnit.Framework;
     using ParseOptions = CrontabSchedule.ParseOptions;
 
@@ -376,6 +377,42 @@ namespace NCrontab.Tests
         [TestCase("* * 3-l2 * * *", true)]
         public void NonNumericFieldRangeComponent(string expression, bool includingSeconds) =>
             BadField(expression, includingSeconds);
+
+        /// <summary>
+        /// Test case for issue #21
+        /// (GetNextOccurrence throws if next occurrence produces invalid time)
+        /// </summary>
+        [Test]
+        public void GetNextOccurence_NextOccurrenceInvalidTime_ShouldStopAtLastValidTime()
+        {
+            var schedule = CrontabSchedule.Parse("0 0 29 Feb Mon");
+            var occurrences = schedule.GetNextOccurrences(new DateTime(9988, 1, 1), DateTime.MaxValue);
+
+            var l = occurrences.ToList();
+
+            Assert.AreEqual(new DateTime(9988, 2, 29), occurrences.Last());
+        }
+
+        // Instead of using strings and parsing as date,
+        // we can use NUnit TestCaseData (https://github.com/nunit/docs/wiki/TestCaseData)
+        [TestCase("0 0 29 Feb Mon", "2017-01-01", "2017-12-31", "2017-12-31")]
+        [TestCase("0 0 29 Feb Mon", "9000-01-01", "9008-12-31", "9008-02-29")]
+        public void GetNextOccurence(string expression, string startDate, string endDate, string expectedValue)
+        {
+            // Arrange
+            var schedule = CrontabSchedule.Parse(expression);
+
+            var start = DateTime.Parse(startDate);
+            var end = DateTime.Parse(endDate);
+            var expected = DateTime.Parse(expectedValue);
+
+            // Act
+            var occurrence = schedule.GetNextOccurrence(start, end);
+
+            // Assert
+            Assert.AreEqual(expected, occurrence);
+        }
+
 
         static void CronCall(string startTimeString, string cronExpression, string nextTimeString, ParseOptions options)
         {
