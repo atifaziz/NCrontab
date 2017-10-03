@@ -212,7 +212,7 @@ namespace NCrontab
         public DateTime GetNextOccurrence(DateTime baseTime, DateTime endTime)
             => TryGetNextOccurrence(baseTime, endTime) ?? endTime;
 
-        private DateTime? TryGetNextOccurrence(DateTime baseTime, DateTime endTime)
+        DateTime? TryGetNextOccurrence(DateTime baseTime, DateTime endTime)
         {
             const int nil = -1;
 
