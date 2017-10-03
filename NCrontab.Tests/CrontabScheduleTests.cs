@@ -387,9 +387,7 @@ namespace NCrontab.Tests
         {
             var schedule = CrontabSchedule.Parse("0 0 29 Feb Mon");
             var occurrences = schedule.GetNextOccurrences(new DateTime(9988, 1, 1), DateTime.MaxValue);
-
-            var l = occurrences.ToList();
-
+            
             Assert.AreEqual(new DateTime(9988, 2, 29), occurrences.Last());
         }
 
