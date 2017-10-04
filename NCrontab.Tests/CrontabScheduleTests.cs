@@ -31,6 +31,14 @@ namespace NCrontab.Tests
     {
         const string TimeFormat = "dd/MM/yyyy HH:mm:ss";
 
+        static readonly string[] TimeFormats =
+        {
+            "yyyy-MM-dd",
+            "yyyy-MM-dd HH:mm",
+            "yyyy-MM-dd HH:mm:ss",
+            "dd/MM/yyyy HH:mm:ss"
+        };
+
         [Test]
         public void CannotParseNullString()
         {
@@ -400,9 +408,9 @@ namespace NCrontab.Tests
             // Arrange
             var schedule = CrontabSchedule.Parse(expression);
 
-            var start = DateTime.Parse(startDate);
-            var end = DateTime.Parse(endDate);
-            var expected = DateTime.Parse(expectedValue);
+            var start = Time(startDate);
+            var end = Time(endDate);
+            var expected = Time(expectedValue);
 
             // Act
             var occurrence = schedule.GetNextOccurrence(start, end);
@@ -432,6 +440,6 @@ namespace NCrontab.Tests
         }
 
         static string TimeString(DateTime time) => time.ToString(TimeFormat, CultureInfo.InvariantCulture);
-        static DateTime Time(string str) => DateTime.ParseExact(str, TimeFormat, CultureInfo.InvariantCulture);
+        static DateTime Time(string str) => DateTime.ParseExact(str, TimeFormats, CultureInfo.InvariantCulture, DateTimeStyles.None);
     }
 }
