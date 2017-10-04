@@ -22,6 +22,7 @@ namespace NCrontab.Tests
 {
     using System;
     using System.Globalization;
+    using System.Linq;
     using NUnit.Framework;
     using ParseOptions = CrontabSchedule.ParseOptions;
 
@@ -29,6 +30,14 @@ namespace NCrontab.Tests
     public sealed class CrontabScheduleTests
     {
         const string TimeFormat = "dd/MM/yyyy HH:mm:ss";
+
+        static readonly string[] TimeFormats =
+        {
+            "yyyy-MM-dd",
+            "yyyy-MM-dd HH:mm",
+            "yyyy-MM-dd HH:mm:ss",
+            "dd/MM/yyyy HH:mm:ss"
+        };
 
         [Test]
         public void CannotParseNullString()
@@ -377,6 +386,40 @@ namespace NCrontab.Tests
         public void NonNumericFieldRangeComponent(string expression, bool includingSeconds) =>
             BadField(expression, includingSeconds);
 
+        /// <summary>
+        /// Test case for
+        /// <a href="https://github.com/atifaziz/NCrontab/issues/21">issue
+        /// #21</a> (GetNextOccurrence throws if next occurrence produces
+        /// invalid time).
+        /// </summary>
+
+        [Test]
+        public void GetNextOccurrences_NextOccurrenceInvalidTime_ShouldStopAtLastValidTime()
+        {
+            var schedule = CrontabSchedule.Parse("0 0 29 Feb Mon");
+            var occurrences = schedule.GetNextOccurrences(new DateTime(9988, 1, 1), DateTime.MaxValue);
+            Assert.AreEqual(new DateTime(9988, 2, 29), occurrences.Last());
+        }
+
+        // Instead of using strings and parsing as date,
+        // consider NUnit's TestCaseData:
+        // https://github.com/nunit/docs/wiki/TestCaseData
+
+        [TestCase("0 0 29 Feb Mon", "2017-01-01", "2017-12-31", "2017-12-31")]
+        [TestCase("0 0 29 Feb Mon", "9000-01-01", "9008-12-31", "9008-02-29")]
+        public void GetNextOccurence(string expression, string startDate, string endDate, string expectedValue)
+        {
+            var schedule = CrontabSchedule.Parse(expression);
+            var start = Time(startDate);
+            var end = Time(endDate);
+            var expected = Time(expectedValue);
+
+            var occurrence = schedule.GetNextOccurrence(start, end);
+
+            Assert.AreEqual(expected, occurrence);
+        }
+
+
         static void CronCall(string startTimeString, string cronExpression, string nextTimeString, ParseOptions options)
         {
             var schedule = CrontabSchedule.Parse(cronExpression, options);
@@ -397,6 +440,6 @@ namespace NCrontab.Tests
         }
 
         static string TimeString(DateTime time) => time.ToString(TimeFormat, CultureInfo.InvariantCulture);
-        static DateTime Time(string str) => DateTime.ParseExact(str, TimeFormat, CultureInfo.InvariantCulture);
+        static DateTime Time(string str) => DateTime.ParseExact(str, TimeFormats, CultureInfo.InvariantCulture, DateTimeStyles.None);
     }
 }
