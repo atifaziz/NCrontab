@@ -405,17 +405,13 @@ namespace NCrontab.Tests
         [TestCase("0 0 29 Feb Mon", "9000-01-01", "9008-12-31", "9008-02-29")]
         public void GetNextOccurence(string expression, string startDate, string endDate, string expectedValue)
         {
-            // Arrange
             var schedule = CrontabSchedule.Parse(expression);
-
             var start = Time(startDate);
             var end = Time(endDate);
             var expected = Time(expectedValue);
 
-            // Act
             var occurrence = schedule.GetNextOccurrence(start, end);
 
-            // Assert
             Assert.AreEqual(expected, occurrence);
         }
 
