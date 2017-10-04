@@ -130,9 +130,9 @@ namespace NCrontab
             var offset = includingSeconds ? 0 : 1;
             for (var i = 0; i < tokens.Length; i++)
             {
-                var kind = (CrontabFieldKind)i + offset;
-                var field = CrontabField.TryParse(kind, tokens[i], v => new { ErrorProvider = (ExceptionProvider)null, Value = v },
-                                                                   e => new { ErrorProvider = e, Value = (CrontabField)null });
+                var kind = (CrontabFieldKind) i + offset;
+                var field = CrontabField.TryParse(kind, tokens[i], v => new { ErrorProvider = (ExceptionProvider) null, Value = v },
+                                                                   e => new { ErrorProvider = e, Value = (CrontabField) null });
                 if (field.ErrorProvider != null)
                     return errorSelector(field.ErrorProvider);
                 fields[i + offset] = field.Value;
@@ -364,7 +364,7 @@ namespace NCrontab
             // Day of week
             //
 
-            if (_daysOfWeek.Contains((int)nextTime.DayOfWeek))
+            if (_daysOfWeek.Contains((int) nextTime.DayOfWeek))
                 return nextTime;
 
             return TryGetNextOccurrence(new DateTime(year, month, day, 23, 59, 59, 0, baseTime.Kind), endTime);
