@@ -322,8 +322,11 @@ namespace NCrontab
                 day = _days.GetFirst();
             }
 
+            //
             // Stop processing when year is too large for the datetime or calendar
             // object. Otherwise we would get an exception.
+            //
+
             if (year > Calendar.MaxSupportedDateTime.Year)
                 return null;
 
