@@ -387,9 +387,12 @@ namespace NCrontab.Tests
             BadField(expression, includingSeconds);
 
         /// <summary>
-        /// Test case for issue #21
-        /// (GetNextOccurrence throws if next occurrence produces invalid time)
+        /// Test case for
+        /// <a href="https://github.com/atifaziz/NCrontab/issues/21">issue
+        /// #21</a> (GetNextOccurrence throws if next occurrence produces
+        /// invalid time).
         /// </summary>
+
         [Test]
         public void GetNextOccurrences_NextOccurrenceInvalidTime_ShouldStopAtLastValidTime()
         {
