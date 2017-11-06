@@ -13,9 +13,8 @@ NCrontab is a library written in C# targeting [.NET Standard Library][netstd]
 This library does not provide any scheduler or is not a scheduling facility like
 cron from Unix platforms. What it provides is parsing, formatting and an algorithm
 to produce occurrences of time based on a give schedule expressed in the crontab
-or six-part expression format:
+format:
 
-    Crontab expression format:
     * * * * *
     - - - - -
     | | | | |
@@ -25,7 +24,8 @@ or six-part expression format:
     | +----------- hour (0 - 23)
     +------------- min (0 - 59)
 
-    Six-part expression format:
+or a six-part format that allows for seconds:
+
     * * * * * *
     - - - - - -
     | | | | | |
