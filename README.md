@@ -187,7 +187,7 @@ This product includes software developed by the OpenSymphony Group (http://www.o
 
   [ipy]: http://en.wikipedia.org/wiki/IronPython
   [f#]: http://msdn.microsoft.com/en-us/fsharp/cc742182
-  [build-badge]: https://img.shields.io/appveyor/ci/raboof/ncrontab.svg
+  [build-badge]: https://img.shields.io/appveyor/ci/raboof/ncrontab/master.svg
   [nuget-badge]: https://img.shields.io/nuget/v/ncrontab.svg
   [nuget-pkg]: https://www.nuget.org/packages/ncrontab
   [builds]: https://ci.appveyor.com/project/raboof/ncrontab
