@@ -62,7 +62,7 @@ namespace NCrontabConsole
                             Options = new CrontabSchedule.ParseOptions
                             {
                                 IncludingSeconds = expression.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries)
-                                                             .Length > 5,
+                                                             .Length == 6,
                             },
                         })
                         .ToArray();
