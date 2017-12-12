@@ -24,6 +24,7 @@ namespace NCrontabConsole
     using System;
     using System.Collections.Generic;
     using System.Globalization;
+    using System.Linq;
     using NCrontab;
 
     #endregion
@@ -45,22 +46,37 @@ namespace NCrontabConsole
                 if (argList.Count < 3)
                     throw new ApplicationException("Missing required arguments. You must at least supply CRONTAB-EXPRESSION START-DATE END-DATE.");
 
-                var expression = argList[0].Trim();
-                var options = new CrontabSchedule.ParseOptions
-                {
-                    IncludingSeconds = expression.Split(' ').Length > 5,
-                };
+                var expressions = argList[0].Split(';')
+                                            .Select(s => s.Trim())
+                                            .Where(s => s.Length > 0)
+                                            .ToArray();
 
                 var start = ParseDateArgument(argList[1], "start");
                 var end = ParseDateArgument(argList[2], "end");
+
+                var exopts =
+                    expressions
+                        .Select(expression => new
+                        {
+                            Expression = expression,
+                            Options = new CrontabSchedule.ParseOptions
+                            {
+                                IncludingSeconds = expression.Split(' ').Length > 5,
+                            },
+                        })
+                        .ToArray();
+
                 var format =
                     argList.Count > 3 ? argList[3]
-                    : options.IncludingSeconds ? "ddd, dd MMM yyyy HH:mm:ss"
+                    : exopts.Any(e => e.Options.IncludingSeconds)
+                    ? "ddd, dd MMM yyyy HH:mm:ss"
                     : "ddd, dd MMM yyyy HH:mm";
 
-                var schedule = CrontabSchedule.Parse(expression, options);
+                var schedules =
+                    from e in exopts
+                    select CrontabSchedule.Parse(e.Expression, e.Options);
 
-                foreach (var occurrence in schedule.GetNextOccurrences(start, end))
+                foreach (var occurrence in schedules.GetNextOccurrences(start, end))
                     Console.Out.WriteLine(occurrence.ToString(format));
 
                 return 0;
