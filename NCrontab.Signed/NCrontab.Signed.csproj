@@ -19,6 +19,7 @@
     <PackageId>NCrontab.Signed</PackageId>
     <PackageTags>cron;schedule;time</PackageTags>
     <PackageProjectUrl>https://github.com/atifaziz/NCrontab</PackageProjectUrl>
+    <PublishRepositoryUrl>true</PublishRepositoryUrl>
     <PackageLicenseFile>COPYING.txt</PackageLicenseFile>
     <PackageOutputPath>..\dist</PackageOutputPath>
     <GenerateAssemblyDescriptionAttribute>false</GenerateAssemblyDescriptionAttribute>
@@ -58,6 +59,10 @@
     <PackageReference Include="System.IO" Version="4.3.0" />
     <PackageReference Include="System.Resources.ResourceManager" Version="4.3.0" />
     <PackageReference Include="System.Net.Primitives" Version="4.3.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0-*" PrivateAssets="all" />
   </ItemGroup>
 
 </Project>
