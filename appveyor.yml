@@ -24,6 +24,14 @@ test_script:
 - sh: ./test.sh
 artifacts:
 - path: dist\*.nupkg
+deploy:
+- provider: NuGet
+  server: https://www.myget.org/F/raboof/api/v2/package
+  api_key:
+    secure: fhGwXyO35FSshRzs5GWmF1LJTrd1sIqmS/jNCSfO2LfOciuYAKiXuFMYZFGiTAl+
+  symbol_server: https://www.myget.org/F/raboof/symbols/api/v2/package
+  on:
+    branch: master
 notifications:
 - provider: Email
   to:
