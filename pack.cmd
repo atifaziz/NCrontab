@@ -23,5 +23,5 @@ goto :EOF
 
 :pack
 setlocal
-dotnet pack -c Release %VERSION_SUFFIX% %1
+dotnet pack --no-restore --no-build -c Release %VERSION_SUFFIX% %1
 goto :EOF

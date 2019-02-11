@@ -12,7 +12,7 @@ dotnet restore
 for p in NCrontab NCrontab.Signed; do {
     for c in Debug Release; do {
         for f in netstandard1.0 netstandard2.0; do {
-            dotnet build -c $c -f $f $p
+            dotnet build --no-restore -c $c -f $f $p
         }
         done
     }
@@ -21,7 +21,7 @@ for p in NCrontab NCrontab.Signed; do {
 done
 for p in NCrontabConsole NCrontab.Tests; do {
     for c in Debug Release; do {
-        dotnet build -c $c -f netcoreapp1.0 $p
+        dotnet build --no-restore -c $c -f netcoreapp1.0 $p
     }
     done
 }
