@@ -7,8 +7,7 @@ which dotnet 2>/dev/null || {
     echo>&2 https://dot.net
     exit 1
 }
-dotnet --info \
-&& dotnet restore \
+dotnet restore \
 && for p in NCrontab NCrontab.Signed NCrontab.Tests NCrontabConsole;
     do for c in Debug Release; do {
         dotnet build -c $c $p || exit

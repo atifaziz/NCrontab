@@ -20,8 +20,7 @@ if not exist "%DOTNETEXE%" (
     echo https://dot.net
     exit /b 1
 )
-"%DOTNETEXE%" --info                     ^
-  && "%DOTNETEXE%" restore               ^
+"%DOTNETEXE%" restore                    ^
   && call :build NCrontab        Debug   ^
   && call :build NCrontab        Release ^
   && call :build NCrontab.Signed Debug   ^
