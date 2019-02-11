@@ -26,7 +26,7 @@
 3.0: Replaces uses of Converter with Func and therefore requires .NET Framework 3.5 as a minimum.
 </PackageReleaseNotes>
     <PackageProjectUrl>https://github.com/atifaziz/NCrontab</PackageProjectUrl>
-    <PackageLicenseUrl>http://www.apache.org/licenses/LICENSE-2.0</PackageLicenseUrl>
+    <PackageLicenseFile>COPYING.txt</PackageLicenseFile>
     <GenerateAssemblyDescriptionAttribute>false</GenerateAssemblyDescriptionAttribute>
     <GenerateAssemblyVersionAttribute>false</GenerateAssemblyVersionAttribute>
     <GenerateAssemblyFileVersionAttribute>false</GenerateAssemblyFileVersionAttribute>
@@ -38,10 +38,7 @@
 
   <ItemGroup>
     <Compile Include="..\SolutionInfo.cs" />
-    <Compile Include="..\NCrontab\*.cs" Exclude="bin\**;obj\**;**\*.xproj;packages\**" />
-    <None Update="..\COPYING.txt;..\lic\OpenSymphony.txt">
-      <Pack>true</Pack>
-    </None>
+    <None Include="..\COPYING.txt" Pack="true" PackagePath="$(PackageLicenseFile)" />
   </ItemGroup>
 
   <!--
