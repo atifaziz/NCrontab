@@ -18,13 +18,6 @@
     <PublicSign Condition=" '$(OS)' != 'Windows_NT' ">true</PublicSign>
     <PackageId>NCrontab.Signed</PackageId>
     <PackageTags>cron;schedule;time</PackageTags>
-    <PackageReleaseNotes>3.3: Targets .NET Standard 1.0
-3.2: Fixes the following issues:
-     - Wrong schedule when a crontab field is of the form N/1; remaining values of that field were being ignored.
-     - CrontabSchedule.TryParse doesn't throw if given a null string as input.
-3.1: CrontabFieldImpl and CrontabFieldAccumulator are now private.
-3.0: Replaces uses of Converter with Func and therefore requires .NET Framework 3.5 as a minimum.
-</PackageReleaseNotes>
     <PackageProjectUrl>https://github.com/atifaziz/NCrontab</PackageProjectUrl>
     <PackageLicenseFile>COPYING.txt</PackageLicenseFile>
     <GenerateAssemblyDescriptionAttribute>false</GenerateAssemblyDescriptionAttribute>
