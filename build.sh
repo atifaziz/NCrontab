@@ -9,9 +9,20 @@ which dotnet 2>/dev/null || {
 }
 cd "$(dirname "$0")"
 dotnet restore
-for p in NCrontab NCrontab.Signed NCrontab.Tests NCrontabConsole;
-    do for c in Debug Release; do {
-        dotnet build -c $c $p
+for p in NCrontab NCrontab.Signed; do {
+    for c in Debug Release; do {
+        for f in netstandard1.0 netstandard2.0; do {
+            dotnet build -c $c -f $f $p
+        }
+        done
     }
     done
+}
+done
+for p in NCrontabConsole NCrontab.Tests; do {
+    for c in Debug Release; do {
+        dotnet build -c $c -f netcoreapp1.0 $p
+    }
+    done
+}
 done
