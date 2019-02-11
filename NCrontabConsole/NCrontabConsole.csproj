@@ -5,7 +5,6 @@
     <DebugType>portable</DebugType>
     <AssemblyName>NCrontabConsole</AssemblyName>
     <OutputType>Exe</OutputType>
-    <PackageId>NCrontabConsole</PackageId>
     <PackageTargetFallback>$(PackageTargetFallback);dnxcore50</PackageTargetFallback>
     <RuntimeFrameworkVersion>1.0.4</RuntimeFrameworkVersion>
     <GenerateAssemblyTitleAttribute>false</GenerateAssemblyTitleAttribute>
