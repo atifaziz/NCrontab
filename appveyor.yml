@@ -11,8 +11,12 @@ skip_commits:
     - '*.txt'
 skip_tags: true
 build_script:
-- cmd: pack.cmd
-- sh: ./pack.sh
+- ps: >-
+    $id = $env:APPVEYOR_REPO_COMMIT_TIMESTAMP -replace '([-:]|\.0+Z)', ''
+
+    $id = $id.Substring(0, 13)
+
+    if ($isWindows) { .\pack.cmd ci-$id } else { ./pack.sh ci-$id }
 test_script:
 - cmd: test.cmd
 - sh: ./test.sh
