@@ -1,12 +1,17 @@
 version: '{build}'
+image:
+  - Visual Studio 2017
+  - Ubuntu
 branches:
   only:
   - master
 skip_tags: true
 build_script:
 - cmd: pack.cmd
+- sh: ./pack.sh
 test_script:
 - cmd: test.cmd
+- sh: ./test.sh
 artifacts:
 - path: dist\*.nupkg
 notifications:
