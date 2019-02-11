@@ -5,6 +5,10 @@ image:
 branches:
   only:
   - master
+skip_commits:
+  files:
+    - '*.md'
+    - '*.txt'
 skip_tags: true
 build_script:
 - cmd: pack.cmd
