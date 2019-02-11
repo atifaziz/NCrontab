@@ -11,7 +11,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		COPYING.txt = COPYING.txt
 		global.json = global.json
 		pack.cmd = pack.cmd
-		pack.sh = pack.sh
 		README.md = README.md
 		SolutionInfo.cs = SolutionInfo.cs
 		test.cmd = test.cmd
