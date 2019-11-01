@@ -343,6 +343,7 @@ namespace NCrontab.Tests
 
         [TestCase("bad * * * *", false)]
         [TestCase("* bad * * * *", true)]
+        [TestCase("*/250 * * * *", false)]
         public void BadMinutesField(string expression, bool includingSeconds) =>
             BadField(expression, includingSeconds);
 

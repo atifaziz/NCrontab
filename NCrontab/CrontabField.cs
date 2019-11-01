@@ -165,6 +165,11 @@ namespace NCrontab
             var minValue = _impl.MinValue;
             var maxValue = _impl.MaxValue;
 
+            if (interval > maxValue)
+                return OnValueAboveMaxError(interval, errorSelector);
+            if (interval < minValue)
+                return OnValueBelowMinError(interval, errorSelector);
+
             if (start == end)
             {
                 if (start < 0)
