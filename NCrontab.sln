@@ -9,7 +9,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		build.cmd = build.cmd
 		build.sh = build.sh
 		COPYING.txt = COPYING.txt
-		global.json = global.json
 		pack.cmd = pack.cmd
 		README.md = README.md
 		SolutionInfo.cs = SolutionInfo.cs
@@ -17,7 +16,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		test.sh = test.sh
 	EndProjectSection
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NCrontabViewer", "NCrontabViewer\NCrontabViewer.csproj", "{70306E49-D9C7-40BA-B15F-F88283351C57}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NCrontabViewer", "NCrontabViewer\NCrontabViewer.csproj", "{02F42DAC-8A9F-45BB-B734-BB08F0D194C4}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NCrontab", "NCrontab\NCrontab.csproj", "{1B6D7AA9-38DE-45B3-8E90-7FC08E83173F}"
 EndProject
@@ -27,6 +26,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NCrontabConsole", "NCrontab
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NCrontab.Signed", "NCrontab.Signed\NCrontab.Signed.csproj", "{00415F52-1635-4DC7-AA50-4750DC928F89}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NCrontabTester", "NCrontabTester\NCrontabTester.csproj", "{8153039C-24F1-4CD1-8CDA-E1780AE75F1C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -35,6 +36,14 @@ Global
 		ReleaseSigned|Any CPU = ReleaseSigned|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{02F42DAC-8A9F-45BB-B734-BB08F0D194C4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{02F42DAC-8A9F-45BB-B734-BB08F0D194C4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{02F42DAC-8A9F-45BB-B734-BB08F0D194C4}.DebugSigned|Any CPU.ActiveCfg = Debug|Any CPU
+		{02F42DAC-8A9F-45BB-B734-BB08F0D194C4}.DebugSigned|Any CPU.Build.0 = Debug|Any CPU
+		{02F42DAC-8A9F-45BB-B734-BB08F0D194C4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{02F42DAC-8A9F-45BB-B734-BB08F0D194C4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{02F42DAC-8A9F-45BB-B734-BB08F0D194C4}.ReleaseSigned|Any CPU.ActiveCfg = Release|Any CPU
+		{02F42DAC-8A9F-45BB-B734-BB08F0D194C4}.ReleaseSigned|Any CPU.Build.0 = Release|Any CPU
 		{1B6D7AA9-38DE-45B3-8E90-7FC08E83173F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{1B6D7AA9-38DE-45B3-8E90-7FC08E83173F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1B6D7AA9-38DE-45B3-8E90-7FC08E83173F}.DebugSigned|Any CPU.ActiveCfg = Debug|Any CPU
@@ -67,14 +76,14 @@ Global
 		{00415F52-1635-4DC7-AA50-4750DC928F89}.Release|Any CPU.Build.0 = Release|Any CPU
 		{00415F52-1635-4DC7-AA50-4750DC928F89}.ReleaseSigned|Any CPU.ActiveCfg = Release|Any CPU
 		{00415F52-1635-4DC7-AA50-4750DC928F89}.ReleaseSigned|Any CPU.Build.0 = Release|Any CPU
-		{70306E49-D9C7-40BA-B15F-F88283351C57}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{70306E49-D9C7-40BA-B15F-F88283351C57}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{70306E49-D9C7-40BA-B15F-F88283351C57}.DebugSigned|Any CPU.ActiveCfg = Debug|Any CPU
-		{70306E49-D9C7-40BA-B15F-F88283351C57}.DebugSigned|Any CPU.Build.0 = Debug|Any CPU
-		{70306E49-D9C7-40BA-B15F-F88283351C57}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{70306E49-D9C7-40BA-B15F-F88283351C57}.Release|Any CPU.Build.0 = Release|Any CPU
-		{70306E49-D9C7-40BA-B15F-F88283351C57}.ReleaseSigned|Any CPU.ActiveCfg = Release|Any CPU
-		{70306E49-D9C7-40BA-B15F-F88283351C57}.ReleaseSigned|Any CPU.Build.0 = Release|Any CPU
+		{8153039C-24F1-4CD1-8CDA-E1780AE75F1C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8153039C-24F1-4CD1-8CDA-E1780AE75F1C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8153039C-24F1-4CD1-8CDA-E1780AE75F1C}.DebugSigned|Any CPU.ActiveCfg = Debug|Any CPU
+		{8153039C-24F1-4CD1-8CDA-E1780AE75F1C}.DebugSigned|Any CPU.Build.0 = Debug|Any CPU
+		{8153039C-24F1-4CD1-8CDA-E1780AE75F1C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8153039C-24F1-4CD1-8CDA-E1780AE75F1C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8153039C-24F1-4CD1-8CDA-E1780AE75F1C}.ReleaseSigned|Any CPU.ActiveCfg = Release|Any CPU
+		{8153039C-24F1-4CD1-8CDA-E1780AE75F1C}.ReleaseSigned|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
