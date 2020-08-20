@@ -18,6 +18,16 @@ pull_requests:
 environment:
   DOTNET_CLI_TELEMETRY_OPTOUT: true
   DOTNET_SKIP_FIRST_TIME_EXPERIENCE: true
+install:
+  - cmd: curl -OsSL https://dot.net/v1/dotnet-install.ps1
+  - ps: if ($isWindows) { ./dotnet-install.ps1 -JsonFile global.json }
+  - sh: curl -OsSL https://dot.net/v1/dotnet-install.sh
+  - sh: chmod +x dotnet-install.sh
+  # https://github.com/dotnet/install-scripts/issues/71
+# - sh: ./dotnet-install.sh --jsonfile global.json
+  - sh: apt install -y jq
+  - sh: ./dotnet-install.sh --version $(jq -r .sdk.version global.json)
+  - sh: export PATH="$HOME/.dotnet:$PATH"
 before_build:
 - dotnet --info
 build_script:
