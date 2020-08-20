@@ -4,7 +4,10 @@ image:
   - Ubuntu
 branches:
   only:
-  - master
+    - master
+  except:
+    - /.+[\-.]wip$/
+    - wip
 skip_commits:
   files:
     - '*.md'
