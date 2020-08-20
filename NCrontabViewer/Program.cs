@@ -1,20 +1,24 @@
 ﻿namespace NCrontabViewer
 {
     using System;
-    using Microsoft.AspNetCore.Blazor.Hosting;
+    using System.Net.Http;
+    using System.Threading.Tasks;
+    using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
+    using Microsoft.Extensions.DependencyInjection;
 
     static class Program
     {
-        public static IWebAssemblyHostBuilder CreateHostBuilder() =>
-            BlazorWebAssemblyHost
-                .CreateDefaultBuilder()
-                .UseBlazorStartup<Startup>();
-
-        public static int Main()
+        static async Task<int> Main(string[] args)
         {
             try
             {
-                CreateHostBuilder().Build().Run();
+                var builder = WebAssemblyHostBuilder.CreateDefault(args);
+                builder.RootComponents.Add<App>("app");
+                builder.Services.AddTransient(sp => new HttpClient
+                {
+                    BaseAddress = new Uri(builder.HostEnvironment.BaseAddress)
+                });
+                await builder.Build().RunAsync();
                 return 0;
             }
             catch (Exception e)
