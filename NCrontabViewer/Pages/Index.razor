@@ -81,13 +81,14 @@ else if (_parseError is Exception e)
         }
     }
 
-    protected override void OnInitialized()
+    protected override Task OnInitializedAsync()
     {
         _expression = "* * * * *";
         var today = DateTime.Today;
         _startTime = today;
         _endTime = today.AddDays(1);
-        base.OnInitialized();
+        Refresh();
+        return base.OnInitializedAsync();
     }
 
     void Refresh()
