@@ -16,5 +16,7 @@ if not exist "%DOTNETEXE%" (
     echo https://dot.net
     exit /b 1
 )
-"%DOTNETEXE%" build
+dotnet restore ^
+  && "%DOTNETEXE%" build --no-restore -c Debug ^
+  && "%DOTNETEXE%" build --no-restore -c Release
 goto :EOF
