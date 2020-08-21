@@ -25,7 +25,7 @@ install:
   - sh: chmod +x dotnet-install.sh
   # https://github.com/dotnet/install-scripts/issues/71
 # - sh: ./dotnet-install.sh --jsonfile global.json
-  - sh: sudo apt-get install -y jq
+  - sh: sudo apt-get install -y jq > /dev/null
   - sh: ./dotnet-install.sh --version $(jq -r .sdk.version global.json)
   - sh: export PATH="$HOME/.dotnet:$PATH"
 before_build:
