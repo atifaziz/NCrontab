@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30320.27
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NCrontabTester", "NCrontabTester.csproj", "{4E119D1A-82E3-46BF-A6EE-DB6F6E0F1A12}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{4E119D1A-82E3-46BF-A6EE-DB6F6E0F1A12}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4E119D1A-82E3-46BF-A6EE-DB6F6E0F1A12}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4E119D1A-82E3-46BF-A6EE-DB6F6E0F1A12}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4E119D1A-82E3-46BF-A6EE-DB6F6E0F1A12}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {6E04AE6D-F6FA-4D79-A418-33899B224298}
+	EndGlobalSection
+EndGlobal
