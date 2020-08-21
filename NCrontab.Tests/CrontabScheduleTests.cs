@@ -310,11 +310,7 @@ namespace NCrontab.Tests
         //
 
         [Category("Performance")]
-#if NETCOREAPP1_0
-        [Ignore("Timeout attribute missing from NUnit for .NET Core.")]
-#else
         [Timeout(1000)]
-#endif
         [TestCase("* * 31 Feb *", false)]
         [TestCase("* * * 31 Feb *", true)]
         public void DontLoopIndefinitely(string expression, bool includingSeconds)

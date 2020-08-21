@@ -26,3 +26,4 @@ for p in NCrontabConsole NCrontab.Tests; do {
     done
 }
 done
+dotnet build --no-restore NCrontabViewer

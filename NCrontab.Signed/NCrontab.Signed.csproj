@@ -16,7 +16,7 @@
     <AssemblyOriginatorKeyFile>key.snk</AssemblyOriginatorKeyFile>
     <SignAssembly>true</SignAssembly>
     <PublicSign Condition=" '$(OS)' != 'Windows_NT' ">true</PublicSign>
-    <PackageId>NCrontab.Signed</PackageId>
+    <PackageId>ncrontab.signed</PackageId>
     <PackageTags>cron;schedule;time</PackageTags>
     <PackageProjectUrl>https://github.com/atifaziz/NCrontab</PackageProjectUrl>
     <PublishRepositoryUrl>true</PublishRepositoryUrl>
