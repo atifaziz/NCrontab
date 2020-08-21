@@ -149,7 +149,7 @@ Below is the same example in C# Interactive (`csi.exe`):
     > var start = new DateTime(2000, 1, 1);
     > var end = start.AddYears(1);
     > var occurrences = s.GetNextOccurrences(start, end);
-    > Console.WriteLine(string.Join(Environment.NewLine, 
+    > Console.WriteLine(string.Join(Environment.NewLine,
     .     from t in occurrences
     .     select $"{t:ddd, dd MMM yyyy HH:mm}"));
     Mon, 03 Jan 2000 12:00

@@ -12,7 +12,7 @@
     <DebugType>portable</DebugType>
     <AssemblyName>NCrontab</AssemblyName>
     <OutputType>Library</OutputType>
-    <PackageId>NCrontab</PackageId>
+    <PackageId>ncrontab</PackageId>
     <PackageTags>cron;schedule;time</PackageTags>
     <PackageProjectUrl>https://github.com/atifaziz/NCrontab</PackageProjectUrl>
     <PublishRepositoryUrl>true</PublishRepositoryUrl>

@@ -4,20 +4,35 @@ image:
   - Ubuntu
 branches:
   only:
-  - master
+    - master
+  except:
+    - /.+[\-.]wip$/
+    - wip
 skip_commits:
   files:
     - '*.md'
     - '*.txt'
 skip_tags: true
+pull_requests:
+  do_not_increment_build_number: true
+environment:
+  DOTNET_CLI_TELEMETRY_OPTOUT: true
+  DOTNET_SKIP_FIRST_TIME_EXPERIENCE: true
+install:
+  - cmd: curl -OsSL https://dot.net/v1/dotnet-install.ps1
+  - ps: if ($isWindows) { ./dotnet-install.ps1 -JsonFile global.json }
+  - sh: curl -OsSL https://dot.net/v1/dotnet-install.sh
+  - sh: chmod +x dotnet-install.sh
+  # https://github.com/dotnet/install-scripts/issues/71
+# - sh: ./dotnet-install.sh --jsonfile global.json
+  - sh: sudo apt-get install -y jq > /dev/null
+  - sh: ./dotnet-install.sh --version $(jq -r .sdk.version global.json)
+  - sh: export PATH="$HOME/.dotnet:$PATH"
 before_build:
 - dotnet --info
 build_script:
-- ps: >-
-    $id = $env:APPVEYOR_REPO_COMMIT_TIMESTAMP -replace '([-:]|\.0+Z)', ''
-
-    $id = $id.Substring(0, 13)
-
+- ps: |-
+    $id = ([datetimeoffset]$env:APPVEYOR_REPO_COMMIT_TIMESTAMP).ToUniversalTime().ToString('yyyyMMdd''t''HHmm')
     if ($isWindows) { .\pack.cmd ci-$id }
 test_script:
 - cmd: test.cmd
@@ -36,7 +51,7 @@ for:
       secure: fhGwXyO35FSshRzs5GWmF1LJTrd1sIqmS/jNCSfO2LfOciuYAKiXuFMYZFGiTAl+
     symbol_server: https://www.myget.org/F/raboof/symbols/api/v2/package
     on:
-      branch: master
+      branch: deploy
 notifications:
 - provider: Email
   to:
