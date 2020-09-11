@@ -53,12 +53,18 @@ namespace NCrontab.Tests
         }
 
         [Test]
-        public void TryParseNullString() =>
+        public void TryParseNullString()
+        {
             Assert.That(CrontabSchedule.TryParse(null), Is.Null);
+            Assert.False(CrontabSchedule.TryParse(null, out var _));
+        }
 
         [Test]
-        public void TryParseEmptyString() =>
+        public void TryParseEmptyString()
+        {
             Assert.That(CrontabSchedule.TryParse(string.Empty), Is.Null);
+            Assert.False(CrontabSchedule.TryParse(string.Empty, out var _));
+        }
 
         [Test]
         public void AllTimeString()
@@ -335,6 +341,10 @@ namespace NCrontab.Tests
             {
                 IncludingSeconds = includingSeconds
             }), Is.Null);
+            Assert.False(CrontabSchedule.TryParse(expression, new ParseOptions
+            {
+                IncludingSeconds = includingSeconds
+            }, out var _));
         }
 
         [TestCase("bad * * * * *", false)]
