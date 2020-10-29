@@ -30,7 +30,7 @@ namespace NCrontab
 
     #endregion
 
-    delegate T CrontabFieldAccumulator<T>(int start, int end, int interval, T successs, Func<ExceptionProvider, T> onError);
+    delegate T CrontabFieldAccumulator<T>(int start, int end, int interval, T success, Func<ExceptionProvider, T> onError);
 
     // ReSharper disable once PartialTypeWithSinglePart
 
