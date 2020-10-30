@@ -107,8 +107,6 @@ namespace NCrontab
 
             _impl = impl;
             _bits = new BitArray(impl.ValueCount);
-
-            _bits.SetAll(false);
             _minValueSet = int.MaxValue;
             _maxValueSet = -1;
         }
