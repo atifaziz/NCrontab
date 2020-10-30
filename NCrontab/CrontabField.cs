@@ -47,7 +47,7 @@ namespace NCrontab
         /// </summary>
 
         public static CrontabField Parse(CrontabFieldKind kind, string expression) =>
-            TryParse(kind, expression, v => v, e => { throw e(); });
+            TryParse(kind, expression, v => v, e => throw e());
 
         public static CrontabField TryParse(CrontabFieldKind kind, string expression) =>
             TryParse(kind, expression, v => v, _ => null);
