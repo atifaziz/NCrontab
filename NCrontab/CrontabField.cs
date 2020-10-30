@@ -103,9 +103,7 @@ namespace NCrontab
 
         CrontabField(CrontabFieldImpl impl)
         {
-            if (impl == null) throw new ArgumentNullException(nameof(impl));
-
-            _impl = impl;
+            _impl = impl ?? throw new ArgumentNullException(nameof(impl));
             _bits = new BitArray(impl.ValueCount);
             _minValueSet = int.MaxValue;
             _maxValueSet = -1;
