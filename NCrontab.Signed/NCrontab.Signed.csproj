@@ -5,9 +5,9 @@
     <Copyright>Copyright © 2008 Atif Aziz. All rights reserved. Portions Copyright © 2001 The OpenSymphony Group. All rights reserved.</Copyright>
     <AssemblyTitle>NCrontab (Signed)</AssemblyTitle>
     <NeutralLanguage>en-US</NeutralLanguage>
-    <VersionPrefix>3.3.0</VersionPrefix>
+    <VersionPrefix>3.3.2</VersionPrefix>
     <Authors>Atif Aziz</Authors>
-    <TargetFrameworks>net35;netstandard1.0</TargetFrameworks>
+    <TargetFrameworks>net35;netstandard1.0;netstandard2.0</TargetFrameworks>
     <DefineConstants>$(DefineConstants);SIGNED</DefineConstants>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <DebugType>portable</DebugType>
@@ -18,30 +18,22 @@
     <PublicSign Condition=" '$(OS)' != 'Windows_NT' ">true</PublicSign>
     <PackageId>NCrontab.Signed</PackageId>
     <PackageTags>cron;schedule;time</PackageTags>
-    <PackageReleaseNotes>3.3: Targets .NET Standard 1.0
-3.2: Fixes the following issues:
-     - Wrong schedule when a crontab field is of the form N/1; remaining values of that field were being ignored.
-     - CrontabSchedule.TryParse doesn't throw if given a null string as input.
-3.1: CrontabFieldImpl and CrontabFieldAccumulator are now private.
-3.0: Replaces uses of Converter with Func and therefore requires .NET Framework 3.5 as a minimum.
-</PackageReleaseNotes>
     <PackageProjectUrl>https://github.com/atifaziz/NCrontab</PackageProjectUrl>
-    <PackageLicenseUrl>http://www.apache.org/licenses/LICENSE-2.0</PackageLicenseUrl>
+    <PublishRepositoryUrl>true</PublishRepositoryUrl>
+    <PackageLicenseFile>COPYING.txt</PackageLicenseFile>
+    <PackageOutputPath>..\dist</PackageOutputPath>
     <GenerateAssemblyDescriptionAttribute>false</GenerateAssemblyDescriptionAttribute>
-    <GenerateAssemblyVersionAttribute>false</GenerateAssemblyVersionAttribute>
-    <GenerateAssemblyFileVersionAttribute>false</GenerateAssemblyFileVersionAttribute>
     <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
     <GenerateAssemblyCopyrightAttribute>false</GenerateAssemblyCopyrightAttribute>
     <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
     <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
+    <AllowedOutputExtensionsInPackageBuildOutputFolder>$(AllowedOutputExtensionsInPackageBuildOutputFolder);.pdb</AllowedOutputExtensionsInPackageBuildOutputFolder>
   </PropertyGroup>
 
   <ItemGroup>
     <Compile Include="..\SolutionInfo.cs" />
     <Compile Include="..\NCrontab\*.cs" Exclude="bin\**;obj\**;**\*.xproj;packages\**" />
-    <None Update="..\COPYING.txt;..\lic\OpenSymphony.txt">
-      <Pack>true</Pack>
-    </None>
+    <None Include="..\COPYING.txt" Pack="true" PackagePath="$(PackageLicenseFile)" />
   </ItemGroup>
 
   <!--
@@ -67,6 +59,10 @@
     <PackageReference Include="System.IO" Version="4.3.0" />
     <PackageReference Include="System.Resources.ResourceManager" Version="4.3.0" />
     <PackageReference Include="System.Net.Primitives" Version="4.3.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0-*" PrivateAssets="all" />
   </ItemGroup>
 
 </Project>

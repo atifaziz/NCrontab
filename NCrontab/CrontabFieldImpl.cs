@@ -30,7 +30,7 @@ namespace NCrontab
 
     #endregion
 
-    delegate T CrontabFieldAccumulator<T>(int start, int end, int interval, T successs, Func<ExceptionProvider, T> onError);
+    delegate T CrontabFieldAccumulator<T>(int start, int end, int interval, T success, Func<ExceptionProvider, T> onError);
 
     // ReSharper disable once PartialTypeWithSinglePart
 
@@ -166,7 +166,7 @@ namespace NCrontab
         }
 
         public void Parse(string str, CrontabFieldAccumulator<ExceptionProvider> acc) =>
-            TryParse(str, acc, null, ep => { throw ep(); });
+            TryParse(str, acc, null, ep => throw ep());
 
         public T TryParse<T>(string str, CrontabFieldAccumulator<T> acc, T success, Func<ExceptionProvider, T> errorSelector)
         {

@@ -47,7 +47,7 @@ namespace NCrontab
         /// </summary>
 
         public static CrontabField Parse(CrontabFieldKind kind, string expression) =>
-            TryParse(kind, expression, v => v, e => { throw e(); });
+            TryParse(kind, expression, v => v, e => throw e());
 
         public static CrontabField TryParse(CrontabFieldKind kind, string expression) =>
             TryParse(kind, expression, v => v, _ => null);
@@ -103,12 +103,8 @@ namespace NCrontab
 
         CrontabField(CrontabFieldImpl impl)
         {
-            if (impl == null) throw new ArgumentNullException(nameof(impl));
-
-            _impl = impl;
+            _impl = impl ?? throw new ArgumentNullException(nameof(impl));
             _bits = new BitArray(impl.ValueCount);
-
-            _bits.SetAll(false);
             _minValueSet = int.MaxValue;
             _maxValueSet = -1;
         }

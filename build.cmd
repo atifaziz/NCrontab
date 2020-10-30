@@ -6,23 +6,8 @@ goto :EOF
 
 :main
 setlocal
-if "%PROCESSOR_ARCHITECTURE%"=="x86" set MSBUILD=%ProgramFiles%
-if defined ProgramFiles(x86) set MSBUILD=%ProgramFiles(x86)%
-set MSBUILD=%MSBUILD%\MSBuild\14.0\bin\msbuild
-if not exist "%MSBUILD%" (
-    echo ----------------------------------------------------------------------
-    echo  WARNING!
-    echo.
-    echo Microsoft Build Tools 2015 does not appear to be installed on this
-    echo machine, which is required to build WinForms-based demo application.
-    echo You can install it from the URL below and then try building again:
-    echo https://www.microsoft.com/en-us/download/details.aspx?id=48159
-    echo ----------------------------------------------------------------------
-    echo.
-    goto buildlib
-)
 for %%c in (Debug Release) do (
-    "%MSBUILD%" /p:Configuration=%%c /v:m NCrontabViewer\NCrontabViewer.csproj || exit /b 1
+    call msbuild /p:Configuration=%%c /v:m NCrontabViewer\NCrontabViewer.csproj || exit /b 1
 )
 :buildlib
 set DOTNETEXE=
@@ -35,8 +20,7 @@ if not exist "%DOTNETEXE%" (
     echo https://dot.net
     exit /b 1
 )
-"%DOTNETEXE%" --info                     ^
-  && "%DOTNETEXE%" restore               ^
+"%DOTNETEXE%" restore                    ^
   && call :build NCrontab        Debug   ^
   && call :build NCrontab        Release ^
   && call :build NCrontab.Signed Debug   ^

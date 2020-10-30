@@ -95,7 +95,7 @@ namespace NCrontab
         public static CrontabSchedule Parse(string expression) => Parse(expression, null);
 
         public static CrontabSchedule Parse(string expression, ParseOptions options) =>
-            TryParse(expression, options, v => v, e => { throw e(); });
+            TryParse(expression, options, v => v, e => throw e());
 
         public static CrontabSchedule TryParse(string expression) => TryParse(expression, null);
 

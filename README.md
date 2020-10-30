@@ -149,7 +149,7 @@ Below is the same example in C# Interactive (`csi.exe`):
     > var start = new DateTime(2000, 1, 1);
     > var end = start.AddYears(1);
     > var occurrences = s.GetNextOccurrences(start, end);
-    > Console.WriteLine(string.Join(Environment.NewLine, 
+    > Console.WriteLine(string.Join(Environment.NewLine,
     .     from t in occurrences
     .     select $"{t:ddd, dd MMM yyyy HH:mm}"));
     Mon, 03 Jan 2000 12:00
@@ -235,7 +235,7 @@ This product includes software developed by the OpenSymphony Group (http://www.o
 
   [ipy]: http://en.wikipedia.org/wiki/IronPython
   [f#]: http://msdn.microsoft.com/en-us/fsharp/cc742182
-  [build-badge]: https://img.shields.io/appveyor/ci/raboof/ncrontab.svg
+  [build-badge]: https://img.shields.io/appveyor/ci/raboof/ncrontab/master.svg
   [nuget-badge]: https://img.shields.io/nuget/v/ncrontab.svg
   [nuget-pkg]: https://www.nuget.org/packages/ncrontab
   [builds]: https://ci.appveyor.com/project/raboof/ncrontab
