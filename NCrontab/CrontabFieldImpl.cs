@@ -57,7 +57,7 @@ namespace NCrontab
                 throw new ArgumentException($"Invalid crontab field kind. Valid values are {kinds}.", nameof(kind));
             }
 
-            return FieldByKind[(int) kind];
+            return FieldByKind[(int)kind];
         }
 
         CrontabFieldImpl(CrontabFieldKind kind, int minValue, int maxValue, string[] names)
@@ -156,12 +156,12 @@ namespace NCrontab
 
             if (value >= 10)
             {
-                writer.Write((char) ('0' + (value / 10)));
-                writer.Write((char) ('0' + (value % 10)));
+                writer.Write((char)('0' + (value / 10)));
+                writer.Write((char)('0' + (value % 10)));
             }
             else
             {
-                writer.Write((char) ('0' + value));
+                writer.Write((char)('0' + value));
             }
         }
 
@@ -215,7 +215,7 @@ namespace NCrontab
             if (commaIndex > 0)
             {
                 var result = success;
-                using (var token = ((IEnumerable<string>) str.Split(StringSeparatorStock.Comma)).GetEnumerator())
+                using (var token = ((IEnumerable<string>)str.Split(StringSeparatorStock.Comma)).GetEnumerator())
                 {
                     while (token.MoveNext() && result == null)
                         result = InternalParse(token.Current, acc, success, errorSelector);
@@ -241,7 +241,7 @@ namespace NCrontab
             // Next, look for wildcard (*).
             //
 
-            if (str.Length == 1 && str[0]== '*')
+            if (str.Length == 1 && str[0] == '*')
             {
                 return acc(-1, -1, every ?? 1, success, errorSelector);
             }
