@@ -2,6 +2,19 @@
 set -e
 cd "$(dirname "$0")"
 dotnet restore
-for c in Debug Release; do
-    dotnet build --no-restore -c $c
+for p in NCrontab NCrontab.Signed; do {
+    for c in Debug Release; do {
+        for f in netstandard1.0 netstandard2.0; do {
+            dotnet build --no-restore -c $c -f $f $p
+        }
+        done
+    }
+    done
+}
 done
+for p in NCrontabConsole NCrontab.Tests; do {
+    for c in Debug Release; do {
+        dotnet build --no-restore -c $c -f net5 $p
+    }
+    done
+}
