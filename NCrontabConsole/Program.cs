@@ -67,20 +67,11 @@ catch (Exception e)
 }
 
 static DateTime ParseDateArgument(string arg, string hint)
-{
-    try
-    {
-        return DateTime.Parse(arg, null, DateTimeStyles.AssumeLocal);
-    }
-    catch (FormatException e)
-    {
-        throw new ApplicationException("Invalid " + hint + " date or date format argument.", e);
-    }
-}
+    => DateTime.TryParse(arg, null, DateTimeStyles.AssumeLocal, out var v) ? v
+     : throw new ApplicationException("Invalid " + hint + " date or date format argument.");
 
 sealed class ApplicationException : Exception
 {
     public ApplicationException() {}
     public ApplicationException(string message) : base(message) {}
-    public ApplicationException(string message, Exception inner) : base(message, inner) {}
 }
