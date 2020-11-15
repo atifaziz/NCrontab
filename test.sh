@@ -2,7 +2,11 @@
 set -e
 cd "$(dirname "$0")"
 ./build.sh
-dotnet test --no-build NCrontab.Tests -c Debug -p:CollectCoverage=true \
-                                               -p:CoverletOutputFormat=opencover \
-                                               -p:Exclude=[NUnit*]*
-dotnet test --no-build NCrontab.Tests -c Release
+for f in net5 netcoreapp3.1; do {
+    dotnet test --no-build NCrontab.Tests -c Debug -f $f \
+        -p:CollectCoverage=true \
+        -p:CoverletOutputFormat=opencover \
+        -p:Exclude=[NUnit*]*
+    dotnet test --no-build NCrontab.Tests -c Release -f $f
+}
+done
