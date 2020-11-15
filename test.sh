@@ -1,9 +1,12 @@
 #!/usr/bin/env bash
 set -e
 cd "$(dirname "$0")"
-VERSION_SUFFIX=
-if [ ! -z "$1" ]; then VERSION_SUFFIX="--version-suffix $1"; fi
 ./build.sh
-for c in Debug Release; do
-    dotnet test --no-restore --no-build -f netcoreapp3.1 -c $c NCrontab.Tests
+for f in net5 netcoreapp3.1; do {
+    dotnet test --no-build NCrontab.Tests -c Debug -f $f \
+        -p:CollectCoverage=true \
+        -p:CoverletOutputFormat=opencover \
+        -p:Exclude=[NUnit*]*
+    dotnet test --no-build NCrontab.Tests -c Release -f $f
+}
 done

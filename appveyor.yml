@@ -23,6 +23,7 @@ install:
   - ps: if ($isWindows) { ./dotnet-install.ps1 -JsonFile global.json }
   - sh: curl -OsSL https://dot.net/v1/dotnet-install.sh
   - sh: chmod +x dotnet-install.sh
+  - sh: ./dotnet-install.sh --runtime dotnet --version 3.1.10
   - sh: ./dotnet-install.sh --jsonfile global.json
   - sh: export PATH="$HOME/.dotnet:$PATH"
 before_build:
