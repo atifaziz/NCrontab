@@ -17,6 +17,8 @@
 //
 #endregion
 
+#nullable enable
+
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -32,20 +34,24 @@ try
     if (verbose = verboseIndex >= 0)
         argList.RemoveAt(verboseIndex);
 
-    if (argList.Count < 3)
-        throw new ApplicationException("Missing required arguments. You must at least supply CRONTAB-EXPRESSION START-DATE END-DATE.");
+    var (expression, startTimeString, endTimeString, format) =
+        argList.Count switch
+        {
+            3   => (argList[0], argList[1], argList[2], null),
+            > 3 => (argList[0], argList[1], argList[2], argList[3]),
+            _ => throw new ApplicationException("Missing required arguments. You must at least supply CRONTAB-EXPRESSION START-DATE END-DATE."),
+        };
 
-    var expression = argList[0].Trim();
+    expression = expression.Trim();
     var options = new CrontabSchedule.ParseOptions
     {
         IncludingSeconds = expression.Split(' ').Length > 5,
     };
 
-    var start = ParseDateArgument(argList[1], "start");
-    var end = ParseDateArgument(argList[2], "end");
-    var format = argList.Count > 3 ? argList[3]
-               : options.IncludingSeconds ? "ddd, dd MMM yyyy HH:mm:ss"
-               : "ddd, dd MMM yyyy HH:mm";
+    var start = ParseDateArgument(startTimeString, "start");
+    var end = ParseDateArgument(endTimeString, "end");
+    format = format ?? (options.IncludingSeconds ? "ddd, dd MMM yyyy HH:mm:ss"
+                                                 : "ddd, dd MMM yyyy HH:mm");
 
     var schedule = CrontabSchedule.Parse(expression, options);
 
