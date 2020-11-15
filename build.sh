@@ -14,8 +14,12 @@ for p in NCrontab NCrontab.Signed; do {
 done
 for p in NCrontabConsole NCrontab.Tests; do {
     dotnet restore $p
-    for c in Debug Release; do {
-        dotnet build --no-restore -c $c -f net5 $p
+}
+done
+for c in Debug Release; do {
+    dotnet build --no-restore -c $c -f net5 NCrontabConsole
+    for f in net5 netcoreapp3.1; do {
+        dotnet build --no-restore -c $c -f $f NCrontab.Tests
     }
     done
 }
