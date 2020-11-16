@@ -29,10 +29,10 @@ namespace NCrontab
         public CrontabException() :
             base("Crontab error.") {} // TODO: Fix message and add it to resource.
 
-        public CrontabException(string message) :
+        public CrontabException(string? message) :
             base(message) {}
 
-        public CrontabException(string message, Exception innerException) :
+        public CrontabException(string? message, Exception? innerException) :
             base(message, innerException) {}
     }
 }

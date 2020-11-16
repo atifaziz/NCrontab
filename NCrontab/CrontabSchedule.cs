@@ -94,18 +94,20 @@ namespace NCrontab
 
         public static CrontabSchedule Parse(string expression) => Parse(expression, null);
 
-        public static CrontabSchedule Parse(string expression, ParseOptions options) =>
+        public static CrontabSchedule Parse(string expression, ParseOptions? options) =>
             TryParse(expression, options, v => v, e => throw e());
 
-        public static CrontabSchedule TryParse(string expression) => TryParse(expression, null);
+        public static CrontabSchedule? TryParse(string expression) => TryParse(expression, null);
 
-        public static CrontabSchedule TryParse(string expression, ParseOptions options) =>
-            TryParse(expression ?? string.Empty, options, v => v, _ => null);
+        public static CrontabSchedule? TryParse(string expression, ParseOptions? options) =>
+            TryParse(expression ?? string.Empty, options, v => v, _ => (CrontabSchedule?)null);
 
-        public static T TryParse<T>(string expression, Func<CrontabSchedule, T> valueSelector, Func<ExceptionProvider, T> errorSelector) =>
+        public static T TryParse<T>(string expression,
+                                    Func<CrontabSchedule, T> valueSelector,
+                                    Func<ExceptionProvider, T> errorSelector) =>
             TryParse(expression ?? string.Empty, null, valueSelector, errorSelector);
 
-        public static T TryParse<T>(string expression, ParseOptions options, Func<CrontabSchedule, T> valueSelector, Func<ExceptionProvider, T> errorSelector)
+        public static T TryParse<T>(string expression, ParseOptions? options, Func<CrontabSchedule, T> valueSelector, Func<ExceptionProvider, T> errorSelector)
         {
             if (expression == null) throw new ArgumentNullException(nameof(expression));
 
@@ -131,11 +133,12 @@ namespace NCrontab
             for (var i = 0; i < tokens.Length; i++)
             {
                 var kind = (CrontabFieldKind)i + offset;
-                var field = CrontabField.TryParse(kind, tokens[i], v => new { ErrorProvider = (ExceptionProvider)null, Value = v },
-                                                                   e => new { ErrorProvider = e, Value = (CrontabField)null });
+                var field = CrontabField.TryParse(kind, tokens[i], v => new { ErrorProvider = (ExceptionProvider?)null, Value = (CrontabField?)v    },
+                                                                   e => new { ErrorProvider = (ExceptionProvider?)e   , Value = (CrontabField?)null }) ;
+
                 if (field.ErrorProvider != null)
                     return errorSelector(field.ErrorProvider);
-                fields[i + offset] = field.Value;
+                fields[i + offset] = field.Value!; // non-null by mutual exclusivity!
             }
 
             return valueSelector(new CrontabSchedule(fields[0], fields[1], fields[2], fields[3], fields[4], fields[5]));
@@ -147,12 +150,6 @@ namespace NCrontab
             CrontabField days, CrontabField months,
             CrontabField daysOfWeek)
         {
-            Debug.Assert(minutes != null);
-            Debug.Assert(hours != null);
-            Debug.Assert(days != null);
-            Debug.Assert(months != null);
-            Debug.Assert(daysOfWeek != null);
-
             _seconds = seconds;
             _minutes = minutes;
             _hours = hours;
