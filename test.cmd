@@ -1,11 +1,17 @@
 @echo off
 pushd "%~dp0"
-call build ^
-  && call :test Debug ^
-  && call :test Release ^
+call :main %*
 popd
 goto :EOF
 
+:main
+    call build ^
+ && call :test Debug -p:CollectCoverage=true ^
+                     -p:CoverletOutputFormat=opencover ^
+                     -p:Exclude=[NUnit*]* ^
+ && call :test Release
+goto :EOF
+
 :test
-dotnet test --no-restore --no-build -c %1 NCrontab.Tests
+dotnet test --no-build -c %1 NCrontab.Tests
 goto :EOF

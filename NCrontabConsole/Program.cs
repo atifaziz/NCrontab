@@ -17,83 +17,68 @@
 //
 #endregion
 
-namespace NCrontabConsole
+#nullable enable
+
+using System;
+using System.Collections.Generic;
+using System.Globalization;
+using NCrontab;
+
+var verbose = false;
+
+try
 {
-    #region Imports
+    var argList = new List<string>(args);
+    var verboseIndex = argList.IndexOf("--verbose") is {} vi and >= 0 ? vi
+                     : argList.IndexOf("-v");
+    // ReSharper disable once AssignmentInConditionalExpression
+    if (verbose = verboseIndex >= 0)
+        argList.RemoveAt(verboseIndex);
 
-    using System;
-    using System.Collections.Generic;
-    using System.Globalization;
-    using NCrontab;
+    var (expression, startTimeString, endTimeString, format) =
+        argList.Count switch
+        {
+            3   => (argList[0], argList[1], argList[2], null),
+            > 3 => (argList[0], argList[1], argList[2], argList[3]),
+            _ => throw new ApplicationException("Missing required arguments. You must at least supply CRONTAB-EXPRESSION START-DATE END-DATE."),
+        };
 
-    #endregion
-
-    static class Program
+    expression = expression.Trim();
+    var options = new CrontabSchedule.ParseOptions
     {
-        static int Main(string[] args)
-        {
-            var verbose = false;
+        IncludingSeconds = expression.Split(' ').Length > 5,
+    };
 
-            try
-            {
-                var argList = new List<string>(args);
-                var verboseIndex = argList.IndexOf("--verbose");
-                // ReSharper disable once AssignmentInConditionalExpression
-                if (verbose = verboseIndex >= 0)
-                    argList.RemoveAt(verboseIndex);
+    var start = ParseDateArgument(startTimeString, "start");
+    var end = ParseDateArgument(endTimeString, "end");
+    format = format ?? (options.IncludingSeconds ? "ddd, dd MMM yyyy HH:mm:ss"
+                                                 : "ddd, dd MMM yyyy HH:mm");
 
-                if (argList.Count < 3)
-                    throw new ApplicationException("Missing required arguments. You must at least supply CRONTAB-EXPRESSION START-DATE END-DATE.");
+    var schedule = CrontabSchedule.Parse(expression, options);
 
-                var expression = argList[0].Trim();
-                var options = new CrontabSchedule.ParseOptions
-                {
-                    IncludingSeconds = expression.Split(' ').Length > 5,
-                };
+    foreach (var occurrence in schedule.GetNextOccurrences(start, end))
+        Console.Out.WriteLine(occurrence.ToString(format));
 
-                var start = ParseDateArgument(argList[1], "start");
-                var end = ParseDateArgument(argList[2], "end");
-                var format =
-                    argList.Count > 3 ? argList[3]
-                    : options.IncludingSeconds ? "ddd, dd MMM yyyy HH:mm:ss"
-                    : "ddd, dd MMM yyyy HH:mm";
+    return 0;
+}
+catch (Exception e)
+{
+    var error =
+        verbose
+        ? e.ToString()
+        : e is ApplicationException
+        ? e.Message
+        : e.GetBaseException().Message;
+    Console.Error.WriteLine(error);
+    return 1;
+}
 
-                var schedule = CrontabSchedule.Parse(expression, options);
+static DateTime ParseDateArgument(string arg, string hint)
+    => DateTime.TryParse(arg, null, DateTimeStyles.AssumeLocal, out var v) ? v
+     : throw new ApplicationException("Invalid " + hint + " date or date format argument.");
 
-                foreach (var occurrence in schedule.GetNextOccurrences(start, end))
-                    Console.Out.WriteLine(occurrence.ToString(format));
-
-                return 0;
-            }
-            catch (Exception e)
-            {
-                var error =
-                    verbose
-                    ? e.ToString()
-                    : e is ApplicationException
-                    ? e.Message : e.GetBaseException().Message;
-                Console.Error.WriteLine(error);
-                return 1;
-            }
-        }
-
-        static DateTime ParseDateArgument(string arg, string hint)
-        {
-            try
-            {
-                return DateTime.Parse(arg, null, DateTimeStyles.AssumeLocal);
-            }
-            catch (FormatException e)
-            {
-                throw new ApplicationException("Invalid " + hint + " date or date format argument.", e);
-            }
-        }
-
-        sealed class ApplicationException : Exception
-        {
-            public ApplicationException() {}
-            public ApplicationException(string message) : base(message) {}
-            public ApplicationException(string message, Exception inner) : base(message, inner) {}
-        }
-    }
+sealed class ApplicationException : Exception
+{
+    public ApplicationException() {}
+    public ApplicationException(string message) : base(message) {}
 }
