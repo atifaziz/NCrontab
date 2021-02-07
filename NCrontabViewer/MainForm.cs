@@ -84,7 +84,7 @@ namespace NCrontabViewer
                         return;
 
                     _isSixPart = expression.Split(Separators, StringSplitOptions.RemoveEmptyEntries).Length == 6;
-                    _crontab = CrontabSchedule.Parse(expression, new CrontabSchedule.ParseOptions { IncludingSeconds = _isSixPart });
+                    _crontab = CrontabSchedule.Parse(expression, new CrontabSchedule.ParseOptions { RequireSeconds = _isSixPart });
 
                     _totalOccurrenceCount = 0;
 

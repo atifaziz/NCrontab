@@ -23,8 +23,8 @@ NCrontab.CrontabSchedule.GetNextOccurrence(System.DateTime baseTime) -> System.D
 NCrontab.CrontabSchedule.GetNextOccurrence(System.DateTime baseTime, System.DateTime endTime) -> System.DateTime
 NCrontab.CrontabSchedule.GetNextOccurrences(System.DateTime baseTime, System.DateTime endTime) -> System.Collections.Generic.IEnumerable<System.DateTime>!
 NCrontab.CrontabSchedule.ParseOptions
-NCrontab.CrontabSchedule.ParseOptions.IncludingSeconds.get -> bool
-NCrontab.CrontabSchedule.ParseOptions.IncludingSeconds.set -> void
+NCrontab.CrontabSchedule.ParseOptions.RequireSeconds.get -> bool
+NCrontab.CrontabSchedule.ParseOptions.RequireSeconds.set -> void
 NCrontab.CrontabSchedule.ParseOptions.ParseOptions() -> void
 NCrontab.ExceptionProvider
 NCrontab.ICrontabField

@@ -69,13 +69,20 @@ namespace NCrontab.Tests
         [Test]
         public void SixPartAllTimeString()
         {
-            Assert.AreEqual("* * * * * *", CrontabSchedule.Parse("* * * * * *", new ParseOptions { IncludingSeconds = true }).ToString());
+            Assert.AreEqual("* * * * * *", CrontabSchedule.Parse("* * * * * *", new ParseOptions { RequireSeconds = true }).ToString());
         }
 
         [Test]
         public void CannotParseWhenSecondsRequired()
         {
-            Assert.Throws<CrontabException>(() => CrontabSchedule.Parse("* * * * *", new ParseOptions { IncludingSeconds = true }));
+            Assert.Throws<CrontabException>(() => CrontabSchedule.Parse("* * * * *", new ParseOptions { RequireSeconds = true }));
+        }
+
+        [TestCase("* * * * *")]
+        [TestCase("* * * * * *")]
+        public void CanParseEitherFormatWhenSecondsAreNotRequired(string expression)
+        {
+            Assert.DoesNotThrow(() => CrontabSchedule.Parse(expression, new ParseOptions { RequireSeconds = false }));
         }
 
         [TestCase("* 1-3 * * *"            , "* 1-2,3 * * *"                   , false)]
@@ -86,9 +93,9 @@ namespace NCrontab.Tests
         [TestCase("22 * * * 1,3,5,7,9,11 *", "22 * * * */2 *"                  , true )]
         [TestCase("33 10,25,40 * * * *"    , "33 10-40/15 * * * *"             , true )]
         [TestCase("55 * * * 1,3,8 1-2,5"   , "55 * * * Mar,Jan,Aug Fri,Mon-Tue", true )]
-        public void Formatting(string format, string expression, bool includingSeconds)
+        public void Formatting(string format, string expression, bool requireSeconds)
         {
-            var options = new ParseOptions { IncludingSeconds = includingSeconds };
+            var options = new ParseOptions { RequireSeconds = requireSeconds };
             Assert.AreEqual(format, CrontabSchedule.Parse(expression, options).ToString());
         }
 
@@ -274,11 +281,11 @@ namespace NCrontab.Tests
         [TestCase("01/01/2000 12:00:00", "40 14/1 * * *", "01/01/2000 14:40:00", false)]
         [TestCase("01/01/2000 14:40:00", "40 14/1 * * *", "01/01/2000 15:40:00", false)]
 
-        public void Evaluations(string startTimeString, string cronExpression, string nextTimeString, bool includingSeconds)
+        public void Evaluations(string startTimeString, string cronExpression, string nextTimeString, bool requireSeconds)
         {
             CronCall(startTimeString, cronExpression, nextTimeString, new ParseOptions
             {
-                IncludingSeconds = includingSeconds
+                RequireSeconds = requireSeconds
             });
         }
 
@@ -296,11 +303,11 @@ namespace NCrontab.Tests
         [TestCase(" *  *  * * * Mon", "01/01/2003 00:00:00", "02/01/2003 12:00:00", true )]
         [TestCase("10 30 12 * * Mon", "01/01/2003 00:00:00", "06/01/2003 12:00:10", true )]
 
-        public void FiniteOccurrences(string cronExpression, string startTimeString, string endTimeString, bool includingSeconds)
+        public void FiniteOccurrences(string cronExpression, string startTimeString, string endTimeString, bool requireSeconds)
         {
             CronFinite(cronExpression, startTimeString, endTimeString, new ParseOptions
             {
-                IncludingSeconds = includingSeconds
+                RequireSeconds = requireSeconds
             });
         }
 
@@ -317,74 +324,74 @@ namespace NCrontab.Tests
 #endif
         [TestCase("* * 31 Feb *", false)]
         [TestCase("* * * 31 Feb *", true)]
-        public void DontLoopIndefinitely(string expression, bool includingSeconds)
+        public void DontLoopIndefinitely(string expression, bool requireSeconds)
         {
             CronFinite(expression, "01/01/2001 00:00:00", "01/01/2010 00:00:00", new ParseOptions
             {
-                IncludingSeconds = includingSeconds
+                RequireSeconds = requireSeconds
             });
         }
 
-        static void BadField(string expression, bool includingSeconds)
+        static void BadField(string expression, bool requireSeconds)
         {
             Assert.Throws<CrontabException>(() => CrontabSchedule.Parse(expression, new ParseOptions
             {
-                IncludingSeconds = includingSeconds
+                RequireSeconds = requireSeconds
             }));
             Assert.That(CrontabSchedule.TryParse(expression, new ParseOptions
             {
-                IncludingSeconds = includingSeconds
+                RequireSeconds = requireSeconds
             }), Is.Null);
         }
 
         [TestCase("bad * * * * *", false)]
-        public void BadSecondsField(string expression, bool includingSeconds) =>
-            BadField(expression, includingSeconds);
+        public void BadSecondsField(string expression, bool requireSeconds) =>
+            BadField(expression, requireSeconds);
 
         [TestCase("bad * * * *", false)]
         [TestCase("* bad * * * *", true)]
-        public void BadMinutesField(string expression, bool includingSeconds) =>
-            BadField(expression, includingSeconds);
+        public void BadMinutesField(string expression, bool requireSeconds) =>
+            BadField(expression, requireSeconds);
 
         [TestCase("* bad * * *", false)]
         [TestCase("* * bad * * *", true)]
-        public void BadHoursField(string expression, bool includingSeconds) =>
-            BadField(expression, includingSeconds);
+        public void BadHoursField(string expression, bool requireSeconds) =>
+            BadField(expression, requireSeconds);
 
         [TestCase("* * bad * *", false)]
         [TestCase("* * * bad * *", true)]
-        public void BadDayField(string expression, bool includingSeconds) =>
-            BadField(expression, includingSeconds);
+        public void BadDayField(string expression, bool requireSeconds) =>
+            BadField(expression, requireSeconds);
 
         [TestCase("* * * bad *", false)]
         [TestCase("* * * * bad *", true)]
-        public void BadMonthField(string expression, bool includingSeconds) =>
-            BadField(expression, includingSeconds);
+        public void BadMonthField(string expression, bool requireSeconds) =>
+            BadField(expression, requireSeconds);
 
         [TestCase("* * * * mon,bad,wed", false)]
         [TestCase("* * * * * mon,bad,wed", true)]
-        public void BadDayOfWeekField(string expression, bool includingSeconds) =>
-            BadField(expression, includingSeconds);
+        public void BadDayOfWeekField(string expression, bool requireSeconds) =>
+            BadField(expression, requireSeconds);
 
         [TestCase("* 1,2,3,456,7,8,9 * * *", false)]
         [TestCase("* * 1,2,3,456,7,8,9 * * *", true)]
-        public void OutOfRangeField(string expression, bool includingSeconds) =>
-            BadField(expression, includingSeconds);
+        public void OutOfRangeField(string expression, bool requireSeconds) =>
+            BadField(expression, requireSeconds);
 
         [TestCase("* 1,Z,3,4 * * *", false)]
         [TestCase("* * 1,Z,3,4 * * *", true)]
-        public void NonNumberValueInNumericOnlyField(string expression, bool includingSeconds) =>
-            BadField(expression, includingSeconds);
+        public void NonNumberValueInNumericOnlyField(string expression, bool requireSeconds) =>
+            BadField(expression, requireSeconds);
 
         [TestCase("* 1/Z * * *", false)]
         [TestCase("* * 1/Z * * *", true)]
-        public void NonNumericFieldInterval(string expression, bool includingSeconds) =>
-            BadField(expression, includingSeconds);
+        public void NonNumericFieldInterval(string expression, bool requireSeconds) =>
+            BadField(expression, requireSeconds);
 
         [TestCase("* 3-l2 * * *", false)]
         [TestCase("* * 3-l2 * * *", true)]
-        public void NonNumericFieldRangeComponent(string expression, bool includingSeconds) =>
-            BadField(expression, includingSeconds);
+        public void NonNumericFieldRangeComponent(string expression, bool requireSeconds) =>
+            BadField(expression, requireSeconds);
 
         /// <summary>
         /// Test case for

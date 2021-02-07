@@ -51,7 +51,7 @@ namespace NCrontab
 
         public sealed partial class ParseOptions
         {
-            public bool IncludingSeconds { get; set; }
+            public bool RequireSeconds { get; set; }
         }
 
         //
@@ -113,23 +113,23 @@ namespace NCrontab
 
             var tokens = expression.Split(StringSeparatorStock.Space, StringSplitOptions.RemoveEmptyEntries);
 
-            var includingSeconds = options != null && options.IncludingSeconds;
-            var expectedTokenCount = includingSeconds ? 6 : 5;
-            if (tokens.Length < expectedTokenCount || tokens.Length > expectedTokenCount)
+            var secondsRequired = options != null && options.RequireSeconds;
+            var minimumExpectedTokenCount = secondsRequired ? 6 : 5;
+            const int maximumExpectedTokenCount = 6;
+            if (tokens.Length < minimumExpectedTokenCount || tokens.Length > maximumExpectedTokenCount)
             {
-                return errorSelector(() =>
-                {
-                    var components =
-                        includingSeconds
-                        ? "6 components of a schedule in the sequence of seconds, minutes, hours, days, months, and days of week"
-                        : "5 components of a schedule in the sequence of minutes, hours, days, months, and days of week";
-                    return new CrontabException($"'{expression}' is an invalid crontab expression. It must contain {components}.");
-                });
+                const string fiveComponents =
+                    "5 components of a schedule in the sequence of minutes, hours, days, months, and days of week";
+                const string sixComponents =
+                    "6 components of a schedule in the sequence of seconds, minutes, hours, days, months, and days of week";
+
+                return errorSelector(() => new CrontabException(
+                    $"'{expression}' is an invalid crontab expression. It must contain either {fiveComponents} or {sixComponents}."));
             }
 
             var fields = new CrontabField[6];
 
-            var offset = includingSeconds ? 0 : 1;
+            var offset = secondsRequired ? 0 : tokens.Length == 6 ? 0 : 1;
             for (var i = 0; i < tokens.Length; i++)
             {
                 var kind = (CrontabFieldKind)i + offset;
