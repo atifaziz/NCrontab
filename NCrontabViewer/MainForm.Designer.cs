@@ -41,7 +41,6 @@ namespace NCrontabViewer
             this._statusBar = new System.Windows.Forms.StatusStrip();
             this._statusBarPanel = new System.Windows.Forms.ToolStripStatusLabel();
             this._errorProvider = new System.Windows.Forms.ErrorProvider(this.components);
-            ((System.ComponentModel.ISupportInitialize)(this._statusBarPanel)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this._errorProvider)).BeginInit();
             this.SuspendLayout();
             //
@@ -173,7 +172,6 @@ namespace NCrontabViewer
             this.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.Name = "MainForm";
             this.Text = "Crontab Viewer";
-            ((System.ComponentModel.ISupportInitialize)(this._statusBarPanel)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this._errorProvider)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
