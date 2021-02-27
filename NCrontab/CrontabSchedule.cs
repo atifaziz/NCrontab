@@ -253,8 +253,13 @@ namespace NCrontab
 
             if (minute == nil)
             {
+                second = seconds.GetFirst();
                 minute = _minutes.GetFirst();
                 hour++;
+            }
+            else if (minute > baseMinute)
+            {
+                second = seconds.GetFirst();
             }
 
             //
@@ -271,6 +276,7 @@ namespace NCrontab
             }
             else if (hour > baseHour)
             {
+                second = seconds.GetFirst();
                 minute = _minutes.GetFirst();
             }
 
