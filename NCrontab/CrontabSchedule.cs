@@ -38,7 +38,7 @@ namespace NCrontab
 
     public sealed partial class CrontabSchedule
     {
-        readonly CrontabField _seconds;
+        readonly CrontabField? _seconds;
         readonly CrontabField _minutes;
         readonly CrontabField _hours;
         readonly CrontabField _days;
@@ -145,7 +145,7 @@ namespace NCrontab
         }
 
         CrontabSchedule(
-            CrontabField seconds,
+            CrontabField? seconds,
             CrontabField minutes, CrontabField hours,
             CrontabField days, CrontabField months,
             CrontabField daysOfWeek)
