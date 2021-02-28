@@ -21,7 +21,7 @@ for p in NCrontab NCrontab.Signed; do {
 done
 for p in NCrontabConsole NCrontab.Tests; do {
     for c in Debug Release; do {
-        dotnet build --no-restore -c $c -f netcoreapp1.0 $p
+        dotnet build --no-restore -c $c -f netcoreapp2.1 $p
     }
     done
 }
