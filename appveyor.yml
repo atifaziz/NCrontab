@@ -5,6 +5,7 @@ image:
 branches:
   only:
   - master
+  - /^rel\/.+/
 skip_commits:
   files:
     - '*.md'
