@@ -24,6 +24,8 @@ namespace NCrontab
     {
         int GetFirst();
         int Next(int start);
+        int GetLast();
+        int Prev(int start);
         bool Contains(int value);
     }
 }

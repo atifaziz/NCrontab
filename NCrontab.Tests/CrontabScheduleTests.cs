@@ -408,6 +408,14 @@ namespace NCrontab.Tests
             Assert.AreEqual(new DateTime(9988, 2, 29), occurrences.Last());
         }
 
+        [Test]
+        public void GetPrevOccurrences_PrevOccurrenceInvalidTime_ShouldStopAtLastValidTime()
+        {
+            var schedule = CrontabSchedule.Parse("0 0 29 Feb Mon");
+            var occurrences = schedule.GetPrevOccurrences(new DateTime(20, 1, 1), DateTime.MinValue);
+            Assert.AreEqual(new DateTime(16, 2, 29), occurrences.Last());
+        }
+
         // Instead of using strings and parsing as date,
         // consider NUnit's TestCaseData:
         // https://github.com/nunit/docs/wiki/TestCaseData
@@ -422,6 +430,24 @@ namespace NCrontab.Tests
             var expected = Time(expectedValue);
 
             var occurrence = schedule.GetNextOccurrence(start, end);
+
+            Assert.AreEqual(expected, occurrence);
+        }
+
+        // Instead of using strings and parsing as date,
+        // consider NUnit's TestCaseData:
+        // https://github.com/nunit/docs/wiki/TestCaseData
+
+        [TestCase("0 0 29 Feb Mon", "2017-12-31", "2017-01-01", "2017-01-01")]
+        [TestCase("0 0 29 Feb Mon", "9009-12-31", "9000-01-01", "9008-02-29")]
+        public void GetPrevOccurrence(string expression, string startDate, string endDate, string expectedValue)
+        {
+            var schedule = CrontabSchedule.Parse(expression);
+            var start = Time(startDate);
+            var end = Time(endDate);
+            var expected = Time(expectedValue);
+
+            var occurrence = schedule.GetPrevOccurrence(start, end);
 
             Assert.AreEqual(expected, occurrence);
         }

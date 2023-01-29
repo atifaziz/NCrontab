@@ -185,12 +185,26 @@ namespace NCrontab
             }
         }
 
+        public IEnumerable<DateTime> GetPrevOccurrences(DateTime baseTime, DateTime startTime)
+        {
+            for (var occurrence = TryGetPrevOccurrence(baseTime, startTime);
+                 occurrence != null && occurrence > startTime;
+                 occurrence = TryGetPrevOccurrence(occurrence.Value, startTime))
+            {
+                yield return occurrence.Value;
+            }
+        }
+
         /// <summary>
         /// Gets the next occurrence of this schedule starting with a base time.
         /// </summary>
 
         public DateTime GetNextOccurrence(DateTime baseTime) =>
             GetNextOccurrence(baseTime, DateTime.MaxValue);
+
+
+        public DateTime GetPrevOccurrence(DateTime baseTime) =>
+            GetPrevOccurrence(baseTime, DateTime.MinValue);
 
         /// <summary>
         /// Gets the next occurrence of this schedule starting with a base
@@ -209,6 +223,9 @@ namespace NCrontab
 
         public DateTime GetNextOccurrence(DateTime baseTime, DateTime endTime) =>
             TryGetNextOccurrence(baseTime, endTime) ?? endTime;
+
+        public DateTime GetPrevOccurrence(DateTime baseTime, DateTime startTime) =>
+            TryGetPrevOccurrence(baseTime, startTime) ?? startTime;
 
         DateTime? TryGetNextOccurrence(DateTime baseTime, DateTime endTime)
         {
@@ -377,6 +394,183 @@ namespace NCrontab
             return TryGetNextOccurrence(new DateTime(year, month, day, 23, 59, 59, 0, baseTime.Kind), endTime);
         }
 
+
+        DateTime? TryGetPrevOccurrence(DateTime baseTime, DateTime startTime)
+        {
+            const int nil = -1;
+
+            var baseYear = baseTime.Year;
+            var baseMonth = baseTime.Month;
+            var baseDay = baseTime.Day;
+            var baseHour = baseTime.Hour;
+            var baseMinute = baseTime.Minute;
+            var baseSecond = baseTime.Second;
+
+            var startYear = startTime.Year;
+            var startMonth = startTime.Month;
+            var startDay = startTime.Day;
+
+            var year = baseYear;
+            var month = baseMonth;
+            var day = baseDay;
+            var hour = baseHour;
+            var minute = baseMinute;
+            var second = baseSecond - 1;
+
+            //
+            // Second
+            //
+
+            var seconds = _seconds ?? SecondZero;
+            second = seconds.Prev(second);
+
+            if (second == nil)
+            {
+                second = seconds.GetLast();
+                minute--;
+            }
+
+            //
+            // Minute
+            //
+
+            minute = _minutes.Prev(minute);
+
+            if (minute == nil)
+            {
+                second = seconds.GetLast();
+                minute = _minutes.GetLast();
+                hour--;
+            }
+            else if (minute < baseMinute)
+            {
+                second = seconds.GetLast();
+            }
+
+            //
+            // Hour
+            //
+
+            hour = _hours.Prev(hour);
+
+            // this variable for trick
+            // to keep day when it adjusted day 31 for
+            // "short" months
+            bool adjusting = false;
+
+            RetryDayMonth:
+
+            if (hour == nil)
+            {
+                minute = _minutes.GetLast();
+                hour = _hours.GetLast();
+                day--;
+            }
+            else if (hour > baseHour)
+            {
+                second = seconds.GetLast();
+                minute = _minutes.GetLast();
+            }
+
+            //
+            // Day
+            //
+
+            
+
+            day = _days.Prev(day);
+
+            
+            if (day == nil)
+            {
+                second = seconds.GetLast();
+                minute = _minutes.GetLast();
+                hour = _hours.GetLast();
+                day = _days.GetLast();
+                month--;
+            }
+            else if (day < baseDay)
+            {
+                second = seconds.GetLast();
+                minute = _minutes.GetLast();
+                hour = _hours.GetLast();
+            }
+
+            //
+            // Month
+            //
+
+            month = _months.Prev(month);
+
+            if (month == nil)
+            {
+                second = seconds.GetLast();
+                minute = _minutes.GetLast();
+                hour = _hours.GetLast();
+                day = _days.GetLast();
+                month = _months.GetLast();
+                year--;
+            }
+            else if (month < baseMonth)
+            {
+                second = seconds.GetLast();
+                minute = _minutes.GetLast();
+                hour = _hours.GetLast();
+                if (!adjusting)
+                    day = _days.GetLast();
+            }
+
+            //
+            // Stop processing when year is too large for the datetime or calendar
+            // object. Otherwise we would get an exception.
+            //
+
+            if (year < Calendar.MinSupportedDateTime.Year)
+                return null;
+
+            //
+            // The day field in a cron expression spans the entire range of days
+            // in a month, which is from 1 to 31. However, the number of days in
+            // a month tend to be variable depending on the month (and the year
+            // in case of February). So a check is needed here to see if the
+            // date is a border case. If the day happens to be beyond 28
+            // (meaning that we're dealing with the suspicious range of 29-31)
+            // and the date part has changed then we need to determine whether
+            // the day still makes sense for the given year and month. If the
+            // day is beyond the last possible value, then the day/month part
+            // for the schedule is re-evaluated. So an expression like "0 0
+            // 15,31 * *" will yield the following sequence starting on midnight
+            // of Jan 1, 2000:
+            //
+            //  Jan 15, Jan 31, Feb 15, Mar 15, Apr 15, Apr 31, ...
+            //
+
+            var dateChanged = day != baseDay || month != baseMonth || year != baseYear;
+
+            if (day > 28 && dateChanged && day > Calendar.GetDaysInMonth(year, month))
+            {
+                if (year <= startYear && month <= startMonth && day <= startDay)
+                    return startTime;
+
+                hour = nil;
+                adjusting = true;
+                goto RetryDayMonth;
+            }
+
+            var prevTime = new DateTime(year, month, day, hour, minute, second, 0, baseTime.Kind);
+
+            if (prevTime <= startTime)
+                return startTime;
+
+            //
+            // Day of week
+            //
+
+            if (_daysOfWeek.Contains((int)prevTime.DayOfWeek))
+                return prevTime;
+
+            return TryGetPrevOccurrence(new DateTime(year, month, day, 0, 0, 0, 0, baseTime.Kind), startTime);
+        }
         /// <summary>
         /// Returns a string in crontab expression (expanded) that represents
         /// this schedule.

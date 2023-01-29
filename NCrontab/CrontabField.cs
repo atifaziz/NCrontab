@@ -118,6 +118,11 @@ namespace NCrontab
         public int GetFirst() => _minValueSet < int.MaxValue ? _minValueSet : -1;
 
         /// <summary>
+        /// Gets the last value of the field or -1.
+        /// </summary>
+        public int GetLast() => _maxValueSet >= 0 ? _maxValueSet : -1;
+
+        /// <summary>
         /// Gets the next value of the field that occurs after the given
         /// start value or -1 if there is no next value available.
         /// </summary>
@@ -131,6 +136,23 @@ namespace NCrontab
             var lastIndex = ValueToIndex(_maxValueSet);
 
             for (var i = startIndex; i <= lastIndex; i++)
+            {
+                if (_bits[i])
+                    return IndexToValue(i);
+            }
+
+            return -1;
+        }
+
+        public int Prev(int start)
+        {
+            if (start > _maxValueSet)
+                return _maxValueSet;
+
+            var startIndex = ValueToIndex(start);
+            var lastIndex = ValueToIndex(_minValueSet);
+
+            for (var i = startIndex; i >= lastIndex; i--)
             {
                 if (_bits[i])
                     return IndexToValue(i);

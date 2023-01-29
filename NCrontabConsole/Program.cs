@@ -59,6 +59,39 @@ try
     foreach (var occurrence in schedule.GetNextOccurrences(start, end))
         Console.Out.WriteLine(occurrence.ToString(format));
 
+
+    /*var schedule3 = CrontabSchedule.Parse("0 0 29 Feb Mon");
+    var schedule4 = CrontabSchedule.Parse("0 0 15,31 * *");
+    var occurrencesA = schedule4.GetNextOccurrences(new DateTime(2000,1,1), new DateTime(2020,1,1));
+    foreach (var occurrence in occurrencesA)
+        Console.Out.WriteLine(occurrence.ToString(format));*/
+
+    Console.WriteLine();
+    var occurrencesB = schedule.GetPrevOccurrences(end, start);
+    foreach(var occurrence in occurrencesB)
+        Console.Out.WriteLine(occurrence.ToString(format));
+
+    Console.WriteLine();
+    var schedule2 = CrontabSchedule.Parse(expression, options);
+    var date0 = DateTime.Parse("2022/07/10 16:11:00");
+    var date1 = DateTime.Parse("2023/01/05 16:11:00");
+    var date2 = DateTime.Parse("2023/03/05 16:11:00");
+
+    Console.Out.WriteLine();
+    var nextDate =  schedule2.GetNextOccurrence(date0);
+    Console.Out.WriteLine(nextDate.ToString(format));
+    Console.Out.WriteLine();
+
+    var prevDate = schedule2.GetPrevOccurrence(date2);
+    Console.Out.WriteLine(prevDate.ToString(format));
+
+    prevDate = schedule2.GetPrevOccurrence(date1);
+    Console.Out.WriteLine(prevDate.ToString(format));
+
+    prevDate = schedule2.GetPrevOccurrence(date0);
+    Console.Out.WriteLine(prevDate.ToString(format));
+
+
     return 0;
 }
 catch (Exception e)
