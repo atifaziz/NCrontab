@@ -221,7 +221,7 @@ Below is the same example in C# using [`dotnet-script`][dotnet-script]:
 
 ---
 
-This product includes software developed by the OpenSymphony Group (http://www.opensymphony.com/).
+This product includes software developed by the [OpenSymphony Group].
 
 
   [ipy]: http://en.wikipedia.org/wiki/IronPython
@@ -232,3 +232,4 @@ This product includes software developed by the OpenSymphony Group (http://www.o
   [builds]: https://ci.appveyor.com/project/raboof/ncrontab
   [netstd]: https://docs.microsoft.com/en-us/dotnet/articles/standard/library
   [dotnet-script]: https://github.com/dotnet-script/dotnet-script
+  [OpenSymphony Group]: http://www.opensymphony.com/
