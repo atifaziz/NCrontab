@@ -40,7 +40,7 @@ Star (`*`) in the value field above means all legal values as in parentheses for
 that column. The value column can have a `*` or a list of elements separated by
 commas. An element is either a number in the ranges shown above or two numbers in
 the range separated by a hyphen (meaning an inclusive range). For more, see
-[CrontabExpression](https://github.com/atifaziz/NCrontab/wiki/Crontab-Expression).
+[CrontabExpression].
 
 Below is an example in [IronPython][ipy] of how to use `CrontabSchedule` class
 from NCrontab to generate occurrences of the schedule `0 12 * */2 Mon`
@@ -224,6 +224,7 @@ Below is the same example in C# using [`dotnet-script`][dotnet-script]:
 This product includes software developed by the [OpenSymphony Group].
 
 
+  [CrontabExpression]: https://github.com/atifaziz/NCrontab/wiki/Crontab-Expression
   [ipy]: http://en.wikipedia.org/wiki/IronPython
   [f#]: http://msdn.microsoft.com/en-us/fsharp/cc742182
   [build-badge]: https://img.shields.io/appveyor/ci/raboof/ncrontab/master.svg
