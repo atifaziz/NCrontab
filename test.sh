@@ -2,7 +2,7 @@
 set -e
 cd "$(dirname "$0")"
 ./build.sh
-for f in net5 netcoreapp3.1; do {
+for f in net7.0 net6.0; do {
     dotnet test --no-build NCrontab.Tests -c Debug -f $f \
         -p:CollectCoverage=true \
         -p:CoverletOutputFormat=opencover \

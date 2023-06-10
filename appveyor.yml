@@ -1,6 +1,6 @@
 version: '{build}'
 image:
-  - Visual Studio 2019
+  - Visual Studio 2022
   - Ubuntu
 branches:
   only:
@@ -10,6 +10,7 @@ branches:
     - wip
 skip_commits:
   files:
+    - '.gitignore'
     - '*.md'
     - '*.txt'
 skip_tags: true
@@ -21,10 +22,11 @@ environment:
 install:
   - cmd: curl -OsSL https://dot.net/v1/dotnet-install.ps1
   - ps: if ($isWindows) { ./dotnet-install.ps1 -JsonFile global.json }
+  - ps: if ($isWindows) { ./dotnet-install.ps1 -Runtime dotnet -Version 6.0.16 }
   - sh: curl -OsSL https://dot.net/v1/dotnet-install.sh
   - sh: chmod +x dotnet-install.sh
-  - sh: ./dotnet-install.sh --runtime dotnet --version 3.1.10
   - sh: ./dotnet-install.sh --jsonfile global.json
+  - sh: ./dotnet-install.sh --runtime dotnet --version 6.0.16
   - sh: export PATH="$HOME/.dotnet:$PATH"
 before_build:
 - dotnet --info
@@ -39,7 +41,7 @@ for:
 -
   matrix:
     only:
-      - image: Visual Studio 2019
+      - image: Visual Studio 2022
   artifacts:
   - path: dist\*.nupkg
   deploy:

@@ -40,7 +40,7 @@ Star (`*`) in the value field above means all legal values as in parentheses for
 that column. The value column can have a `*` or a list of elements separated by
 commas. An element is either a number in the ranges shown above or two numbers in
 the range separated by a hyphen (meaning an inclusive range). For more, see
-[CrontabExpression](https://github.com/atifaziz/NCrontab/wiki/Crontab-Expression).
+[CrontabExpression].
 
 Below is an example in [IronPython][ipy] of how to use `CrontabSchedule` class
 from NCrontab to generate occurrences of the schedule `0 12 * */2 Mon`
@@ -180,11 +180,51 @@ Below is the same example in C# Interactive (`csi.exe`):
     Mon, 20 Nov 2000 12:00
     Mon, 27 Nov 2000 12:00
 
+Below is the same example in C# using [`dotnet-script`][dotnet-script]:
+
+    > #r "nuget:NCrontab"
+    > using NCrontab;
+    > var s = CrontabSchedule.Parse("0 12 * */2 Mon");
+    > var start = new DateTime(2000, 1, 1);
+    > var end = start.AddYears(1);
+    > var occurrences = s.GetNextOccurrences(start, end);
+    > Console.WriteLine(string.Join(Environment.NewLine,
+    *     from t in occurrences
+    *     select $"{t:ddd, dd MMM yyyy HH:mm}"));
+    Mon, 03 Jan 2000 12:00
+    Mon, 10 Jan 2000 12:00
+    Mon, 17 Jan 2000 12:00
+    Mon, 24 Jan 2000 12:00
+    Mon, 31 Jan 2000 12:00
+    Mon, 06 Mar 2000 12:00
+    Mon, 13 Mar 2000 12:00
+    Mon, 20 Mar 2000 12:00
+    Mon, 27 Mar 2000 12:00
+    Mon, 01 May 2000 12:00
+    Mon, 08 May 2000 12:00
+    Mon, 15 May 2000 12:00
+    Mon, 22 May 2000 12:00
+    Mon, 29 May 2000 12:00
+    Mon, 03 Jul 2000 12:00
+    Mon, 10 Jul 2000 12:00
+    Mon, 17 Jul 2000 12:00
+    Mon, 24 Jul 2000 12:00
+    Mon, 31 Jul 2000 12:00
+    Mon, 04 Sept 2000 12:00
+    Mon, 11 Sept 2000 12:00
+    Mon, 18 Sept 2000 12:00
+    Mon, 25 Sept 2000 12:00
+    Mon, 06 Nov 2000 12:00
+    Mon, 13 Nov 2000 12:00
+    Mon, 20 Nov 2000 12:00
+    Mon, 27 Nov 2000 12:00
+
 ---
 
-This product includes software developed by the OpenSymphony Group (http://www.opensymphony.com/).
+This product includes software developed by the [OpenSymphony Group].
 
 
+  [CrontabExpression]: https://github.com/atifaziz/NCrontab/wiki/Crontab-Expression
   [ipy]: http://en.wikipedia.org/wiki/IronPython
   [f#]: http://msdn.microsoft.com/en-us/fsharp/cc742182
   [build-badge]: https://img.shields.io/appveyor/ci/raboof/ncrontab/master.svg
@@ -192,3 +232,5 @@ This product includes software developed by the OpenSymphony Group (http://www.o
   [nuget-pkg]: https://www.nuget.org/packages/ncrontab
   [builds]: https://ci.appveyor.com/project/raboof/ncrontab
   [netstd]: https://docs.microsoft.com/en-us/dotnet/articles/standard/library
+  [dotnet-script]: https://github.com/dotnet-script/dotnet-script
+  [OpenSymphony Group]: http://www.opensymphony.com/
