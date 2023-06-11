@@ -192,10 +192,10 @@ namespace NCrontab
                     //
 
                     if (start < minValue)
-                        return OnValueBelowMinError(start, errorSelector);
+                        return OnValueBelowMinError(start);
 
                     if (start > maxValue)
-                        return OnValueAboveMaxError(start, errorSelector);
+                        return OnValueAboveMaxError(start);
                 }
             }
             else
@@ -215,12 +215,12 @@ namespace NCrontab
                 if (start < 0)
                     start = minValue;
                 else if (start < minValue)
-                    return OnValueBelowMinError(start, errorSelector);
+                    return OnValueBelowMinError(start);
 
                 if (end < 0)
                     end = maxValue;
                 else if (end > maxValue)
-                    return OnValueAboveMaxError(end, errorSelector);
+                    return OnValueAboveMaxError(end);
             }
 
             if (interval < 1)
@@ -251,19 +251,19 @@ namespace NCrontab
                 _maxValueSet = i;
 
             return success;
+
+            T OnValueAboveMaxError(int value) =>
+                errorSelector(
+                    () => new CrontabException(
+                        $"{value} is higher than the maximum allowable value for the [{_impl.Kind}] field. " +
+                        $"Value must be between {_impl.MinValue} and {_impl.MaxValue} (all inclusive)."));
+
+            T OnValueBelowMinError(int value) =>
+                errorSelector(
+                    () => new CrontabException(
+                        $"{value} is lower than the minimum allowable value for the [{_impl.Kind}] field. " +
+                        $"Value must be between {_impl.MinValue} and {_impl.MaxValue} (all inclusive)."));
         }
-
-        T OnValueAboveMaxError<T>(int value, Func<ExceptionProvider, T> errorSelector) =>
-            errorSelector(
-                () => new CrontabException(
-                    $"{value} is higher than the maximum allowable value for the [{_impl.Kind}] field. " +
-                    $"Value must be between {_impl.MinValue} and {_impl.MaxValue} (all inclusive)."));
-
-        T OnValueBelowMinError<T>(int value, Func<ExceptionProvider, T> errorSelector) =>
-            errorSelector(
-                () => new CrontabException(
-                    $"{value} is lower than the minimum allowable value for the [{_impl.Kind}] field. " +
-                    $"Value must be between {_impl.MinValue} and {_impl.MaxValue} (all inclusive)."));
 
         public override string ToString() => ToString(null);
 
