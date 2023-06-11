@@ -192,9 +192,7 @@ namespace NCrontab
             // Next, look for a list of values (e.g. 1,2,3).
             //
 
-            var commaIndex = str.IndexOf(',');
-
-            if (commaIndex > 0)
+            if (str.IndexOf(',') > 0)
             {
                 var result = success;
                 using var token = ((IEnumerable<string>)str.Split(StringSeparatorStock.Comma)).GetEnumerator();
@@ -209,9 +207,7 @@ namespace NCrontab
             // Look for stepping first (e.g. */2 = every 2nd).
             //
 
-            var slashIndex = str.IndexOf('/');
-
-            if (slashIndex > 0)
+            if (str.IndexOf('/') is var slashIndex and > 0)
             {
                 every = int.Parse(str.Substring(slashIndex + 1), CultureInfo.InvariantCulture);
                 str = str.Substring(0, slashIndex);
@@ -230,9 +226,7 @@ namespace NCrontab
             // Next, look for a range of values (e.g. 2-10).
             //
 
-            var dashIndex = str.IndexOf('-');
-
-            if (dashIndex > 0)
+            if (str.IndexOf('-') is var dashIndex and > 0)
             {
                 var first = ParseValue(str.Substring(0, dashIndex));
                 var last = ParseValue(str.Substring(dashIndex + 1));
@@ -246,11 +240,9 @@ namespace NCrontab
 
             var value = ParseValue(str);
 
-            if (every == null)
-                return acc(value, value, 1, success, errorSelector);
-
-            Debug.Assert(every != 0);
-            return acc(value, MaxValue, every.Value, success, errorSelector);
+            return every is { } someEvery
+                 ? acc(value, MaxValue, someEvery, success, errorSelector)
+                 : acc(value, value, 1, success, errorSelector);
         }
 
         int ParseValue(string str)
@@ -258,9 +250,7 @@ namespace NCrontab
             if (str.Length == 0)
                 throw new CrontabException("A crontab field value cannot be empty.");
 
-            var firstChar = str[0];
-
-            if (firstChar is >= '0' and <= '9')
+            if (str[0] is >= '0' and <= '9')
                 return int.Parse(str, CultureInfo.InvariantCulture);
 
             if (_names == null)
