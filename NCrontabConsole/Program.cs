@@ -54,8 +54,8 @@ try
 
     var start = ParseDateArgument(startTimeString, "start");
     var end = ParseDateArgument(endTimeString, "end");
-    format = format ?? (options.IncludingSeconds ? "ddd, dd MMM yyyy HH:mm:ss"
-                                                 : "ddd, dd MMM yyyy HH:mm");
+    format ??= options.IncludingSeconds ? "ddd, dd MMM yyyy HH:mm:ss"
+                                        : "ddd, dd MMM yyyy HH:mm";
 
     var schedule = CrontabSchedule.Parse(expression, options);
 
