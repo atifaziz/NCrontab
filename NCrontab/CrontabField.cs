@@ -60,7 +60,7 @@ namespace NCrontab
             if (errorSelector == null) throw new ArgumentNullException(nameof(errorSelector));
 
             var field = new CrontabField(CrontabFieldImpl.FromKind(kind));
-            var error = field._impl.TryParse(expression, field.Accumulate, (ExceptionProvider?)null, e => e);
+            var error = field._impl.TryParse(expression, field.Accumulate, null, e => e);
             return error == null ? valueSelector(field) : errorSelector(error);
         }
 
