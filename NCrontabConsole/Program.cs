@@ -32,7 +32,7 @@ var verbose = false;
 try
 {
     var argList = new List<string>(args);
-    var verboseIndex = argList.IndexOf("--verbose") is {} vi and >= 0 ? vi
+    var verboseIndex = argList.IndexOf("--verbose") is var vi and >= 0 ? vi
                      : argList.IndexOf("-v");
     // ReSharper disable once AssignmentInConditionalExpression
     if (verbose = verboseIndex >= 0)
