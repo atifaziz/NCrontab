@@ -163,7 +163,7 @@ namespace NCrontab
         }
 
         public void Parse(string str, CrontabFieldAccumulator<ExceptionProvider?> acc) =>
-            TryParse(str, acc, null, ep => throw ep());
+            _ = TryParse(str, acc, null, ep => throw ep());
 
         public T TryParse<T>(string str, CrontabFieldAccumulator<T> acc, T success,
                              Func<ExceptionProvider, T> errorSelector)
