@@ -23,7 +23,9 @@ namespace NCrontab
     public interface ICrontabField
     {
         int GetFirst();
+#pragma warning disable CA1716 // Identifiers should not match keywords (by design)
         int Next(int start);
+#pragma warning restore CA1716 // Identifiers should not match keywords
         bool Contains(int value);
     }
 }

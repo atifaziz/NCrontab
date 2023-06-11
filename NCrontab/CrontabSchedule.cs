@@ -49,7 +49,9 @@ namespace NCrontab
 
         // ReSharper disable once PartialTypeWithSinglePart
 
+#pragma warning disable CA1034 // Nested types should not be visible (by design)
         public sealed partial class ParseOptions
+#pragma warning restore CA1034 // Nested types should not be visible
         {
             public bool IncludingSeconds { get; set; }
         }
@@ -110,6 +112,8 @@ namespace NCrontab
         public static T TryParse<T>(string expression, ParseOptions? options, Func<CrontabSchedule, T> valueSelector, Func<ExceptionProvider, T> errorSelector)
         {
             if (expression == null) throw new ArgumentNullException(nameof(expression));
+            if (valueSelector == null) throw new ArgumentNullException(nameof(valueSelector));
+            if (errorSelector == null) throw new ArgumentNullException(nameof(errorSelector));
 
             var tokens = expression.Split(StringSeparatorStock.Space, StringSplitOptions.RemoveEmptyEntries);
 
@@ -384,7 +388,7 @@ namespace NCrontab
 
         public override string ToString()
         {
-            var writer = new StringWriter(CultureInfo.InvariantCulture);
+            using var writer = new StringWriter(CultureInfo.InvariantCulture);
 
             if (_seconds != null)
             {

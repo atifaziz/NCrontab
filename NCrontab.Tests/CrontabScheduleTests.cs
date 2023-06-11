@@ -42,7 +42,8 @@ namespace NCrontab.Tests
         [Test]
         public void CannotParseNullString()
         {
-            var e = Assert.Throws<ArgumentNullException>(() => CrontabSchedule.Parse(null));
+            var e = Assert.Throws<ArgumentNullException>(() => CrontabSchedule.Parse(null!))
+                    ?? throw new NullReferenceException();
             Assert.That(e.ParamName, Is.EqualTo("expression"));
         }
 
@@ -54,7 +55,7 @@ namespace NCrontab.Tests
 
         [Test]
         public void TryParseNullString() =>
-            Assert.That(CrontabSchedule.TryParse(null), Is.Null);
+            Assert.That(CrontabSchedule.TryParse(null!), Is.Null);
 
         [Test]
         public void TryParseEmptyString() =>
