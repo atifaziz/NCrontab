@@ -87,6 +87,6 @@ sealed class ApplicationException : Exception
 #pragma warning restore CA1064 // Exceptions should be public
 {
     public ApplicationException() : this(null) { }
-    public ApplicationException(string message) : this(message, null) { }
-    public ApplicationException(string message, Exception innerException) : base(message, innerException) { }
+    public ApplicationException(string? message) : this(message, null) { }
+    public ApplicationException(string? message, Exception? innerException) : base(message, innerException) { }
 }
