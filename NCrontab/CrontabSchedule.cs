@@ -116,7 +116,7 @@ namespace NCrontab
 
             var tokens = expression.Split(StringSeparatorStock.Space, StringSplitOptions.RemoveEmptyEntries);
 
-            var includingSeconds = options != null && options.IncludingSeconds;
+            var includingSeconds = options is { IncludingSeconds: true };
             var expectedTokenCount = includingSeconds ? 6 : 5;
             if (tokens.Length < expectedTokenCount || tokens.Length > expectedTokenCount)
             {
