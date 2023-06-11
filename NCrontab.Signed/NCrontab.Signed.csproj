@@ -32,7 +32,7 @@
 
   <ItemGroup>
     <Compile Include="..\SolutionInfo.cs" />
-    <Compile Include="..\NCrontab\*.cs" Exclude="bin\**;obj\**;**\*.xproj;packages\**" />
+    <Compile Include="..\NCrontab\*.cs" />
     <None Include="..\COPYING.txt" Pack="true" PackagePath="$(PackageLicenseFile)" />
   </ItemGroup>
 
