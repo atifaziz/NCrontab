@@ -275,9 +275,7 @@ namespace NCrontab
 
             if (_names == null)
             {
-                throw new CrontabException(string.Format(
-                    "'{0}' is not a valid [{3}] crontab field value. It must be a numeric value between {1} and {2} (all inclusive).",
-                    str, MinValue.ToString(), MaxValue.ToString(), Kind.ToString()));
+                throw new CrontabException($"'{str}' is not a valid [{Kind}] crontab field value. It must be a numeric value between {MinValue} and {MaxValue} (all inclusive).");
             }
 
             for (var i = 0; i < _names.Length; i++)

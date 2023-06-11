@@ -56,6 +56,9 @@ namespace NCrontab
                                     Func<CrontabField, T> valueSelector,
                                     Func<ExceptionProvider, T> errorSelector)
         {
+            if (valueSelector == null) throw new ArgumentNullException(nameof(valueSelector));
+            if (errorSelector == null) throw new ArgumentNullException(nameof(errorSelector));
+
             var field = new CrontabField(CrontabFieldImpl.FromKind(kind));
             var error = field._impl.TryParse(expression, field.Accumulate, (ExceptionProvider?)null, e => e);
             return error == null ? valueSelector(field) : errorSelector(error);
@@ -266,7 +269,7 @@ namespace NCrontab
 
         public string ToString(string? format)
         {
-            var writer = new StringWriter(CultureInfo.InvariantCulture);
+            using var writer = new StringWriter(CultureInfo.InvariantCulture);
 
             switch (format)
             {
