@@ -26,7 +26,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NCrontabConsole", "NCrontab
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NCrontab.Signed", "NCrontab.Signed\NCrontab.Signed.csproj", "{00415F52-1635-4DC7-AA50-4750DC928F89}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NCrontabViewer", "NCrontabViewer\NCrontabViewer.csproj", "{DB5C3020-025A-456F-A691-CB7E375A348C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NCrontabViewer", "NCrontabViewer\NCrontabViewer.csproj", "{DB5C3020-025A-456F-A691-CB7E375A348C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
