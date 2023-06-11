@@ -36,7 +36,7 @@ namespace NCrontabViewer
 
         DateTime _lastChangeTime;
         bool _dirty;
-        CrontabSchedule? _crontab;
+        CrontabSchedule _crontab;
         bool _isSixPart;
         DateTime _startTime;
         int _totalOccurrenceCount;
