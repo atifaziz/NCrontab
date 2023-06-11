@@ -131,7 +131,7 @@ namespace NCrontab
         {
             if (noNames || _names == null)
             {
-                if (value >= 0 && value < 100)
+                if (value is >= 0 and < 100)
                 {
                     FastFormatNumericValue(value, writer);
                 }
@@ -149,7 +149,7 @@ namespace NCrontab
 
         static void FastFormatNumericValue(int value, TextWriter writer)
         {
-            Debug.Assert(value >= 0 && value < 100);
+            Debug.Assert(value is >= 0 and < 100);
 
             if (value >= 10)
             {
@@ -268,7 +268,7 @@ namespace NCrontab
 
             var firstChar = str[0];
 
-            if (firstChar >= '0' && firstChar <= '9')
+            if (firstChar is >= '0' and <= '9')
                 return int.Parse(str, CultureInfo.InvariantCulture);
 
             if (_names == null)
