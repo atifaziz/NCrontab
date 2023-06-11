@@ -177,19 +177,11 @@ namespace NCrontab
             {
                 return InternalParse(str, acc, success, errorSelector);
             }
-            catch (FormatException e)
+            catch (Exception e) when (e is FormatException or CrontabException)
             {
-                return OnParseException(e, str, errorSelector);
-            }
-            catch (CrontabException e)
-            {
-                return OnParseException(e, str, errorSelector);
+                return errorSelector(() => new CrontabException($"'{str}' is not a valid [{Kind}] crontab field expression.", e));
             }
         }
-
-        T OnParseException<T>(Exception innerException, string str, Func<ExceptionProvider, T> errorSelector) =>
-            errorSelector(
-                () => new CrontabException($"'{str}' is not a valid [{Kind}] crontab field expression.", innerException));
 
         T InternalParse<T>(string str, CrontabFieldAccumulator<T> acc, T success, Func<ExceptionProvider, T> errorSelector)
         {
