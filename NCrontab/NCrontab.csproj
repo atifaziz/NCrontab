@@ -8,9 +8,7 @@
     <VersionPrefix>3.3.1</VersionPrefix>
     <Authors>Atif Aziz</Authors>
     <TargetFrameworks>net35;netstandard1.0;netstandard2.0</TargetFrameworks>
-    <LangVersion>8</LangVersion>
-    <Nullable>enable</Nullable>
-    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <LangVersion>11</LangVersion>
     <DebugType>portable</DebugType>
     <AssemblyName>NCrontab</AssemblyName>
     <OutputType>Library</OutputType>

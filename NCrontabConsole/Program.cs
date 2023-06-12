@@ -17,7 +17,10 @@
 //
 #endregion
 
-#nullable enable
+#pragma warning disable CA1852 // Seal internal types (incorrect)
+                               // Type 'Program' can be sealed because it has no subtypes in its
+                               // containing assembly and is not externally visible.
+                               // See: https://github.com/dotnet/roslyn-analyzers/issues/6141
 
 using System;
 using System.Collections.Generic;
@@ -29,7 +32,7 @@ var verbose = false;
 try
 {
     var argList = new List<string>(args);
-    var verboseIndex = argList.IndexOf("--verbose") is {} vi and >= 0 ? vi
+    var verboseIndex = argList.IndexOf("--verbose") is var vi and >= 0 ? vi
                      : argList.IndexOf("-v");
     // ReSharper disable once AssignmentInConditionalExpression
     if (verbose = verboseIndex >= 0)
@@ -51,17 +54,19 @@ try
 
     var start = ParseDateArgument(startTimeString, "start");
     var end = ParseDateArgument(endTimeString, "end");
-    format = format ?? (options.IncludingSeconds ? "ddd, dd MMM yyyy HH:mm:ss"
-                                                 : "ddd, dd MMM yyyy HH:mm");
+    format ??= options.IncludingSeconds ? "ddd, dd MMM yyyy HH:mm:ss"
+                                        : "ddd, dd MMM yyyy HH:mm";
 
     var schedule = CrontabSchedule.Parse(expression, options);
 
     foreach (var occurrence in schedule.GetNextOccurrences(start, end))
-        Console.Out.WriteLine(occurrence.ToString(format));
+        Console.Out.WriteLine(occurrence.ToString(format, null));
 
     return 0;
 }
+#pragma warning disable CA1031 // Do not catch general exception types
 catch (Exception e)
+#pragma warning restore CA1031 // Do not catch general exception types
 {
     var error =
         verbose
@@ -77,8 +82,11 @@ static DateTime ParseDateArgument(string arg, string hint)
     => DateTime.TryParse(arg, null, DateTimeStyles.AssumeLocal, out var v) ? v
      : throw new ApplicationException("Invalid " + hint + " date or date format argument.");
 
+#pragma warning disable CA1064 // Exceptions should be public
 sealed class ApplicationException : Exception
+#pragma warning restore CA1064 // Exceptions should be public
 {
-    public ApplicationException() {}
-    public ApplicationException(string message) : base(message) {}
+    public ApplicationException() : this(null) { }
+    public ApplicationException(string? message) : this(message, null) { }
+    public ApplicationException(string? message, Exception? innerException) : base(message, innerException) { }
 }

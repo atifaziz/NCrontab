@@ -36,12 +36,12 @@ namespace NCrontab
 
     sealed partial class CrontabFieldImpl
     {
-        public static readonly CrontabFieldImpl Second    = new CrontabFieldImpl(CrontabFieldKind.Second, 0, 59, null);
-        public static readonly CrontabFieldImpl Minute    = new CrontabFieldImpl(CrontabFieldKind.Minute, 0, 59, null);
-        public static readonly CrontabFieldImpl Hour      = new CrontabFieldImpl(CrontabFieldKind.Hour, 0, 23, null);
-        public static readonly CrontabFieldImpl Day       = new CrontabFieldImpl(CrontabFieldKind.Day, 1, 31, null);
-        public static readonly CrontabFieldImpl Month     = new CrontabFieldImpl(CrontabFieldKind.Month, 1, 12, new[] { "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December" });
-        public static readonly CrontabFieldImpl DayOfWeek = new CrontabFieldImpl(CrontabFieldKind.DayOfWeek, 0, 6, new[] { "Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday" });
+        public static readonly CrontabFieldImpl Second    = new(CrontabFieldKind.Second, 0, 59, null);
+        public static readonly CrontabFieldImpl Minute    = new(CrontabFieldKind.Minute, 0, 59, null);
+        public static readonly CrontabFieldImpl Hour      = new(CrontabFieldKind.Hour, 0, 23, null);
+        public static readonly CrontabFieldImpl Day       = new(CrontabFieldKind.Day, 1, 31, null);
+        public static readonly CrontabFieldImpl Month     = new(CrontabFieldKind.Month, 1, 12, new[] { "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December" });
+        public static readonly CrontabFieldImpl DayOfWeek = new(CrontabFieldKind.DayOfWeek, 0, 6, new[] { "Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday" });
 
         static readonly CrontabFieldImpl[] FieldByKind = { Second, Minute, Hour, Day, Month, DayOfWeek };
 
@@ -131,7 +131,7 @@ namespace NCrontab
         {
             if (noNames || _names == null)
             {
-                if (value >= 0 && value < 100)
+                if (value is >= 0 and < 100)
                 {
                     FastFormatNumericValue(value, writer);
                 }
@@ -149,7 +149,7 @@ namespace NCrontab
 
         static void FastFormatNumericValue(int value, TextWriter writer)
         {
-            Debug.Assert(value >= 0 && value < 100);
+            Debug.Assert(value is >= 0 and < 100);
 
             if (value >= 10)
             {
@@ -163,7 +163,7 @@ namespace NCrontab
         }
 
         public void Parse(string str, CrontabFieldAccumulator<ExceptionProvider?> acc) =>
-            TryParse(str, acc, (ExceptionProvider?)null, ep => throw ep());
+            _ = TryParse(str, acc, null, ep => throw ep());
 
         public T TryParse<T>(string str, CrontabFieldAccumulator<T> acc, T success,
                              Func<ExceptionProvider, T> errorSelector)
@@ -177,19 +177,11 @@ namespace NCrontab
             {
                 return InternalParse(str, acc, success, errorSelector);
             }
-            catch (FormatException e)
+            catch (Exception e) when (e is FormatException or CrontabException)
             {
-                return OnParseException(e, str, errorSelector);
-            }
-            catch (CrontabException e)
-            {
-                return OnParseException(e, str, errorSelector);
+                return errorSelector(() => new CrontabException($"'{str}' is not a valid [{Kind}] crontab field expression.", e));
             }
         }
-
-        T OnParseException<T>(Exception innerException, string str, Func<ExceptionProvider, T> errorSelector) =>
-            errorSelector(
-                () => new CrontabException($"'{str}' is not a valid [{Kind}] crontab field expression.", innerException));
 
         T InternalParse<T>(string str, CrontabFieldAccumulator<T> acc, T success, Func<ExceptionProvider, T> errorSelector)
         {
@@ -200,16 +192,12 @@ namespace NCrontab
             // Next, look for a list of values (e.g. 1,2,3).
             //
 
-            var commaIndex = str.IndexOf(',');
-
-            if (commaIndex > 0)
+            if (str.IndexOf(',') > 0)
             {
                 var result = success;
-                using (var token = ((IEnumerable<string>)str.Split(StringSeparatorStock.Comma)).GetEnumerator())
-                {
-                    while (token.MoveNext() && result == null)
-                        result = InternalParse(token.Current, acc, success, errorSelector);
-                }
+                using var token = ((IEnumerable<string>)str.Split(StringSeparatorStock.Comma)).GetEnumerator();
+                while (token.MoveNext() && result == null)
+                    result = InternalParse(token.Current, acc, success, errorSelector);
                 return result;
             }
 
@@ -219,9 +207,7 @@ namespace NCrontab
             // Look for stepping first (e.g. */2 = every 2nd).
             //
 
-            var slashIndex = str.IndexOf('/');
-
-            if (slashIndex > 0)
+            if (str.IndexOf('/') is var slashIndex and > 0)
             {
                 every = int.Parse(str.Substring(slashIndex + 1), CultureInfo.InvariantCulture);
                 str = str.Substring(0, slashIndex);
@@ -240,9 +226,7 @@ namespace NCrontab
             // Next, look for a range of values (e.g. 2-10).
             //
 
-            var dashIndex = str.IndexOf('-');
-
-            if (dashIndex > 0)
+            if (str.IndexOf('-') is var dashIndex and > 0)
             {
                 var first = ParseValue(str.Substring(0, dashIndex));
                 var last = ParseValue(str.Substring(dashIndex + 1));
@@ -256,11 +240,9 @@ namespace NCrontab
 
             var value = ParseValue(str);
 
-            if (every == null)
-                return acc(value, value, 1, success, errorSelector);
-
-            Debug.Assert(every != 0);
-            return acc(value, MaxValue, every.Value, success, errorSelector);
+            return every is { } someEvery
+                 ? acc(value, MaxValue, someEvery, success, errorSelector)
+                 : acc(value, value, 1, success, errorSelector);
         }
 
         int ParseValue(string str)
@@ -268,16 +250,12 @@ namespace NCrontab
             if (str.Length == 0)
                 throw new CrontabException("A crontab field value cannot be empty.");
 
-            var firstChar = str[0];
-
-            if (firstChar >= '0' && firstChar <= '9')
+            if (str[0] is >= '0' and <= '9')
                 return int.Parse(str, CultureInfo.InvariantCulture);
 
             if (_names == null)
             {
-                throw new CrontabException(string.Format(
-                    "'{0}' is not a valid [{3}] crontab field value. It must be a numeric value between {1} and {2} (all inclusive).",
-                    str, MinValue.ToString(), MaxValue.ToString(), Kind.ToString()));
+                throw new CrontabException($"'{str}' is not a valid [{Kind}] crontab field value. It must be a numeric value between {MinValue} and {MaxValue} (all inclusive).");
             }
 
             for (var i = 0; i < _names.Length; i++)

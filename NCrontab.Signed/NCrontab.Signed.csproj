@@ -8,10 +8,8 @@
     <VersionPrefix>3.3.2</VersionPrefix>
     <Authors>Atif Aziz</Authors>
     <TargetFrameworks>net35;netstandard1.0;netstandard2.0</TargetFrameworks>
-    <LangVersion>8</LangVersion>
-    <Nullable>enable</Nullable>
+    <LangVersion>11</LangVersion>
     <DefineConstants>$(DefineConstants);SIGNED</DefineConstants>
-    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <DebugType>portable</DebugType>
     <AssemblyName>NCrontab.Signed</AssemblyName>
     <OutputType>Library</OutputType>
@@ -36,7 +34,7 @@
     <Compile Include="..\NCrontab\Utils\DateTimeComponents.cs" Link="Utils\DateTimeComponents.cs" />
     <Compile Include="..\NCrontab\Utils\Incrementor.cs" Link="Utils\Incrementor.cs" />
     <Compile Include="..\SolutionInfo.cs" />
-    <Compile Include="..\NCrontab\*.cs" Exclude="bin\**;obj\**;**\*.xproj;packages\**" />
+    <Compile Include="..\NCrontab\*.cs" />
     <None Include="..\COPYING.txt" Pack="true" PackagePath="$(PackageLicenseFile)" />
   </ItemGroup>
 

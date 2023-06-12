@@ -36,7 +36,7 @@ namespace NCrontabViewer
 
         DateTime _lastChangeTime;
         bool _dirty;
-        CrontabSchedule _crontab;
+        CrontabSchedule? _crontab;
         bool _isSixPart;
         DateTime _startTime;
         int _totalOccurrenceCount;
@@ -74,6 +74,8 @@ namespace NCrontabViewer
             _statusBarPanel.Text = "Ready";
             _moreButton.Enabled = false;
 
+            const string defaultCustomFormat = "dd/MM/yyyy HH:mm";
+
             if (_crontab == null)
             {
                 try
@@ -89,7 +91,7 @@ namespace NCrontabViewer
                     _totalOccurrenceCount = 0;
 
                     _startTime = DateTime.ParseExact(_startTimePicker.Text,
-                        _startTimePicker.CustomFormat, CultureInfo.InvariantCulture,
+                        _startTimePicker.CustomFormat ?? defaultCustomFormat, CultureInfo.InvariantCulture,
                         DateTimeStyles.AssumeLocal) - (_isSixPart ? TimeSpan.FromSeconds(1): TimeSpan.FromMinutes(1));
                 }
                 catch (CrontabException e)
@@ -117,7 +119,7 @@ namespace NCrontabViewer
             }
 
             var endTime = DateTime.ParseExact(_endTimePicker.Text,
-                _endTimePicker.CustomFormat, CultureInfo.InvariantCulture,
+                _endTimePicker.CustomFormat ?? defaultCustomFormat, CultureInfo.InvariantCulture,
                 DateTimeStyles.AssumeLocal);
 
             var sb = new StringBuilder();
@@ -129,7 +131,7 @@ namespace NCrontabViewer
             var monthWidth = info.AbbreviatedMonthNames.Max(s => s.Length);
             var timeComponent = _isSixPart ? "HH:mm:ss" : "HH:mm";
             var timeFormat = $"{{0,-{dayWidth}:ddd}} {{0:dd}}, {{0,-{monthWidth}:MMM}} {{0:yyyy {timeComponent}}}";
-            var lastTimeString = new string('?', string.Format(timeFormat, DateTime.MinValue).Length);
+            var lastTimeString = new string('?', string.Format(null, timeFormat, DateTime.MinValue).Length);
 
             foreach (var occurrence in _crontab.GetNextOccurrences(_startTime, endTime))
             {
@@ -140,7 +142,7 @@ namespace NCrontabViewer
                 _totalOccurrenceCount++;
                 count++;
 
-                var timeString = string.Format(timeFormat, occurrence);
+                var timeString = string.Format(null, timeFormat, occurrence);
 
                 sb.Append(timeString);
                 sb.Append(" | ");
