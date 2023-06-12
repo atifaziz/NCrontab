@@ -6,7 +6,7 @@ namespace NCrontab.Utils
     /// Used when heavy manipulation of the individual elements of a DateTime are needed.  These elements may even
     /// represent an invalid DateTime during or after manipulation. Resolution is only down to the second.
     /// </summary>
-    internal class DateTimeComponents
+    internal sealed class DateTimeComponents
     {
         public DateTimeComponents(DateTime dateTime)
         {

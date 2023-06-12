@@ -4,7 +4,7 @@ namespace NCrontab
 {
     public sealed partial class CrontabField
     {
-        internal class Iterator
+        internal sealed class Iterator
         {
             readonly CrontabField _crontabField;
             readonly bool _forwardMoving;

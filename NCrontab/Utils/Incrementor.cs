@@ -2,7 +2,7 @@ using System;
 
 namespace NCrontab.Utils
 {
-    internal class Incrementor
+    internal sealed class Incrementor
     {
         readonly bool _forwardMoving;
 
