@@ -33,6 +33,8 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Include="..\NCrontab\Utils\DateTimeComponents.cs" Link="Utils\DateTimeComponents.cs" />
+    <Compile Include="..\NCrontab\Utils\Incrementor.cs" Link="Utils\Incrementor.cs" />
     <Compile Include="..\SolutionInfo.cs" />
     <Compile Include="..\NCrontab\*.cs" Exclude="bin\**;obj\**;**\*.xproj;packages\**" />
     <None Include="..\COPYING.txt" Pack="true" PackagePath="$(PackageLicenseFile)" />

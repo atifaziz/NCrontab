@@ -20,6 +20,7 @@
 
 namespace NCrontab
 {
+    using NCrontab.Utils;
     #region Imports
 
     using System;
@@ -177,9 +178,9 @@ namespace NCrontab
 
         public IEnumerable<DateTime> GetNextOccurrences(DateTime baseTime, DateTime endTime)
         {
-            for (var occurrence = TryGetNextOccurrence(baseTime, endTime);
+            for (var occurrence = TryGetOccurrence(baseTime, endTime, true);
                  occurrence != null && occurrence < endTime;
-                 occurrence = TryGetNextOccurrence(occurrence.Value, endTime))
+                 occurrence = TryGetOccurrence(occurrence.Value, endTime, true))
             {
                 yield return occurrence.Value;
             }
@@ -187,9 +188,9 @@ namespace NCrontab
 
         public IEnumerable<DateTime> GetPrevOccurrences(DateTime baseTime, DateTime startTime)
         {
-            for (var occurrence = TryGetPrevOccurrence(baseTime, startTime);
+            for (var occurrence = TryGetOccurrence(baseTime, startTime, false);
                  occurrence != null && occurrence > startTime;
-                 occurrence = TryGetPrevOccurrence(occurrence.Value, startTime))
+                 occurrence = TryGetOccurrence(occurrence.Value, startTime, false))
             {
                 yield return occurrence.Value;
             }
@@ -222,360 +223,237 @@ namespace NCrontab
         /// </remarks>
 
         public DateTime GetNextOccurrence(DateTime baseTime, DateTime endTime) =>
-            TryGetNextOccurrence(baseTime, endTime) ?? endTime;
+            TryGetOccurrence(baseTime, endTime, true) ?? endTime;
 
+        /// <summary>
+        /// Gets the previous occurrence of this schedule starting with a base
+        /// time and up to an end time limit.
+        /// </summary>
+        /// <remarks>
+        /// This method does not return the value of <paramref name="baseTime"/>
+        /// itself if it falls on the schedule. For example, if <paramref name="baseTime" />
+        /// is midnight and the schedule was created from the expression <c>* * * * *</c>
+        /// (meaning every minute) then the previous occurrence of the schedule
+        /// will be at one minute before midnight and not midnight itself.
+        /// The method returns the <em>previous</em> occurrence <em>before</em>
+        /// <paramref name="baseTime"/>. Also, <param name="startTime" /> is
+        /// exclusive.
+        /// </remarks>
         public DateTime GetPrevOccurrence(DateTime baseTime, DateTime startTime) =>
-            TryGetPrevOccurrence(baseTime, startTime) ?? startTime;
+            TryGetOccurrence(baseTime, startTime, false) ?? startTime;
 
-        DateTime? TryGetNextOccurrence(DateTime baseTime, DateTime endTime)
+        DateTime? TryGetOccurrence(DateTime baseTime, DateTime limitTime, bool isNext)
         {
-            const int nil = -1;
-
-            var baseYear = baseTime.Year;
-            var baseMonth = baseTime.Month;
-            var baseDay = baseTime.Day;
-            var baseHour = baseTime.Hour;
-            var baseMinute = baseTime.Minute;
-            var baseSecond = baseTime.Second;
-
-            var endYear = endTime.Year;
-            var endMonth = endTime.Month;
-            var endDay = endTime.Day;
-
-            var year = baseYear;
-            var month = baseMonth;
-            var day = baseDay;
-            var hour = baseHour;
-            var minute = baseMinute;
-            var second = baseSecond + 1;
+            var runningTime = new DateTimeComponents(baseTime);
+            var incrementor = new Incrementor(isNext);
+            runningTime.Second = incrementor.Increment(runningTime.Second);
 
             //
             // Second
             //
 
-            var seconds = _seconds ?? SecondZero;
-            second = seconds.Next(second);
+            //Move to next second
+            var secondsIter = new CrontabField.Iterator(_seconds ?? SecondZero, isNext);
+            runningTime.Second = secondsIter.Next(runningTime.Second);
 
-            if (second == nil)
-            {
-                second = seconds.GetFirst();
-                minute++;
-            }
+            AdjustForSecondInvalid(runningTime, incrementor, secondsIter);
 
             //
             // Minute
             //
 
-            minute = _minutes.Next(minute);
+            //Move to next minute
+            var minutesIter = new CrontabField.Iterator(_minutes, isNext);
+            runningTime.Minute = minutesIter.Next(runningTime.Minute);
 
-            if (minute == nil)
-            {
-                second = seconds.GetFirst();
-                minute = _minutes.GetFirst();
-                hour++;
-            }
-            else if (minute > baseMinute)
-            {
-                second = seconds.GetFirst();
-            }
+            AdjustForMinuteInvalidOrRollover(baseTime, runningTime, incrementor, secondsIter, minutesIter);
 
             //
             // Hour
             //
 
-            hour = _hours.Next(hour);
+            //Move to next hour
+            var hoursIter = new CrontabField.Iterator(_hours, isNext);
+            runningTime.Hour = hoursIter.Next(runningTime.Hour);
 
-            if (hour == nil)
+            //Possible iterations will occur when advancing the day causes an invalid date (depending on which)
+            //month is being considered.  Note:  Not all months have the same number of days, unlike the other
+            //date/time elements which always have the same range.
+            var invalidDayOfMonth = false;
+            var daysIter = new CrontabField.Iterator(_days, isNext);
+            var monthsIter = new CrontabField.Iterator(_months, isNext);
+            do
             {
-                minute = _minutes.GetFirst();
-                hour = _hours.GetFirst();
-                day++;
-            }
-            else if (hour > baseHour)
-            {
-                second = seconds.GetFirst();
-                minute = _minutes.GetFirst();
-            }
+                //If anything but a repeat iteration of this do-while loop that is moving forward in time.
+                //When moving backward in time, we need to consider an hour adjustment to the last hour of the previous day
+                if (!invalidDayOfMonth || !isNext)
+                {
+                    AdjustForHourInvalidOrRollover(baseTime, runningTime, incrementor, secondsIter, minutesIter, hoursIter);
 
-            //
-            // Day
-            //
+                    //
+                    // Day
+                    //
 
-            day = _days.Next(day);
+                    //Move to next day
+                    runningTime.Day = daysIter.Next(runningTime.Day);
+                }
 
-            RetryDayMonth:
+                //Reset variable for this iteration and assume valid day until tested down below.
+                invalidDayOfMonth = false;
 
-            if (day == nil)
-            {
-                second = seconds.GetFirst();
-                minute = _minutes.GetFirst();
-                hour = _hours.GetFirst();
-                day = _days.GetFirst();
-                month++;
-            }
-            else if (day > baseDay)
-            {
-                second = seconds.GetFirst();
-                minute = _minutes.GetFirst();
-                hour = _hours.GetFirst();
-            }
+                AdjustForDayInvalidOrRollover(baseTime, runningTime, incrementor, secondsIter, minutesIter, hoursIter, daysIter);
 
-            //
-            // Month
-            //
+                //
+                // Month
+                //
 
-            month = _months.Next(month);
+                runningTime.Month = monthsIter.Next(runningTime.Month);
 
-            if (month == nil)
-            {
-                second = seconds.GetFirst();
-                minute = _minutes.GetFirst();
-                hour = _hours.GetFirst();
-                day = _days.GetFirst();
-                month = _months.GetFirst();
-                year++;
-            }
-            else if (month > baseMonth)
-            {
-                second = seconds.GetFirst();
-                minute = _minutes.GetFirst();
-                hour = _hours.GetFirst();
-                day = _days.GetFirst();
-            }
+                AdjustForMonthInvalidOrRollover(baseTime, isNext, runningTime, incrementor, secondsIter, minutesIter, hoursIter, invalidDayOfMonth, daysIter, monthsIter);
 
-            //
-            // Stop processing when year is too large for the datetime or calendar
-            // object. Otherwise we would get an exception.
-            //
+                //
+                // Stop processing when year goes beyond the upper bound for the datetime or calendar
+                // object. Otherwise we would get an exception.
+                //
 
-            if (year > Calendar.MaxSupportedDateTime.Year)
-                return null;
+                var upperBoundYear = isNext ? Calendar.MaxSupportedDateTime.Year : Calendar.MinSupportedDateTime.Year;
+                if (incrementor.After(runningTime.Year, upperBoundYear))
+                    return null;
 
-            //
-            // The day field in a cron expression spans the entire range of days
-            // in a month, which is from 1 to 31. However, the number of days in
-            // a month tend to be variable depending on the month (and the year
-            // in case of February). So a check is needed here to see if the
-            // date is a border case. If the day happens to be beyond 28
-            // (meaning that we're dealing with the suspicious range of 29-31)
-            // and the date part has changed then we need to determine whether
-            // the day still makes sense for the given year and month. If the
-            // day is beyond the last possible value, then the day/month part
-            // for the schedule is re-evaluated. So an expression like "0 0
-            // 15,31 * *" will yield the following sequence starting on midnight
-            // of Jan 1, 2000:
-            //
-            //  Jan 15, Jan 31, Feb 15, Mar 15, Apr 15, Apr 31, ...
-            //
+                //
+                // The day field in a cron expression spans the entire range of days
+                // in a month, which is from 1 to 31. However, the number of days in
+                // a month tend to be variable depending on the month (and the year
+                // in case of February). So a check is needed here to see if the
+                // date is a border case. If the day happens to be beyond 28
+                // (meaning that we're dealing with the suspicious range of 29-31)
+                // and the date part has changed then we need to determine whether
+                // the day still makes sense for the given year and month. If the
+                // day is beyond the last possible value, then the day/month part
+                // for the schedule is re-evaluated. So an expression like "0 0
+                // 15,31 * *" will yield the following sequence starting on midnight
+                // of Jan 1, 2000:
+                //
+                //  Jan 15, Jan 31, Feb 15, Mar 15, Apr 15, Apr 31, ...
+                //
 
-            var dateChanged = day != baseDay || month != baseMonth || year != baseYear;
+                var dateChanged = runningTime.Day != baseTime.Day || runningTime.Month != baseTime.Month || runningTime.Year != baseTime.Year;
 
-            if (day > 28 && dateChanged && day > Calendar.GetDaysInMonth(year, month))
-            {
-                if (year >= endYear && month >= endMonth && day >= endDay)
-                    return endTime;
+                if (runningTime.Day > 28 && dateChanged && runningTime.Day > Calendar.GetDaysInMonth(runningTime.Year, runningTime.Month))
+                {
+                    if (incrementor.AfterOrEqual(runningTime.Year, limitTime.Year) &&
+                        incrementor.AfterOrEqual(runningTime.Month, limitTime.Month) &&
+                        incrementor.AfterOrEqual(runningTime.Day, limitTime.Day))
+                        return limitTime;
 
-                day = nil;
-                goto RetryDayMonth;
-            }
+                    if (isNext)
+                        runningTime.Day = CrontabField.nil;
+                    else
+                        runningTime.Hour = CrontabField.nil;
 
-            var nextTime = new DateTime(year, month, day, hour, minute, second, 0, baseTime.Kind);
+                    invalidDayOfMonth = true;
+                }
 
-            if (nextTime >= endTime)
-                return endTime;
+            } while (invalidDayOfMonth);
+
+            var resultantTime = new DateTime(runningTime.Year, runningTime.Month, runningTime.Day, runningTime.Hour, runningTime.Minute, runningTime.Second, 0, baseTime.Kind);
+
+            if (incrementor.AfterOrEqual(resultantTime, limitTime))
+                return limitTime;
 
             //
             // Day of week
             //
 
-            if (_daysOfWeek.Contains((int)nextTime.DayOfWeek))
-                return nextTime;
+            if (_daysOfWeek.Contains((int)resultantTime.DayOfWeek))
+                return resultantTime;
 
-            return TryGetNextOccurrence(new DateTime(year, month, day, 23, 59, 59, 0, baseTime.Kind), endTime);
+            var resultantUpperBoundMinuteOfDay = new DateTime(runningTime.Year, runningTime.Month, runningTime.Day, isNext ? 23 : 0, isNext ? 59 : 0, isNext ? 59 : 0, 0, baseTime.Kind);
+            return TryGetOccurrence(resultantUpperBoundMinuteOfDay, limitTime, isNext);
         }
 
-
-        DateTime? TryGetPrevOccurrence(DateTime baseTime, DateTime startTime)
+        private static void AdjustForMonthInvalidOrRollover(DateTime baseTime, bool isNext, DateTimeComponents runningTime, Incrementor incrementor, CrontabField.Iterator secondsIter, CrontabField.Iterator minutesIter, CrontabField.Iterator hoursIter, bool invalidDayOfMonth, CrontabField.Iterator daysIter, CrontabField.Iterator monthsIter)
         {
-            const int nil = -1;
-
-            var baseYear = baseTime.Year;
-            var baseMonth = baseTime.Month;
-            var baseDay = baseTime.Day;
-            var baseHour = baseTime.Hour;
-            var baseMinute = baseTime.Minute;
-            var baseSecond = baseTime.Second;
-
-            var startYear = startTime.Year;
-            var startMonth = startTime.Month;
-            var startDay = startTime.Day;
-
-            var year = baseYear;
-            var month = baseMonth;
-            var day = baseDay;
-            var hour = baseHour;
-            var minute = baseMinute;
-            var second = baseSecond - 1;
-
-            //
-            // Second
-            //
-
-            var seconds = _seconds ?? SecondZero;
-            second = seconds.Prev(second);
-
-            if (second == nil)
+            if (runningTime.Month == CrontabField.nil)
             {
-                second = seconds.GetLast();
-                minute--;
+                runningTime.Second = secondsIter.LowerBound;
+                runningTime.Minute = minutesIter.LowerBound;
+                runningTime.Hour = hoursIter.LowerBound;
+                runningTime.Day = daysIter.LowerBound;
+                runningTime.Month = monthsIter.LowerBound;
+                runningTime.Year = incrementor.Increment(runningTime.Year);
             }
-
-            //
-            // Minute
-            //
-
-            minute = _minutes.Prev(minute);
-
-            if (minute == nil)
+            else if (incrementor.After(runningTime.Month, baseTime.Month))
             {
-                second = seconds.GetLast();
-                minute = _minutes.GetLast();
-                hour--;
+                runningTime.Second = secondsIter.LowerBound;
+                runningTime.Minute = minutesIter.LowerBound;
+                runningTime.Hour = hoursIter.LowerBound;
+
+                if (isNext || !invalidDayOfMonth)
+                    runningTime.Day = daysIter.LowerBound;
             }
-            else if (minute < baseMinute)
-            {
-                second = seconds.GetLast();
-            }
-
-            //
-            // Hour
-            //
-
-            hour = _hours.Prev(hour);
-
-            // this variable for trick
-            // to keep day when it adjusted day 31 for
-            // "short" months
-            bool adjusting = false;
-
-            RetryDayMonth:
-
-            if (hour == nil)
-            {
-                minute = _minutes.GetLast();
-                hour = _hours.GetLast();
-                day--;
-            }
-            else if (hour > baseHour)
-            {
-                second = seconds.GetLast();
-                minute = _minutes.GetLast();
-            }
-
-            //
-            // Day
-            //
-
-            
-
-            day = _days.Prev(day);
-
-            
-            if (day == nil)
-            {
-                second = seconds.GetLast();
-                minute = _minutes.GetLast();
-                hour = _hours.GetLast();
-                day = _days.GetLast();
-                month--;
-            }
-            else if (day < baseDay)
-            {
-                second = seconds.GetLast();
-                minute = _minutes.GetLast();
-                hour = _hours.GetLast();
-            }
-
-            //
-            // Month
-            //
-
-            month = _months.Prev(month);
-
-            if (month == nil)
-            {
-                second = seconds.GetLast();
-                minute = _minutes.GetLast();
-                hour = _hours.GetLast();
-                day = _days.GetLast();
-                month = _months.GetLast();
-                year--;
-            }
-            else if (month < baseMonth)
-            {
-                second = seconds.GetLast();
-                minute = _minutes.GetLast();
-                hour = _hours.GetLast();
-                if (!adjusting)
-                    day = _days.GetLast();
-            }
-
-            //
-            // Stop processing when year is too large for the datetime or calendar
-            // object. Otherwise we would get an exception.
-            //
-
-            if (year < Calendar.MinSupportedDateTime.Year)
-                return null;
-
-            //
-            // The day field in a cron expression spans the entire range of days
-            // in a month, which is from 1 to 31. However, the number of days in
-            // a month tend to be variable depending on the month (and the year
-            // in case of February). So a check is needed here to see if the
-            // date is a border case. If the day happens to be beyond 28
-            // (meaning that we're dealing with the suspicious range of 29-31)
-            // and the date part has changed then we need to determine whether
-            // the day still makes sense for the given year and month. If the
-            // day is beyond the last possible value, then the day/month part
-            // for the schedule is re-evaluated. So an expression like "0 0
-            // 15,31 * *" will yield the following sequence starting on midnight
-            // of Jan 1, 2000:
-            //
-            //  Jan 15, Jan 31, Feb 15, Mar 15, Apr 15, Apr 31, ...
-            //
-
-            var dateChanged = day != baseDay || month != baseMonth || year != baseYear;
-
-            if (day > 28 && dateChanged && day > Calendar.GetDaysInMonth(year, month))
-            {
-                if (year <= startYear && month <= startMonth && day <= startDay)
-                    return startTime;
-
-                hour = nil;
-                adjusting = true;
-                goto RetryDayMonth;
-            }
-
-            var prevTime = new DateTime(year, month, day, hour, minute, second, 0, baseTime.Kind);
-
-            if (prevTime <= startTime)
-                return startTime;
-
-            //
-            // Day of week
-            //
-
-            if (_daysOfWeek.Contains((int)prevTime.DayOfWeek))
-                return prevTime;
-
-            return TryGetPrevOccurrence(new DateTime(year, month, day, 0, 0, 0, 0, baseTime.Kind), startTime);
         }
+
+        private static void AdjustForDayInvalidOrRollover(DateTime baseTime, DateTimeComponents runningTime, Incrementor incrementor, CrontabField.Iterator secondsIter, CrontabField.Iterator minutesIter, CrontabField.Iterator hoursIter, CrontabField.Iterator daysIter)
+        {
+            if (runningTime.Day == CrontabField.nil)
+            {
+                runningTime.Second = secondsIter.LowerBound;
+                runningTime.Minute = minutesIter.LowerBound;
+                runningTime.Hour = hoursIter.LowerBound;
+                runningTime.Day = daysIter.LowerBound;
+                runningTime.Month = incrementor.Increment(runningTime.Month);
+            }
+            else if (incrementor.After(runningTime.Day, baseTime.Day))
+            {
+                runningTime.Second = secondsIter.LowerBound;
+                runningTime.Minute = minutesIter.LowerBound;
+                runningTime.Hour = hoursIter.LowerBound;
+            }
+        }
+
+        private static void AdjustForHourInvalidOrRollover(DateTime baseTime, DateTimeComponents runningTime, Incrementor incrementor, CrontabField.Iterator secondsIter, CrontabField.Iterator minutesIter, CrontabField.Iterator hoursIter)
+        {
+            if (runningTime.Hour == CrontabField.nil)
+            {
+                runningTime.Minute = minutesIter.LowerBound;
+                runningTime.Hour = hoursIter.LowerBound;
+                runningTime.Day = incrementor.Increment(runningTime.Day);
+            }
+            else if (incrementor.After(runningTime.Hour, baseTime.Hour))
+            {
+                runningTime.Second = secondsIter.LowerBound;
+                runningTime.Minute = minutesIter.LowerBound;
+            }
+        }
+
+        private static void AdjustForMinuteInvalidOrRollover(DateTime baseTime, DateTimeComponents runningTime, Incrementor incrementor, CrontabField.Iterator secondsIter, CrontabField.Iterator minutesIter)
+        {
+            if (runningTime.Minute == CrontabField.nil)
+            {
+                runningTime.Second = secondsIter.LowerBound;
+                runningTime.Minute = minutesIter.LowerBound;
+                runningTime.Hour = incrementor.Increment(runningTime.Hour);
+            }
+            else if (incrementor.After(runningTime.Minute, baseTime.Minute))
+            {
+                runningTime.Second = secondsIter.LowerBound;
+            }
+        }
+
+        private static void AdjustForSecondInvalid(DateTimeComponents runningTime, Incrementor incrementor, CrontabField.Iterator secondsIter)
+        {
+            if (runningTime.Second == CrontabField.nil)
+            {
+                runningTime.Second = secondsIter.LowerBound;
+                runningTime.Minute = incrementor.Increment(runningTime.Minute);
+            }
+        }
+
         /// <summary>
         /// Returns a string in crontab expression (expanded) that represents
         /// this schedule.
         /// </summary>
-
         public override string ToString()
         {
             var writer = new StringWriter(CultureInfo.InvariantCulture);
