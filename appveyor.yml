@@ -35,7 +35,10 @@ build_script:
     $id = ([datetimeoffset]$env:APPVEYOR_REPO_COMMIT_TIMESTAMP).ToUniversalTime().ToString('yyyyMMdd''t''HHmm')
     if ($isWindows) { .\pack.cmd ci-$id }
 test_script:
-- cmd: test.cmd
+- cmd: |
+    call test.cmd
+    curl -OsSL https://uploader.codecov.io/latest/windows/codecov.exe
+    codecov
 - sh: ./test.sh
 for:
 -
@@ -44,6 +47,7 @@ for:
       - image: Visual Studio 2022
   artifacts:
   - path: dist\*.nupkg
+  - path: etc\coverage
   deploy:
   - provider: NuGet
     server: https://www.myget.org/F/raboof/api/v2/package

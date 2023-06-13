@@ -370,3 +370,4 @@ __pycache__/
 
 temp/
 tmp/
+etc/coverage/
