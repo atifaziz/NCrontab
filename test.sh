@@ -9,7 +9,7 @@ for f in net7.0 net6.0; do
             -s NCrontab.Tests/.runsettings
     done
 done
-dotnet reportgenerator "-reports:NCrontab.Tests/TestResults/*/coverage.cobertura.xml" \
+dotnet reportgenerator '-reports:NCrontab.Tests/TestResults/*/coverage.cobertura.xml' \
     -targetdir:etc/coverage \
-    -reporttypes:TextSummary;Html
+    '-reporttypes:TextSummary;Html'
 cat etc/coverage/Summary.txt
