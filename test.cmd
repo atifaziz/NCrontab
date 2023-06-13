@@ -1,17 +1,13 @@
 @echo off
 pushd "%~dp0"
-call :main %*
-popd
-goto :EOF
-
-:main
-    call build ^
- && call :test Debug -p:CollectCoverage=true ^
-                     -p:CoverletOutputFormat=opencover ^
-                     -p:Exclude=[NUnit*]* ^
- && call :test Release
-goto :EOF
+dotnet tool restore ^
+ && call build ^
+ && call :test Debug ^
+ && call :test Release ^
+ && dotnet reportgenerator -reports:NCrontab.Tests\TestResults\*\coverage.cobertura.xml -targetdir:etc\coverage -reporttypes:TextSummary;Html ^
+ && type etc\coverage\Summary.txt
+popd && exit /b %ERRORLEVEL%
 
 :test
-dotnet test --no-build -c %1 NCrontab.Tests
+dotnet test --no-build -s NCrontab.Tests\.runsettings -c %*
 goto :EOF
