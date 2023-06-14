@@ -15,6 +15,11 @@ namespace NCrontab
                 _forwardMoving = forwardMoving;
             }
 
+            /// <summary>
+            /// Returns the first valid value (according to filter) beginning at <paramref name="start"/>.
+            /// </summary>
+            /// <param name="start"></param>
+            /// <returns></returns>
             public int Next(int start)
             {
                 if (BeyondLowerBoundValueSet(start))
@@ -34,7 +39,6 @@ namespace NCrontab
             }
 
             public int LowerBound => _forwardMoving ? _crontabField.GetFirst() : _crontabField.GetLast();
-            public int UpperBound => _forwardMoving ? _crontabField.GetLast() : _crontabField.GetFirst();
 
             public int LowerBoundValueSet => _forwardMoving ? _crontabField._minValueSet : _crontabField._maxValueSet;
             public int UpperBoundValueSet => _forwardMoving ? _crontabField._maxValueSet : _crontabField._minValueSet;
@@ -43,7 +47,6 @@ namespace NCrontab
                                                                 start < _crontabField._minValueSet :
                                                                 start > _crontabField._maxValueSet;
 
-            public int IncrementValue(int value) => _forwardMoving ? value + 1 : value - 1;
         }
     }
 }

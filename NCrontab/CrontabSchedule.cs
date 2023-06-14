@@ -249,13 +249,14 @@ namespace NCrontab
         {
             var runningTime = new DateTimeComponents(baseTime);
             var incrementor = new Incrementor(isNext);
+
             runningTime.Second = incrementor.Increment(runningTime.Second);
 
             //
             // Second
             //
 
-            //Move to next second
+            //Per expression filter advance (if necessary) to next second
             var secondsIter = new CrontabField.Iterator(_seconds ?? SecondZero, isNext);
             runningTime.Second = secondsIter.Next(runningTime.Second);
 
@@ -265,7 +266,7 @@ namespace NCrontab
             // Minute
             //
 
-            //Move to next minute
+            //Per expression filter advance (if necessary) to next minute
             var minutesIter = new CrontabField.Iterator(_minutes, isNext);
             runningTime.Minute = minutesIter.Next(runningTime.Minute);
 
@@ -275,7 +276,7 @@ namespace NCrontab
             // Hour
             //
 
-            //Move to next hour
+            //Per expression filter advance (if necessary) to next hour
             var hoursIter = new CrontabField.Iterator(_hours, isNext);
             runningTime.Hour = hoursIter.Next(runningTime.Hour);
 
@@ -297,12 +298,9 @@ namespace NCrontab
                     // Day
                     //
 
-                    //Move to next day
+                    //Per expression filter advance (if necessary) to next day
                     runningTime.Day = daysIter.Next(runningTime.Day);
                 }
-
-                //Reset variable for this iteration and assume valid day until tested down below.
-                invalidDayOfMonth = false;
 
                 AdjustForDayInvalidOrRollover(baseTime, runningTime, incrementor, secondsIter, minutesIter, hoursIter, daysIter);
 
@@ -310,9 +308,13 @@ namespace NCrontab
                 // Month
                 //
 
+                //Per expression filter advance (if necessary) to next month
                 runningTime.Month = monthsIter.Next(runningTime.Month);
 
                 AdjustForMonthInvalidOrRollover(baseTime, isNext, runningTime, incrementor, secondsIter, minutesIter, hoursIter, invalidDayOfMonth, daysIter, monthsIter);
+
+                //Reset variable for this iteration and assume valid day until tested down below.
+                invalidDayOfMonth = false;
 
                 //
                 // Stop processing when year goes beyond the upper bound for the datetime or calendar
