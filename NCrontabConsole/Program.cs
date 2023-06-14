@@ -39,10 +39,10 @@ try
         argList.RemoveAt(verboseIndex);
 
     var (expression, startTimeString, endTimeString, format) =
-        argList.Count switch
+        argList switch
         {
-            3   => (argList[0], argList[1], argList[2], null),
-            > 3 => (argList[0], argList[1], argList[2], argList[3]),
+            [var exa, var sta, var eta] => (exa, sta, eta, null),
+            [var exa, var sta, var eta, var fma, ..] => (exa, sta, eta, fma),
             _ => throw new ApplicationException("Missing required arguments. You must at least supply CRONTAB-EXPRESSION START-DATE END-DATE."),
         };
 
