@@ -8,7 +8,9 @@ NCrontab.CrontabField.Contains(int value) -> bool
 NCrontab.CrontabField.Format(System.IO.TextWriter! writer) -> void
 NCrontab.CrontabField.Format(System.IO.TextWriter! writer, bool noNames) -> void
 NCrontab.CrontabField.GetFirst() -> int
+NCrontab.CrontabField.GetLast() -> int
 NCrontab.CrontabField.Next(int start) -> int
+NCrontab.CrontabField.Prev(int start) -> int
 NCrontab.CrontabField.ToString(string? format) -> string!
 NCrontab.CrontabFieldKind
 NCrontab.CrontabFieldKind.Day = 3 -> NCrontab.CrontabFieldKind
@@ -21,6 +23,9 @@ NCrontab.CrontabSchedule
 NCrontab.CrontabSchedule.GetNextOccurrence(System.DateTime baseTime) -> System.DateTime
 NCrontab.CrontabSchedule.GetNextOccurrence(System.DateTime baseTime, System.DateTime endTime) -> System.DateTime
 NCrontab.CrontabSchedule.GetNextOccurrences(System.DateTime baseTime, System.DateTime endTime) -> System.Collections.Generic.IEnumerable<System.DateTime>!
+NCrontab.CrontabSchedule.GetPrevOccurrence(System.DateTime baseTime) -> System.DateTime
+NCrontab.CrontabSchedule.GetPrevOccurrence(System.DateTime baseTime, System.DateTime startTime) -> System.DateTime
+NCrontab.CrontabSchedule.GetPrevOccurrences(System.DateTime baseTime, System.DateTime startTime) -> System.Collections.Generic.IEnumerable<System.DateTime>!
 NCrontab.CrontabSchedule.ParseOptions
 NCrontab.CrontabSchedule.ParseOptions.IncludingSeconds.get -> bool
 NCrontab.CrontabSchedule.ParseOptions.IncludingSeconds.set -> void
@@ -29,7 +34,9 @@ NCrontab.ExceptionProvider
 NCrontab.ICrontabField
 NCrontab.ICrontabField.Contains(int value) -> bool
 NCrontab.ICrontabField.GetFirst() -> int
+NCrontab.ICrontabField.GetLast() -> int
 NCrontab.ICrontabField.Next(int start) -> int
+NCrontab.ICrontabField.Prev(int start) -> int
 override NCrontab.CrontabField.ToString() -> string!
 override NCrontab.CrontabSchedule.ToString() -> string!
 static NCrontab.CrontabField.Days(string! expression) -> NCrontab.CrontabField!
