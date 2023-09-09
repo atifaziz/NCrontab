@@ -455,9 +455,9 @@ namespace NCrontab.Tests
                     .Split(separator)
                     .Select(CrontabSchedule.Parse)
                     .GetNextOccurrences(new DateTime(2003, 1, 1),
-                                        string.IsNullOrEmpty(endTimeString)
-                                            ? DateTime.MaxValue
-                                            : Time(endTimeString))
+                                        endTimeString is { Length: > 0 } someEndTimeString
+                                            ? Time(someEndTimeString)
+                                            : DateTime.MaxValue)
                     .Select(TimeString);
 
             Assert.That(endTimeString is null ? occurrences.Take(times.Length)
