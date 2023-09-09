@@ -5,10 +5,10 @@
     <Copyright>Copyright © 2008 Atif Aziz. All rights reserved. Portions Copyright © 2001 The OpenSymphony Group. All rights reserved.</Copyright>
     <AssemblyTitle>NCrontab</AssemblyTitle>
     <NeutralLanguage>en-US</NeutralLanguage>
-    <VersionPrefix>3.3.1</VersionPrefix>
+    <VersionPrefix>3.4.0</VersionPrefix>
     <Authors>Atif Aziz</Authors>
     <TargetFrameworks>net35;netstandard1.0;netstandard2.0</TargetFrameworks>
-    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <LangVersion>11</LangVersion>
     <DebugType>portable</DebugType>
     <AssemblyName>NCrontab</AssemblyName>
     <OutputType>Library</OutputType>
@@ -31,16 +31,8 @@
     <None Include="..\COPYING.txt" Pack="true" PackagePath="$(PackageLicenseFile)" />
   </ItemGroup>
 
-  <!--
-  Workaround to fix build error for .NET 3.5
-  See also: https://github.com/Microsoft/msbuild/issues/1333
-  -->
-  <PropertyGroup>
-    <FrameworkPathOverride Condition="'$(TargetFramework)' == 'net35'">$(MSBuildProgramFiles32)\Reference Assemblies\Microsoft\Framework\.NETFramework\v3.5\Profile\Client</FrameworkPathOverride>
-  </PropertyGroup>
-
   <ItemGroup Condition=" '$(TargetFramework)' == 'net35' ">
-    <Reference Include="System" />
+    <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies.net35" Version="1.0.3" />
   </ItemGroup>
 
   <PropertyGroup Condition=" '$(TargetFramework)' == 'net35' ">
@@ -61,7 +53,7 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
-    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0-*" PrivateAssets="all" />
+    <PackageReference Include="DotNet.ReproducibleBuilds" Version="1.1.1" PrivateAssets="all" />
   </ItemGroup>
 
   <ItemGroup>

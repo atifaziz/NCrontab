@@ -38,10 +38,9 @@ namespace NCrontabViewer
             this.label2 = new System.Windows.Forms.Label();
             this.label3 = new System.Windows.Forms.Label();
             this._moreButton = new System.Windows.Forms.Button();
-            this._statusBar = new System.Windows.Forms.StatusBar();
-            this._statusBarPanel = new System.Windows.Forms.StatusBarPanel();
+            this._statusBar = new System.Windows.Forms.StatusStrip();
+            this._statusBarPanel = new System.Windows.Forms.ToolStripStatusLabel();
             this._errorProvider = new System.Windows.Forms.ErrorProvider(this.components);
-            ((System.ComponentModel.ISupportInitialize)(this._statusBarPanel)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this._errorProvider)).BeginInit();
             this.SuspendLayout();
             //
@@ -139,19 +138,17 @@ namespace NCrontabViewer
             //
             this._statusBar.Location = new System.Drawing.Point(0, 448);
             this._statusBar.Name = "_statusBar";
-            this._statusBar.Panels.AddRange(new System.Windows.Forms.StatusBarPanel[] {
+            this._statusBar.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this._statusBarPanel});
-            this._statusBar.ShowPanels = true;
             this._statusBar.Size = new System.Drawing.Size(563, 24);
             this._statusBar.TabIndex = 8;
             this._statusBar.Text = "Ready";
             //
             // _statusBarPanel
             //
-            this._statusBarPanel.AutoSize = System.Windows.Forms.StatusBarPanelAutoSize.Spring;
+            this._statusBarPanel.AutoSize = true;
             this._statusBarPanel.Name = "_statusBarPanel";
             this._statusBarPanel.Text = "Ready";
-            this._statusBarPanel.Width = 542;
             //
             // _errorProvider
             //
@@ -175,7 +172,6 @@ namespace NCrontabViewer
             this.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.Name = "MainForm";
             this.Text = "Crontab Viewer";
-            ((System.ComponentModel.ISupportInitialize)(this._statusBarPanel)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this._errorProvider)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
@@ -193,8 +189,8 @@ namespace NCrontabViewer
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.Button _moreButton;
-        private System.Windows.Forms.StatusBar _statusBar;
-        private System.Windows.Forms.StatusBarPanel _statusBarPanel;
+        private System.Windows.Forms.StatusStrip _statusBar;
+        private System.Windows.Forms.ToolStripStatusLabel _statusBarPanel;
         private System.Windows.Forms.ErrorProvider _errorProvider;
     }
 }

@@ -1,11 +1,13 @@
 @echo off
 pushd "%~dp0"
-call build ^
-  && call :test Debug ^
-  && call :test Release ^
-popd
-goto :EOF
+dotnet tool restore ^
+ && call build ^
+ && call :test Debug ^
+ && call :test Release ^
+ && dotnet reportgenerator -reports:NCrontab.Tests\TestResults\*\coverage.cobertura.xml -targetdir:etc\coverage -reporttypes:TextSummary;Html ^
+ && type etc\coverage\Summary.txt
+popd && exit /b %ERRORLEVEL%
 
 :test
-dotnet test --no-restore --no-build -c %1 NCrontab.Tests
+dotnet test --no-build -s NCrontab.Tests\.runsettings -c %*
 goto :EOF

@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <TargetFramework>net7.0</TargetFramework>
     <DebugType>portable</DebugType>
     <OutputType>Exe</OutputType>
     <GenerateAssemblyTitleAttribute>false</GenerateAssemblyTitleAttribute>
@@ -16,7 +16,6 @@
 
   <ItemGroup>
     <Compile Include="..\SolutionInfo.cs" />
-    <None Include="App.config" />
   </ItemGroup>
 
   <ItemGroup>

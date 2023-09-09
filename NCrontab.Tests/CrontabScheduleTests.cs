@@ -42,7 +42,8 @@ namespace NCrontab.Tests
         [Test]
         public void CannotParseNullString()
         {
-            var e = Assert.Throws<ArgumentNullException>(() => CrontabSchedule.Parse(null));
+            var e = Assert.Throws<ArgumentNullException>(() => CrontabSchedule.Parse(null!))
+                    ?? throw new NullReferenceException();
             Assert.That(e.ParamName, Is.EqualTo("expression"));
         }
 
@@ -54,7 +55,7 @@ namespace NCrontab.Tests
 
         [Test]
         public void TryParseNullString() =>
-            Assert.That(CrontabSchedule.TryParse(null), Is.Null);
+            Assert.That(CrontabSchedule.TryParse(null!), Is.Null);
 
         [Test]
         public void TryParseEmptyString() =>
@@ -125,6 +126,9 @@ namespace NCrontab.Tests
         [TestCase("01/01/2003 00:00:52", "2/5 * * * * *", "01/01/2003 00:00:57"        , true)]
         [TestCase("01/01/2003 00:00:57", "2/5 * * * * *", "01/01/2003 00:01:02"        , true)]
 
+        // See: https://github.com/atifaziz/NCrontab/issues/90
+        [TestCase("24/02/2021 09:50:35", "* 0-1 10 * * *", "24/02/2021 10:00:00"       , true)]
+
         // Minute tests
 
         [TestCase("01/01/2003 00:00:00", "45 * * * *", "01/01/2003 00:45:00", false)]
@@ -141,6 +145,10 @@ namespace NCrontab.Tests
         [TestCase("01/01/2003 00:50:00", "2/5 * * * *", "01/01/2003 00:52:00", false)]
         [TestCase("01/01/2003 00:52:00", "2/5 * * * *", "01/01/2003 00:57:00", false)]
         [TestCase("01/01/2003 00:57:00", "2/5 * * * *", "01/01/2003 01:02:00", false)]
+
+        // See: https://github.com/atifaziz/NCrontab/issues/90
+        [TestCase("24/02/2021 09:50:35", "* * 10 * * *", "24/02/2021 10:00:00", true)]
+        [TestCase("24/02/2021 09:50:35", "* 55 * * * *", "24/02/2021 09:55:00", true)]
 
         [TestCase("01/01/2003 00:00:30", "3 45 * * * *", "01/01/2003 00:45:03", true)]
 
@@ -431,7 +439,7 @@ namespace NCrontab.Tests
                   "03/01/2003 00:00:00; 03/01/2003 03:00:00; 03/01/2003 06:00:00; 03/01/2003 12:00:00; 03/01/2003 18:00:00; " +
                   "06/01/2003 07:00:00; 06/01/2003 08:00:00; 06/01/2003 09:00:00; " +
                   "07/01/2003 06:00:00; 07/01/2003 18:00:00")]
-        public void NextOccurrencesFromMultipleSchedules(string delimitedExpressions, string endTimeString, string delimitedTimes)
+        public void NextOccurrencesFromMultipleSchedules(string delimitedExpressions, string? endTimeString, string delimitedTimes)
         {
             const char separator = ';';
 
@@ -452,7 +460,7 @@ namespace NCrontab.Tests
                                             : Time(endTimeString))
                     .Select(TimeString);
 
-            Assert.That(endTimeString == null ? occurrences.Take(times.Length)
+            Assert.That(endTimeString is null ? occurrences.Take(times.Length)
                                               : occurrences,
                         Is.EquivalentTo(times));
         }
