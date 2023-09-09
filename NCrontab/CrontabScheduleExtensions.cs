@@ -132,7 +132,6 @@ namespace NCrontab
             }
         }
 
-        static KeyValuePair<TKey, TValue> Pair<TKey, TValue>(TKey key, TValue value) =>
-            new KeyValuePair<TKey, TValue>(key, value);
+        static KeyValuePair<TKey, TValue> Pair<TKey, TValue>(TKey key, TValue value) => new(key, value);
     }
 }
