@@ -100,16 +100,15 @@ namespace NCrontab
                     for (var xi = 1; xi < enumerators.Count; xi++)
                     {
                         var xe = enumerators[xi];
-                        var comparison = xe.Value.Current.CompareTo(e.Value.Current);
-                        if (comparison < 0)
+                        switch (xe.Value.Current.CompareTo(e.Value.Current))
                         {
-                            i = xi;
-                            e = xe;
-                        }
-                        else if (comparison == 0)
-                        {
-                            i = xi;
-                            goto skip;
+                            case < 0:
+                                i = xi;
+                                e = xe;
+                                break;
+                            case 0:
+                                i = xi;
+                                goto skip;
                         }
                     }
 
