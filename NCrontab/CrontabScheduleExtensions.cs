@@ -2,7 +2,7 @@
 //
 // NCrontab - Crontab for .NET
 // Copyright (c) 2008 Atif Aziz. All rights reserved.
-// Portions Copyright (c) 2001 The OpenSymphony Group. All rights reserved.
+// Portions Copyright (c) 2023 Microsoft Corp. All rights reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -35,13 +35,31 @@ namespace NCrontab
         /// arguments are exclusive.
         /// </remarks>
 
-        public static IEnumerable<DateTime> GetNextOccurrences(
-            this IEnumerable<CrontabSchedule> schedules,
-            DateTime baseTime, DateTime endTime) =>
-            GetNextOccurrences(schedules, baseTime, endTime, (_, dt) => dt);
+        public static IEnumerable<DateTime> GetNextOccurrences(this IEnumerable<CrontabSchedule> schedules,
+                                                               DateTime baseTime, DateTime endTime)
+        {
+            if (schedules == null) throw new ArgumentNullException(nameof(schedules));
+
+            return Iterator(schedules, baseTime, endTime);
+
+            static IEnumerable<DateTime> Iterator(IEnumerable<CrontabSchedule> schedules,
+                                                  DateTime baseTime, DateTime endTime)
+            {
+                var running = DateTime.MinValue;
+
+                foreach (var current in GetNextOccurrences(schedules, baseTime, endTime, static (_, dt) => dt))
+                {
+                    if (current == running)
+                        continue;
+
+                    running = current;
+                    yield return current;
+                }
+            }
+        }
 
         /// <summary>
-        /// Generates a sequence of unique next occurrences (in order) between
+        /// Generates a sequence of next occurrences (in order) between
         /// two dates and based on one or more schedules. An additional
         /// parameter specifies a function that projects the items of the
         /// resulting sequence where each invocation of the function is given
@@ -52,85 +70,100 @@ namespace NCrontab
         /// arguments are exclusive.
         /// </remarks>
 
-        public static IEnumerable<T> GetNextOccurrences<T>(this IEnumerable<CrontabSchedule> schedules,
-            DateTime baseTime, DateTime endTime,
-            Func<CrontabSchedule, DateTime, T> resultSelector)
+        public static IEnumerable<T>
+            GetNextOccurrences<T>(this IEnumerable<CrontabSchedule> schedules,
+                                  DateTime baseTime, DateTime endTime,
+                                  Func<CrontabSchedule, DateTime, T> resultSelector)
         {
             if (schedules == null) throw new ArgumentNullException(nameof(schedules));
             if (resultSelector == null) throw new ArgumentNullException(nameof(resultSelector));
-            return Merge(schedules, s => s.GetNextOccurrences(baseTime, endTime), resultSelector);
-        }
 
-        static IEnumerable<TResult> Merge<T, TSortable, TResult>(
-            IEnumerable<T> sources,
-            Func<T, IEnumerable<TSortable>> sortablesSelector,
-            Func<T, TSortable, TResult> resultSelector)
-            where TSortable : IComparable<TSortable>
-        {
-            var enumerators = new List<KeyValuePair<T, IEnumerator<TSortable>>>();
-
-            try
-            {
-                enumerators.AddRange(from t in sources
-                                     select Pair(t, sortablesSelector(t).GetEnumerator()));
-            }
-            catch
-            {
-                foreach (var e in enumerators)
-                    e.Value.Dispose();
-                throw;
-            }
-
-            try
-            {
-                for (var i = enumerators.Count - 1; i >= 0; i--)
-                {
-                    if (!enumerators[i].Value.MoveNext())
-                    {
-                        enumerators[i].Value.Dispose();
-                        enumerators.RemoveAt(i);
-                    }
-                }
-
-                while (enumerators.Count > 0)
-                {
-                    var i = 0;
-                    var e = enumerators[0];
-
-                    for (var xi = 1; xi < enumerators.Count; xi++)
-                    {
-                        var xe = enumerators[xi];
-                        switch (xe.Value.Current.CompareTo(e.Value.Current))
-                        {
-                            case < 0:
-                                i = xi;
-                                e = xe;
-                                break;
-                            case 0:
-                                i = xi;
-                                goto skip;
-                        }
-                    }
-
-                    yield return resultSelector(e.Key, e.Value.Current);
-
-                skip:
-
-                    // advance iterator that yielded element, excluding it when consumed
-                    if (!enumerators[i].Value.MoveNext())
-                    {
-                        enumerators[i].Value.Dispose();
-                        enumerators.RemoveAt(i);
-                    }
-                }
-            }
-            finally
-            {
-                foreach (var e in enumerators)
-                    e.Value.Dispose();
-            }
+            return from e in schedules.Aggregate(Enumerable.Empty<KeyValuePair<CrontabSchedule, DateTime>>(),
+                                                 (a, s) => a.Merge(from e in s.GetNextOccurrences(baseTime, endTime)
+                                                                   select Pair(s, e)))
+                   select resultSelector(e.Key, e.Value);
         }
 
         static KeyValuePair<TKey, TValue> Pair<TKey, TValue>(TKey key, TValue value) => new(key, value);
+
+        enum Sides { None, First, Second, Both }
+
+        static IEnumerable<KeyValuePair<T, DateTime>>
+            Merge<T>(this IEnumerable<KeyValuePair<T, DateTime>> schedule1,
+                     IEnumerable<KeyValuePair<T, DateTime>> schedule2)
+        {
+            // Initialize two enumerators for each input sequence.
+
+            using var enumerator1 = schedule1.GetEnumerator();
+            using var enumerator2 = schedule2.GetEnumerator();
+
+            // Initialize the flags to determine if each enumerator has a value.
+
+            var have1 = enumerator1.MoveNext();
+            var have2 = enumerator2.MoveNext();
+
+            // Enumerate and yield the items in order of smallest due time.
+
+            for (;;)
+            {
+                // Determine which sequence contains the next smallest due time.
+
+                var sides = have1 && have2 ? Sides.Both
+                          : have1 ? Sides.First
+                          : have2 ? Sides.Second
+                          : Sides.None;
+
+#pragma warning disable IDE0010 // Add missing cases (false negative)
+                switch (sides)
+#pragma warning restore IDE0010 // Add missing cases
+                {
+                    case Sides.First: // Only first sequence has a value.
+                    {
+                        // Either MoveNext value exists at 1.
+                        yield return enumerator1.Current;
+                        have1 = enumerator1.MoveNext();
+                        break;
+                    }
+                    case Sides.Second: // Only second sequence has a value.
+                    {
+                        yield return enumerator2.Current;
+                        have2 = enumerator2.MoveNext();
+                        break;
+                    }
+                    case Sides.Both: // Both sequences have a value.
+                    {
+                        // Determine which enumerator has the next smallest due time.
+
+                        var occurrence1 = enumerator1.Current;
+                        var occurrence2 = enumerator2.Current;
+
+                        if (occurrence1.Value.CompareTo(occurrence2.Value) > 0)
+                        {
+                            // Second has smaller due time, yield it and progress to
+                            // the next value in the second sequence.
+
+                            yield return occurrence2;
+                            have2 = enumerator2.MoveNext();
+                        }
+                        else
+                        {
+                            // First has smaller due time, yield it and progress to
+                            // the next value in the first sequence.
+
+                            yield return occurrence1;
+                            have1 = enumerator1.MoveNext();
+                        }
+
+                        break;
+                    }
+                    case Sides.None:
+                    {
+                        // No value left in either sequence so end enumerating.
+
+                        yield break;
+                    }
+                }
+            }
+        }
     }
 }
