@@ -1,1 +1,4 @@
 #nullable enable
+NCrontab.CrontabScheduleExtensions
+static NCrontab.CrontabScheduleExtensions.GetNextOccurrences(this System.Collections.Generic.IEnumerable<NCrontab.CrontabSchedule!>! schedules, System.DateTime baseTime, System.DateTime endTime) -> System.Collections.Generic.IEnumerable<System.DateTime>!
+static NCrontab.CrontabScheduleExtensions.GetNextOccurrences<T>(this System.Collections.Generic.IEnumerable<NCrontab.CrontabSchedule!>! schedules, System.DateTime baseTime, System.DateTime endTime, System.Func<NCrontab.CrontabSchedule!, System.DateTime, T>! resultSelector) -> System.Collections.Generic.IEnumerable<T>!
