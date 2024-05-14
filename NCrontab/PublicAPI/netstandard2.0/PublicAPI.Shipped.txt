@@ -47,3 +47,5 @@ static NCrontab.CrontabSchedule.TryParse(string! expression) -> NCrontab.Crontab
 static NCrontab.CrontabSchedule.TryParse(string! expression, NCrontab.CrontabSchedule.ParseOptions? options) -> NCrontab.CrontabSchedule?
 static NCrontab.CrontabSchedule.TryParse<T>(string! expression, NCrontab.CrontabSchedule.ParseOptions? options, System.Func<NCrontab.CrontabSchedule!, T>! valueSelector, System.Func<NCrontab.ExceptionProvider!, T>! errorSelector) -> T
 static NCrontab.CrontabSchedule.TryParse<T>(string! expression, System.Func<NCrontab.CrontabSchedule!, T>! valueSelector, System.Func<NCrontab.ExceptionProvider!, T>! errorSelector) -> T
+static NCrontab.CrontabSchedule.TryParse(string! expression, NCrontab.CrontabSchedule.ParseOptions! options, out NCrontab.CrontabSchedule? schedule) -> bool
+static NCrontab.CrontabSchedule.TryParse(string! expression, out NCrontab.CrontabSchedule? schedule) -> bool
