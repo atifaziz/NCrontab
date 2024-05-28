@@ -42,6 +42,17 @@ commas. An element is either a number in the ranges shown above or two numbers i
 the range separated by a hyphen (meaning an inclusive range). For more, see
 [CrontabExpression].
 
+The default `Parse` format is five-part cron format.  In order to use six-part format that includes seconds pass a `ParseOptions` to `Parse` with `IncludingSeconds=true`. For example,
+
+```csharp
+var s = CrontabSchedule.Parse(
+    "0,30 * * * * *",
+    new CrontabSchedule.ParseOptions
+    {
+        IncludingSeconds = true
+    });
+```
+
 Below is an example in [IronPython][ipy] of how to use `CrontabSchedule` class
 from NCrontab to generate occurrences of the schedule `0 12 * */2 Mon`
 (meaning, *12:00 PM on Monday of every other month, starting with January*)
