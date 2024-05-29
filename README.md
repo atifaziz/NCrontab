@@ -44,7 +44,8 @@ the range separated by a hyphen (meaning an inclusive range). For more, see
 
 The default format parsed by `CrontabSchedule.Parse` is the five-part cron
 format. In order to use the six-part format that includes seconds, pass a
-`ParseOptions` to `Parse` with `IncludingSeconds` set to `true`. For example:
+`CrontabSchedule.ParseOptions` to `Parse` with `IncludingSeconds` set to
+`true`. For example:
 
 ```csharp
 var s = CrontabSchedule.Parse(
