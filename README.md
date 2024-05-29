@@ -48,12 +48,11 @@ format. In order to use the six-part format that includes seconds, pass a
 `true`. For example:
 
 ```csharp
-var s = CrontabSchedule.Parse(
-    "0,30 * * * * *",
-    new CrontabSchedule.ParseOptions
-    {
-        IncludingSeconds = true
-    });
+var s = CrontabSchedule.Parse("0,30 * * * * *",
+                              new CrontabSchedule.ParseOptions
+                              {
+                                  IncludingSeconds = true
+                              });
 ```
 
 Below is an example in [IronPython][ipy] of how to use `CrontabSchedule` class
