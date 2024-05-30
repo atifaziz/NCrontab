@@ -335,14 +335,12 @@ namespace NCrontab.Tests
 
         static void BadField(string expression, bool includingSeconds)
         {
-            Assert.Throws<CrontabException>(() => CrontabSchedule.Parse(expression, new ParseOptions
+            var options = new ParseOptions
             {
                 IncludingSeconds = includingSeconds
-            }));
-            Assert.That(CrontabSchedule.TryParse(expression, new ParseOptions
-            {
-                IncludingSeconds = includingSeconds
-            }), Is.Null);
+            };
+            Assert.Throws<CrontabException>(() => CrontabSchedule.Parse(expression, options));
+            Assert.That(CrontabSchedule.TryParse(expression, options), Is.Null);
         }
 
         [TestCase("bad * * * * *", false)]
