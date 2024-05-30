@@ -26,6 +26,10 @@ namespace NCrontab
 #pragma warning disable CA1716 // Identifiers should not match keywords (by design)
         int Next(int start);
 #pragma warning restore CA1716 // Identifiers should not match keywords
+        int GetLast();
+#pragma warning disable CA1716 // Identifiers should not match keywords (by design)
+        int Prev(int start);
+#pragma warning restore CA1716 // Identifiers should not match keywords
         bool Contains(int value);
     }
 }

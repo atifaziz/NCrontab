@@ -90,7 +90,7 @@ namespace NCrontab
             var next = field.GetFirst();
             var count = 0;
 
-            while (next != -1)
+            while (next != CrontabField.nil)
             {
                 var first = next;
                 int last;
@@ -219,7 +219,7 @@ namespace NCrontab
 
             if (str.Length == 1 && str[0] == '*')
             {
-                return acc(-1, -1, every ?? 1, success, errorSelector);
+                return acc(CrontabField.nil, CrontabField.nil, every ?? 1, success, errorSelector);
             }
 
             //

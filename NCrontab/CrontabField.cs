@@ -20,6 +20,7 @@
 
 namespace NCrontab
 {
+    using NCrontab.Utils;
     #region Imports
 
     using System;
@@ -37,6 +38,8 @@ namespace NCrontab
 
     public sealed partial class CrontabField : ICrontabField
     {
+        internal const int nil = -1;
+
         readonly BitArray _bits;
         /* readonly */ int _minValueSet;
         /* readonly */ int _maxValueSet;
@@ -111,36 +114,32 @@ namespace NCrontab
             _impl = impl ?? throw new ArgumentNullException(nameof(impl));
             _bits = new BitArray(impl.ValueCount);
             _minValueSet = int.MaxValue;
-            _maxValueSet = -1;
+            _maxValueSet = nil;
         }
 
         /// <summary>
         /// Gets the first value of the field or -1.
         /// </summary>
 
-        public int GetFirst() => _minValueSet < int.MaxValue ? _minValueSet : -1;
+        public int GetFirst() => _minValueSet < int.MaxValue ? _minValueSet : nil;
+
+        /// <summary>
+        /// Gets the last value of the field or -1.
+        /// </summary>
+        public int GetLast() => _maxValueSet >= 0 ? _maxValueSet : nil;
 
         /// <summary>
         /// Gets the next value of the field that occurs after the given
         /// start value or -1 if there is no next value available.
         /// </summary>
 
-        public int Next(int start)
-        {
-            if (start < _minValueSet)
-                return _minValueSet;
+        public int Next(int start) => new Iterator(this, true).Next(start);
 
-            var startIndex = ValueToIndex(start);
-            var lastIndex = ValueToIndex(_maxValueSet);
-
-            for (var i = startIndex; i <= lastIndex; i++)
-            {
-                if (_bits[i])
-                    return IndexToValue(i);
-            }
-
-            return -1;
-        }
+        /// <summary>
+        /// Gets the previous value of the field that occurs before the given
+        /// start value or -1 if there is no previous value available.
+        /// </summary>
+        public int Prev(int start) => new Iterator(this, false).Next(start);
 
         int IndexToValue(int index) => index + _impl.MinValue;
         int ValueToIndex(int value) => value - _impl.MinValue;
