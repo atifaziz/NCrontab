@@ -4,3 +4,8 @@
 
 # CA1303: Do not pass literals as localized parameters
 dotnet_diagnostic.CA1303.severity = suggestion
+
+[*Form*.cs]
+
+# IDE0021: Use expression body for constructor
+dotnet_diagnostic.IDE0021.severity = suggestion

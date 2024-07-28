@@ -37,10 +37,10 @@ namespace NCrontab
 
     public sealed partial class CrontabField : ICrontabField
     {
-        readonly BitArray _bits;
-        /* readonly */ int _minValueSet;
-        /* readonly */ int _maxValueSet;
-        readonly CrontabFieldImpl _impl;
+        readonly BitArray bits;
+        /* readonly */ int minValueSet;
+        /* readonly */ int maxValueSet;
+        readonly CrontabFieldImpl impl;
 
         /// <summary>
         /// Parses a crontab field expression given its kind.
@@ -50,7 +50,7 @@ namespace NCrontab
             TryParse(kind, expression, v => v, e => throw e());
 
         public static CrontabField? TryParse(CrontabFieldKind kind, string expression) =>
-            TryParse(kind, expression, v => v, _ => (CrontabField?)null);
+            TryParse(kind, expression, v => (CrontabField?)v, _ => null);
 
         public static T TryParse<T>(CrontabFieldKind kind, string expression,
                                     Func<CrontabField, T> valueSelector,
@@ -60,7 +60,7 @@ namespace NCrontab
             if (errorSelector == null) throw new ArgumentNullException(nameof(errorSelector));
 
             var field = new CrontabField(CrontabFieldImpl.FromKind(kind));
-            var error = field._impl.TryParse(expression, field.Accumulate, null, e => e);
+            var error = field.impl.TryParse(expression, field.Accumulate, null, e => e);
             return error == null ? valueSelector(field) : errorSelector(error);
         }
 
@@ -108,17 +108,17 @@ namespace NCrontab
 
         CrontabField(CrontabFieldImpl impl)
         {
-            _impl = impl ?? throw new ArgumentNullException(nameof(impl));
-            _bits = new BitArray(impl.ValueCount);
-            _minValueSet = int.MaxValue;
-            _maxValueSet = -1;
+            this.impl = impl ?? throw new ArgumentNullException(nameof(impl));
+            this.bits = new BitArray(impl.ValueCount);
+            this.minValueSet = int.MaxValue;
+            this.maxValueSet = -1;
         }
 
         /// <summary>
         /// Gets the first value of the field or -1.
         /// </summary>
 
-        public int GetFirst() => _minValueSet < int.MaxValue ? _minValueSet : -1;
+        public int GetFirst() => this.minValueSet < int.MaxValue ? this.minValueSet : -1;
 
         /// <summary>
         /// Gets the next value of the field that occurs after the given
@@ -127,29 +127,29 @@ namespace NCrontab
 
         public int Next(int start)
         {
-            if (start < _minValueSet)
-                return _minValueSet;
+            if (start < this.minValueSet)
+                return this.minValueSet;
 
             var startIndex = ValueToIndex(start);
-            var lastIndex = ValueToIndex(_maxValueSet);
+            var lastIndex = ValueToIndex(this.maxValueSet);
 
             for (var i = startIndex; i <= lastIndex; i++)
             {
-                if (_bits[i])
+                if (this.bits[i])
                     return IndexToValue(i);
             }
 
             return -1;
         }
 
-        int IndexToValue(int index) => index + _impl.MinValue;
-        int ValueToIndex(int value) => value - _impl.MinValue;
+        int IndexToValue(int index) => index + this.impl.MinValue;
+        int ValueToIndex(int value) => value - this.impl.MinValue;
 
         /// <summary>
         /// Determines if the given value occurs in the field.
         /// </summary>
 
-        public bool Contains(int value) => _bits[ValueToIndex(value)];
+        public bool Contains(int value) => this.bits[ValueToIndex(value)];
 
         /// <summary>
         /// Accumulates the given range (start to end) and interval of values
@@ -163,8 +163,8 @@ namespace NCrontab
 
         T Accumulate<T>(int start, int end, int interval, T success, Func<ExceptionProvider, T> errorSelector)
         {
-            var minValue = _impl.MinValue;
-            var maxValue = _impl.MaxValue;
+            var minValue = this.impl.MinValue;
+            var maxValue = this.impl.MaxValue;
 
             if (start == end)
             {
@@ -176,9 +176,9 @@ namespace NCrontab
 
                     if (interval <= 1)
                     {
-                        _minValueSet = minValue;
-                        _maxValueSet = maxValue;
-                        _bits.SetAll(true);
+                        this.minValueSet = minValue;
+                        this.maxValueSet = maxValue;
+                        this.bits.SetAll(true);
                         return success;
                     }
 
@@ -234,7 +234,7 @@ namespace NCrontab
             //
 
             for (i = start - minValue; i <= (end - minValue); i += interval)
-                _bits[i] = true;
+                this.bits[i] = true;
 
             //
             // Make sure we remember the minimum value set so far Keep track of
@@ -242,27 +242,27 @@ namespace NCrontab
             // so far.
             //
 
-            if (_minValueSet > start)
-                _minValueSet = start;
+            if (this.minValueSet > start)
+                this.minValueSet = start;
 
-            i += (minValue - interval);
+            i += minValue - interval;
 
-            if (_maxValueSet < i)
-                _maxValueSet = i;
+            if (this.maxValueSet < i)
+                this.maxValueSet = i;
 
             return success;
 
             T OnValueAboveMaxError(int value) =>
                 errorSelector(
                     () => new CrontabException(
-                        $"{value} is higher than the maximum allowable value for the [{_impl.Kind}] field. " +
-                        $"Value must be between {_impl.MinValue} and {_impl.MaxValue} (all inclusive)."));
+                        $"{value} is higher than the maximum allowable value for the [{this.impl.Kind}] field. " +
+                        $"Value must be between {this.impl.MinValue} and {this.impl.MaxValue} (all inclusive)."));
 
             T OnValueBelowMinError(int value) =>
                 errorSelector(
                     () => new CrontabException(
-                        $"{value} is lower than the minimum allowable value for the [{_impl.Kind}] field. " +
-                        $"Value must be between {_impl.MinValue} and {_impl.MaxValue} (all inclusive)."));
+                        $"{value} is lower than the minimum allowable value for the [{this.impl.Kind}] field. " +
+                        $"Value must be between {this.impl.MinValue} and {this.impl.MaxValue} (all inclusive)."));
         }
 
         public override string ToString() => ToString(null);
@@ -290,6 +290,6 @@ namespace NCrontab
         public void Format(TextWriter writer) => Format(writer, false);
 
         public void Format(TextWriter writer, bool noNames) =>
-            _impl.Format(this, writer, noNames);
+            this.impl.Format(this, writer, noNames);
     }
 }

@@ -62,7 +62,7 @@ try
                 Expression = expression,
                 Options = new CrontabSchedule.ParseOptions
                 {
-                    IncludingSeconds = expression.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries)
+                    IncludingSeconds = expression.Split(' ', StringSplitOptions.RemoveEmptyEntries)
                                                  .Length == 6,
                 },
             })

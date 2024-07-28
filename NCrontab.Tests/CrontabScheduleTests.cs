@@ -50,7 +50,7 @@ namespace NCrontab.Tests
         [Test]
         public void CannotParseEmptyString()
         {
-            Assert.Throws<CrontabException>(() => CrontabSchedule.Parse(string.Empty));
+            _ = Assert.Throws<CrontabException>(() => CrontabSchedule.Parse(string.Empty));
         }
 
         [Test]
@@ -76,7 +76,7 @@ namespace NCrontab.Tests
         [Test]
         public void CannotParseWhenSecondsRequired()
         {
-            Assert.Throws<CrontabException>(() => CrontabSchedule.Parse("* * * * *", new ParseOptions { IncludingSeconds = true }));
+            _ = Assert.Throws<CrontabException>(() => CrontabSchedule.Parse("* * * * *", new ParseOptions { IncludingSeconds = true }));
         }
 
         [TestCase("* 1-3 * * *"            , "* 1-2,3 * * *"                   , false)]
@@ -339,7 +339,7 @@ namespace NCrontab.Tests
             {
                 IncludingSeconds = includingSeconds
             };
-            Assert.Throws<CrontabException>(() => CrontabSchedule.Parse(expression, options));
+            _ = Assert.Throws<CrontabException>(() => CrontabSchedule.Parse(expression, options));
             Assert.That(CrontabSchedule.TryParse(expression, options), Is.Null);
         }
 
