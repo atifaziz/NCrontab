@@ -28,61 +28,11 @@ max_line_length = 100
 [*.cs]
 dotnet_analyzer_diagnostic.category-Style.severity = warning
 
-# Prefer "var" everywhere
-csharp_style_var_for_built_in_types = true:suggestion
-csharp_style_var_when_type_is_apparent = true:suggestion
-csharp_style_var_elsewhere = true:suggestion
-
-# Prefer method-like constructs to have a block body
-csharp_style_expression_bodied_methods = false:none
-csharp_style_expression_bodied_constructors = false:none
-csharp_style_expression_bodied_operators = false:none
-
-# Prefer property-like constructs to have an expression-body
-csharp_style_expression_bodied_properties = true:none
-csharp_style_expression_bodied_indexers = true:none
-csharp_style_expression_bodied_accessors = true:none
-
-# Suggest more modern language features when available
-csharp_style_pattern_matching_over_is_with_cast_check = true:suggestion
-csharp_style_pattern_matching_over_as_with_null_check = true:suggestion
-csharp_style_inlined_variable_declaration = true:suggestion
-csharp_style_throw_expression = true:suggestion
-csharp_style_conditional_delegate_call = true:suggestion
-csharp_prefer_simple_default_expression = true:suggestion
-
-# Spacing
-csharp_space_after_cast = false
-csharp_space_after_keywords_in_control_flow_statements = true
-csharp_space_between_method_declaration_parameter_list_parentheses = false
-
-# Wrapping
-csharp_preserve_single_line_statements = true
-csharp_preserve_single_line_blocks = true
-
-# Modifier preferences
-dotnet_style_require_accessibility_modifiers = omit_if_default
-
-# IDE0011: Add braces
-csharp_prefer_braces = when_multiline
-
-# IDE0061: Use block body for local functions
-csharp_style_expression_bodied_local_functions = true
-
-# IDE0065: Misplaced using directive
-csharp_using_directive_placement = inside_namespace
-
-# IDE0055: Fix formatting
-dotnet_diagnostic.IDE0055.severity = suggestion
+# IDE0022: Use expression/block body for methods
+dotnet_diagnostic.IDE0022.severity = suggestion
 
 # IDE1006: Naming rule violation
 dotnet_diagnostic.IDE1006.severity = warning
-
-# this. preferences
-dotnet_style_qualification_for_event = false
-dotnet_style_qualification_for_field = true
-dotnet_style_qualification_for_method = false
-dotnet_style_qualification_for_property = false
 
 # Naming capitalization styles
 dotnet_naming_style.camel_case_style.capitalization = camel_case
@@ -110,3 +60,68 @@ dotnet_naming_symbols.const_fields.required_modifiers = const
 dotnet_naming_rule.pascal_case_const_fields.severity = warning
 dotnet_naming_rule.pascal_case_const_fields.symbols = const_fields
 dotnet_naming_rule.pascal_case_const_fields.style = pascal_case_style
+
+# this. preferences
+dotnet_style_qualification_for_event = false
+dotnet_style_qualification_for_field = true
+dotnet_style_qualification_for_method = false
+dotnet_style_qualification_for_property = false
+
+# Prefer "var" everywhere
+csharp_style_var_for_built_in_types = true
+csharp_style_var_when_type_is_apparent = true
+csharp_style_var_elsewhere = true
+
+# Prefer method-like constructs to have a block body
+csharp_style_expression_bodied_methods = true
+csharp_style_expression_bodied_constructors = true
+csharp_style_expression_bodied_operators = true
+
+# Prefer property-like constructs to have an expression-body
+csharp_style_expression_bodied_properties = true
+csharp_style_expression_bodied_indexers = true
+csharp_style_expression_bodied_accessors = true
+
+# Suggest more modern language features when available
+csharp_style_pattern_matching_over_is_with_cast_check = true
+csharp_style_pattern_matching_over_as_with_null_check = true
+csharp_style_inlined_variable_declaration = true
+csharp_style_throw_expression = true
+csharp_style_conditional_delegate_call = true
+csharp_prefer_simple_default_expression = true
+
+# Spacing
+csharp_space_after_cast = false
+csharp_space_after_keywords_in_control_flow_statements = true
+csharp_space_between_method_declaration_parameter_list_parentheses = false
+
+# Wrapping
+csharp_preserve_single_line_statements = true
+csharp_preserve_single_line_blocks = true
+
+# Indentation
+csharp_indent_case_contents_when_block = false
+
+# Modifier preferences
+dotnet_style_require_accessibility_modifiers = omit_if_default
+
+# IDE0011: Add braces
+csharp_prefer_braces = when_multiline
+
+# IDE0061: Use block body for local functions
+csharp_style_expression_bodied_local_functions = true
+
+# IDE0065: Misplaced using directive
+csharp_using_directive_placement = inside_namespace
+
+# IDE0048: Add parentheses for clarity
+dotnet_diagnostic.IDE0048.severity = suggestion
+
+# IDE0055: Fix formatting
+dotnet_diagnostic.IDE0055.severity = suggestion
+
+# IDE0046: Convert to conditional expression
+dotnet_diagnostic.IDE0046.severity = suggestion
+
+# IDE0160: Convert to block scoped namespace
+csharp_style_namespace_declarations = block_scoped
