@@ -18,7 +18,7 @@ for p in NCrontabConsole NCrontab.Tests; do {
 done
 for c in Debug Release; do {
     dotnet build --no-restore -c $c NCrontabConsole
-    for f in net7.0 net6.0; do {
+    for f in net8.0 net6.0; do {
         dotnet build --no-restore -c $c -f $f NCrontab.Tests
     }
     done
