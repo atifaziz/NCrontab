@@ -34,12 +34,12 @@ namespace NCrontabViewer
     {
         static readonly char[] Separators = { ' ' };
 
-        DateTime _lastChangeTime;
-        bool _dirty;
-        CrontabSchedule? _crontab;
-        bool _isSixPart;
-        DateTime _startTime;
-        int _totalOccurrenceCount;
+        DateTime lastChangeTime;
+        bool dirty;
+        CrontabSchedule? crontab;
+        bool isSixPart;
+        DateTime startTime;
+        int totalOccurrenceCount;
 
         public MainForm()
         {
@@ -49,54 +49,54 @@ namespace NCrontabViewer
         // ReSharper disable once InconsistentNaming
         void CronBox_Changed(object sender, EventArgs args)
         {
-            _lastChangeTime = DateTime.Now;
-            _dirty = true;
-            _isSixPart = false;
-            _crontab = null;
+            this.lastChangeTime = DateTime.Now;
+            this.dirty = true;
+            this.isSixPart = false;
+            this.crontab = null;
         }
 
         // ReSharper disable once InconsistentNaming
         void Timer_Tick(object sender, EventArgs args)
         {
-            var changeLapse = DateTime.Now - _lastChangeTime;
+            var changeLapse = DateTime.Now - this.lastChangeTime;
 
-            if (!_dirty || changeLapse <= TimeSpan.FromMilliseconds(500))
+            if (!this.dirty || changeLapse <= TimeSpan.FromMilliseconds(500))
                 return;
 
-            _dirty = false;
+            this.dirty = false;
             DoCrontabbing();
         }
 
         void DoCrontabbing()
         {
-            _resultBox.Clear();
-            _errorProvider.SetError(_cronBox, null);
-            _statusBarPanel.Text = "Ready";
-            _moreButton.Enabled = false;
+            this.resultBox.Clear();
+            this.errorProvider.SetError(this.cronBox, null);
+            this.statusBarPanel.Text = "Ready";
+            this.moreButton.Enabled = false;
 
             const string defaultCustomFormat = "dd/MM/yyyy HH:mm";
 
-            if (_crontab == null)
+            if (this.crontab == null)
             {
                 try
                 {
-                    var expression = _cronBox.Text.Trim();
+                    var expression = this.cronBox.Text.Trim();
 
                     if (expression.Length == 0)
                         return;
 
-                    _isSixPart = expression.Split(Separators, StringSplitOptions.RemoveEmptyEntries).Length == 6;
-                    _crontab = CrontabSchedule.Parse(expression, new CrontabSchedule.ParseOptions { IncludingSeconds = _isSixPart });
+                    this.isSixPart = expression.Split(Separators, StringSplitOptions.RemoveEmptyEntries).Length == 6;
+                    this.crontab = CrontabSchedule.Parse(expression, new CrontabSchedule.ParseOptions { IncludingSeconds = this.isSixPart });
 
-                    _totalOccurrenceCount = 0;
+                    this.totalOccurrenceCount = 0;
 
-                    _startTime = DateTime.ParseExact(_startTimePicker.Text,
-                        _startTimePicker.CustomFormat ?? defaultCustomFormat, CultureInfo.InvariantCulture,
-                        DateTimeStyles.AssumeLocal) - (_isSixPart ? TimeSpan.FromSeconds(1): TimeSpan.FromMinutes(1));
+                    this.startTime = DateTime.ParseExact(this.startTimePicker.Text,
+                                                         this.startTimePicker.CustomFormat ?? defaultCustomFormat, CultureInfo.InvariantCulture,
+                                                         DateTimeStyles.AssumeLocal) - (this.isSixPart ? TimeSpan.FromSeconds(1): TimeSpan.FromMinutes(1));
                 }
                 catch (CrontabException e)
                 {
-                    _errorProvider.SetError(_cronBox, e.Message);
+                    this.errorProvider.SetError(this.cronBox, e.Message);
 
                     var traceBuilder = new StringBuilder();
 
@@ -112,14 +112,14 @@ namespace NCrontabViewer
                     }
                     while (lastException != traceException);
 
-                    _resultBox.Text = traceBuilder.ToString();
+                    this.resultBox.Text = traceBuilder.ToString();
                     return;
                 }
 
             }
 
-            var endTime = DateTime.ParseExact(_endTimePicker.Text,
-                _endTimePicker.CustomFormat ?? defaultCustomFormat, CultureInfo.InvariantCulture,
+            var endTime = DateTime.ParseExact(this.endTimePicker.Text,
+                this.endTimePicker.CustomFormat ?? defaultCustomFormat, CultureInfo.InvariantCulture,
                 DateTimeStyles.AssumeLocal);
 
             var sb = new StringBuilder();
@@ -129,17 +129,17 @@ namespace NCrontabViewer
             var info = DateTimeFormatInfo.CurrentInfo;
             var dayWidth = info.AbbreviatedDayNames.Max(s => s.Length);
             var monthWidth = info.AbbreviatedMonthNames.Max(s => s.Length);
-            var timeComponent = _isSixPart ? "HH:mm:ss" : "HH:mm";
+            var timeComponent = this.isSixPart ? "HH:mm:ss" : "HH:mm";
             var timeFormat = $"{{0,-{dayWidth}:ddd}} {{0:dd}}, {{0,-{monthWidth}:MMM}} {{0:yyyy {timeComponent}}}";
             var lastTimeString = new string('?', string.Format(null, timeFormat, DateTime.MinValue).Length);
 
-            foreach (var occurrence in _crontab.GetNextOccurrences(_startTime, endTime))
+            foreach (var occurrence in this.crontab.GetNextOccurrences(this.startTime, endTime))
             {
                 if (count + 1 > maxCount)
                     break;
 
-                _startTime = occurrence;
-                _totalOccurrenceCount++;
+                this.startTime = occurrence;
+                this.totalOccurrenceCount++;
                 count++;
 
                 var timeString = string.Format(null, timeFormat, occurrence);
@@ -158,7 +158,7 @@ namespace NCrontabViewer
                 index = Diff(lastTimeString, timeString, index + 1, 2, sb);
                 _ = sb.Append(':');
                 index = Diff(lastTimeString, timeString, index + 1, 2, sb);
-                if (_isSixPart)
+                if (this.isSixPart)
                 {
                     _ = sb.Append(':');
                     _ = Diff(lastTimeString, timeString, index + 1, 2, sb);
@@ -169,13 +169,13 @@ namespace NCrontabViewer
                 _ = sb.Append("\r\n");
             }
 
-            _moreButton.Enabled = count == maxCount;
+            this.moreButton.Enabled = count == maxCount;
 
-            _statusBarPanel.Text = $"Last count = {count:N0}, Total = {_totalOccurrenceCount:N0}";
+            this.statusBarPanel.Text = $"Last count = {count:N0}, Total = {this.totalOccurrenceCount:N0}";
 
-            _resultBox.Text = sb.ToString();
-            _resultBox.Select(0, 0);
-            _resultBox.ScrollToCaret();
+            this.resultBox.Text = sb.ToString();
+            this.resultBox.Select(0, 0);
+            this.resultBox.ScrollToCaret();
         }
 
         static int Diff(string oldString, string newString, int index, int length, StringBuilder builder)

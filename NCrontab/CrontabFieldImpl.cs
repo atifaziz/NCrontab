@@ -47,7 +47,7 @@ namespace NCrontab
 
         static readonly CompareInfo Comparer = CultureInfo.InvariantCulture.CompareInfo;
 
-        readonly string[]? _names; // TODO reconsider empty array == unnamed
+        readonly string[]? names; // TODO reconsider empty array == unnamed
 
         public static CrontabFieldImpl FromKind(CrontabFieldKind kind)
         {
@@ -70,7 +70,7 @@ namespace NCrontab
             Kind = kind;
             MinValue = minValue;
             MaxValue = maxValue;
-            _names = names;
+            this.names = names;
         }
 
         public CrontabFieldKind Kind { get; }
@@ -129,7 +129,7 @@ namespace NCrontab
 
         void FormatValue(int value, TextWriter writer, bool noNames)
         {
-            if (noNames || _names == null)
+            if (noNames || this.names == null)
             {
                 if (value is >= 0 and < 100)
                 {
@@ -143,7 +143,7 @@ namespace NCrontab
             else
             {
                 var index = value - MinValue;
-                writer.Write(_names[index]);
+                writer.Write(this.names[index]);
             }
         }
 
@@ -253,18 +253,18 @@ namespace NCrontab
             if (str[0] is >= '0' and <= '9')
                 return int.Parse(str, CultureInfo.InvariantCulture);
 
-            if (_names == null)
+            if (this.names == null)
             {
                 throw new CrontabException($"'{str}' is not a valid [{Kind}] crontab field value. It must be a numeric value between {MinValue} and {MaxValue} (all inclusive).");
             }
 
-            for (var i = 0; i < _names.Length; i++)
+            for (var i = 0; i < this.names.Length; i++)
             {
-                if (Comparer.IsPrefix(_names[i], str, CompareOptions.IgnoreCase))
+                if (Comparer.IsPrefix(this.names[i], str, CompareOptions.IgnoreCase))
                     return i + MinValue;
             }
 
-            var names = string.Join(", ", _names);
+            var names = string.Join(", ", this.names);
             throw new CrontabException($"'{str}' is not a known value name. Use one of the following: {names}.");
         }
     }
