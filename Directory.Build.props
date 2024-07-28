@@ -6,5 +6,7 @@
     <Nullable>enable</Nullable>
     <CodeAnalysisTreatWarningsAsErrors>true</CodeAnalysisTreatWarningsAsErrors>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <!-- Workaround for IDE0005 (Remove unnecessary usings/imports); see https://github.com/dotnet/roslyn/issues/41640 -->
+    <NoWarn>EnableGenerateDocumentationFile</NoWarn>
   </PropertyGroup>
 </Project>

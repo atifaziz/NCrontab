@@ -101,7 +101,7 @@ namespace NCrontab
         public static CrontabSchedule? TryParse(string expression) => TryParse(expression, null);
 
         public static CrontabSchedule? TryParse(string expression, ParseOptions? options) =>
-            TryParse(expression ?? string.Empty, options, v => v, _ => (CrontabSchedule?)null);
+            TryParse(expression ?? string.Empty, options, v => (CrontabSchedule?)v, _ => null);
 
         public static T TryParse<T>(string expression,
                                     Func<CrontabSchedule, T> valueSelector,
@@ -374,8 +374,12 @@ namespace NCrontab
             // Day of week
             //
 
+#pragma warning disable IDE0046 // Use conditional expression for return (readability)
             if (_daysOfWeek.Contains((int)nextTime.DayOfWeek))
+#pragma warning restore IDE0046 // Use conditional expression for return
+            {
                 return nextTime;
+            }
 
             return TryGetNextOccurrence(new DateTime(year, month, day, 23, 59, 59, 0, baseTime.Kind), endTime);
         }

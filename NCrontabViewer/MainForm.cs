@@ -105,8 +105,8 @@ namespace NCrontabViewer
 
                     do
                     {
-                        traceBuilder.Append(traceException.Message);
-                        traceBuilder.Append("\r\n");
+                        _ = traceBuilder.Append(traceException.Message)
+                                        .Append("\r\n");
                         lastException = traceException;
                         traceException = traceException.GetBaseException();
                     }
@@ -144,29 +144,29 @@ namespace NCrontabViewer
 
                 var timeString = string.Format(null, timeFormat, occurrence);
 
-                sb.Append(timeString);
-                sb.Append(" | ");
+                _ = sb.Append(timeString)
+                      .Append(" | ");
 
                 var index = Diff(lastTimeString, timeString, 0, dayWidth, sb);
-                sb.Append(' ');
+                _ = sb.Append(' ');
                 index = Diff(lastTimeString, timeString, index + 1, 2, sb);
-                sb.Append(", ");
+                _ = sb.Append(", ");
                 index = Diff(lastTimeString, timeString, index + 2, monthWidth, sb);
-                sb.Append(' ');
+                _ = sb.Append(' ');
                 index = Diff(lastTimeString, timeString, index + 1, 4, sb);
-                sb.Append(' ');
+                _ = sb.Append(' ');
                 index = Diff(lastTimeString, timeString, index + 1, 2, sb);
-                sb.Append(':');
+                _ = sb.Append(':');
                 index = Diff(lastTimeString, timeString, index + 1, 2, sb);
                 if (_isSixPart)
                 {
-                    sb.Append(':');
-                    Diff(lastTimeString, timeString, index + 1, 2, sb);
+                    _ = sb.Append(':');
+                    _ = Diff(lastTimeString, timeString, index + 1, 2, sb);
                 }
 
                 lastTimeString = timeString;
 
-                sb.Append("\r\n");
+                _ = sb.Append("\r\n");
             }
 
             _moreButton.Enabled = count == maxCount;
@@ -180,10 +180,12 @@ namespace NCrontabViewer
 
         static int Diff(string oldString, string newString, int index, int length, StringBuilder builder)
         {
+#pragma warning disable IDE0045 // Convert to conditional expression (has side-effects)
             if (string.CompareOrdinal(oldString, index, newString, index, length) == 0)
-                builder.Append('-', length);
+                _ = builder.Append('-', length);
             else
-                builder.Append(newString, index, length);
+                _ = builder.Append(newString, index, length);
+#pragma warning restore IDE0045 // Convert to conditional expression
 
             return index + length;
         }

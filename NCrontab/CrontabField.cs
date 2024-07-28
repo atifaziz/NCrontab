@@ -50,7 +50,7 @@ namespace NCrontab
             TryParse(kind, expression, v => v, e => throw e());
 
         public static CrontabField? TryParse(CrontabFieldKind kind, string expression) =>
-            TryParse(kind, expression, v => v, _ => (CrontabField?)null);
+            TryParse(kind, expression, v => (CrontabField?)v, _ => null);
 
         public static T TryParse<T>(CrontabFieldKind kind, string expression,
                                     Func<CrontabField, T> valueSelector,
@@ -245,7 +245,7 @@ namespace NCrontab
             if (_minValueSet > start)
                 _minValueSet = start;
 
-            i += (minValue - interval);
+            i += minValue - interval;
 
             if (_maxValueSet < i)
                 _maxValueSet = i;
