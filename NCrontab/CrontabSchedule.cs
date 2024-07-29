@@ -386,22 +386,6 @@ namespace NCrontab
             return TryGetNextOccurrence(new DateTime(year, month, day, 23, 59, 59, 0, baseTime.Kind), endTime);
         }
 
-        internal static IEnumerable<TResult>
-            GetOccurrences<TSource, TResult>(IEnumerable<TSource> sources,
-                                             Func<TSource, IEnumerable<DateTime>> occurrencesSelector,
-                                             Func<TSource, DateTime, TResult> resultSelector)
-        {
-            if (sources == null) throw new ArgumentNullException(nameof(sources));
-            if (resultSelector == null) throw new ArgumentNullException(nameof(resultSelector));
-
-            return from e in sources.Aggregate(Enumerable.Empty<KeyValuePair<TSource, DateTime>>(),
-                                               (a, s) => a.Merge(from e in occurrencesSelector(s)
-                                                                 select Pair(s, e)))
-                   select resultSelector(e.Key, e.Value);
-
-            static KeyValuePair<TKey, TValue> Pair<TKey, TValue>(TKey key, TValue value) => new(key, value);
-        }
-
         /// <summary>
         /// Returns a string in crontab expression (expanded) that represents
         /// this schedule.

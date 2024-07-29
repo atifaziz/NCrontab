@@ -62,8 +62,9 @@ namespace NCrontab
             if (schedules == null) throw new ArgumentNullException(nameof(schedules));
             if (resultSelector == null) throw new ArgumentNullException(nameof(resultSelector));
 
-            return CrontabSchedule.GetOccurrences(schedules, s => s.GetNextOccurrences(baseTime, endTime),
-                                                  resultSelector);
+            return Schedule.GetOccurrences(schedules,
+                                           s => s.GetNextOccurrences(baseTime, endTime),
+                                           resultSelector);
         }
 
         enum Sides { None, First, Second, Both }
