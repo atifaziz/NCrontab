@@ -22,7 +22,6 @@ namespace NCrontab
 {
     using System;
     using System.Collections.Generic;
-    using System.Linq;
 
     public static class CrontabScheduleExtensions
     {
@@ -40,22 +39,7 @@ namespace NCrontab
         {
             if (schedules == null) throw new ArgumentNullException(nameof(schedules));
 
-            return Iterator(schedules, baseTime, endTime);
-
-            static IEnumerable<DateTime> Iterator(IEnumerable<CrontabSchedule> schedules,
-                                                  DateTime baseTime, DateTime endTime)
-            {
-                var running = DateTime.MinValue;
-
-                foreach (var current in GetNextOccurrences(schedules, baseTime, endTime, static (_, dt) => dt))
-                {
-                    if (current == running)
-                        continue;
-
-                    running = current;
-                    yield return current;
-                }
-            }
+            return GetNextOccurrences(schedules, baseTime, endTime, static (_, dt) => dt).DistinctUntilChanged();
         }
 
         /// <summary>
@@ -78,17 +62,13 @@ namespace NCrontab
             if (schedules == null) throw new ArgumentNullException(nameof(schedules));
             if (resultSelector == null) throw new ArgumentNullException(nameof(resultSelector));
 
-            return from e in schedules.Aggregate(Enumerable.Empty<KeyValuePair<CrontabSchedule, DateTime>>(),
-                                                 (a, s) => a.Merge(from e in s.GetNextOccurrences(baseTime, endTime)
-                                                                   select Pair(s, e)))
-                   select resultSelector(e.Key, e.Value);
+            return CrontabSchedule.GetOccurrences(schedules, s => s.GetNextOccurrences(baseTime, endTime),
+                                                  resultSelector);
         }
-
-        static KeyValuePair<TKey, TValue> Pair<TKey, TValue>(TKey key, TValue value) => new(key, value);
 
         enum Sides { None, First, Second, Both }
 
-        static IEnumerable<KeyValuePair<T, DateTime>>
+        internal static IEnumerable<KeyValuePair<T, DateTime>>
             Merge<T>(this IEnumerable<KeyValuePair<T, DateTime>> schedule1,
                      IEnumerable<KeyValuePair<T, DateTime>> schedule2)
         {
