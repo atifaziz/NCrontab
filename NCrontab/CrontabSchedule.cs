@@ -109,7 +109,9 @@ namespace NCrontab
                                     Func<ExceptionProvider, T> errorSelector) =>
             TryParse(expression ?? string.Empty, null, valueSelector, errorSelector);
 
-        public static T TryParse<T>(string expression, ParseOptions? options, Func<CrontabSchedule, T> valueSelector, Func<ExceptionProvider, T> errorSelector)
+        public static T TryParse<T>(string expression, ParseOptions? options,
+                                    Func<CrontabSchedule, T> valueSelector,
+                                    Func<ExceptionProvider, T> errorSelector)
         {
             if (expression == null) throw new ArgumentNullException(nameof(expression));
             if (valueSelector == null) throw new ArgumentNullException(nameof(valueSelector));
@@ -148,11 +150,10 @@ namespace NCrontab
             return valueSelector(new CrontabSchedule(fields[0], fields[1], fields[2], fields[3], fields[4], fields[5]));
         }
 
-        CrontabSchedule(
-            CrontabField? seconds,
-            CrontabField minutes, CrontabField hours,
-            CrontabField days, CrontabField months,
-            CrontabField daysOfWeek)
+        CrontabSchedule(CrontabField? seconds,
+                        CrontabField minutes, CrontabField hours,
+                        CrontabField days, CrontabField months,
+                        CrontabField daysOfWeek)
         {
             this.seconds = seconds;
             this.minutes = minutes;
