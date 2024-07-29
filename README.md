@@ -280,6 +280,61 @@ every 6 hours on weekdays while the second occurs every 12 hours on weekends.
 If one or more schedules produce the same occurrence then only one of them
 if returned.
 
+## Merging Schedules
+
+NCrontab can merge the timeline of one or more schedules. This can sometimes
+come handy when it's impossible to express a schedule with a single crontab
+expression like _every 6 hours from 9 AM to 5 PM, on weekdays, but at noon on
+weekends_. By breaking it up into two schedules:
+
+- `0 12 * * Sat-Sun`: at noon on weekends
+- `0 9-17/6 * * Mon-Fri`: every 6 hours from 9 AM to 5 PM on weekdays
+
+you can merge them to produce a single timeline:
+
+```csharp
+using System;
+using NCrontab;
+
+var start = new DateTime(2000, 1, 1);
+var end = start.AddYears(1);
+var schedules = new[]
+{
+    CrontabSchedule.Parse("0 12 * * Sat-Sun"),
+    CrontabSchedule.Parse("0 9-17/6 * * Mon-Fri")
+};
+var occurrences = schedules.GetNextOccurrences(start, end);
+Console.WriteLine(string.Join(Environment.NewLine,
+                              from t in occurrences
+                              select $"{t:ddd, dd MMM yyyy HH:mm}"));
+```
+
+The output from a run will:
+
+    Sat, 01 Jan 2000 12:00
+    Sun, 02 Jan 2000 12:00
+    Mon, 03 Jan 2000 09:00
+    Mon, 03 Jan 2000 12:00
+    Mon, 03 Jan 2000 15:00
+    Tue, 04 Jan 2000 09:00
+    Tue, 04 Jan 2000 12:00
+    Tue, 04 Jan 2000 15:00
+    Wed, 05 Jan 2000 09:00
+    Wed, 05 Jan 2000 12:00
+    Wed, 05 Jan 2000 15:00
+    Thu, 06 Jan 2000 09:00
+    Thu, 06 Jan 2000 12:00
+    Thu, 06 Jan 2000 15:00
+    Fri, 07 Jan 2000 09:00
+    Fri, 07 Jan 2000 12:00
+    Fri, 07 Jan 2000 15:00
+    Sat, 08 Jan 2000 12:00
+    Sun, 09 Jan 2000 12:00
+    ...
+
+If two or more schedules produce the same occurrence then only one of them
+is returned.
+
 ---
 
 This product includes software developed by the [OpenSymphony Group].
