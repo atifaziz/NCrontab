@@ -18,46 +18,45 @@
 //
 #endregion
 
-namespace NCrontab
+using System;
+using System.Collections.Generic;
+
+namespace NCrontab;
+
+static class Extensions
 {
-    using System;
-    using System.Collections.Generic;
+    /// <summary>
+    /// Iterates over the given sequence and yields the first occurrence
+    /// of each consecutively repeating element, e.g.
+    /// <c>[1, 2, 2, 3, 3, 3, 2, 4]</c> &#x2192; <c>[1, 2, 3, 2, 4]</c>.
+    /// </summary>
 
-    static class Extensions
+    public static IEnumerable<T> DistinctUntilChanged<T>(this IEnumerable<T> source,
+                                                         IEqualityComparer<T>? comparer = null)
     {
-        /// <summary>
-        /// Iterates over the given sequence and yields the first occurrence
-        /// of each consecutively repeating element, e.g.
-        /// <c>[1, 2, 2, 3, 3, 3, 2, 4]</c> &#x2192; <c>[1, 2, 3, 2, 4]</c>.
-        /// </summary>
+        if (source == null) throw new ArgumentNullException(nameof(source));
 
-        public static IEnumerable<T> DistinctUntilChanged<T>(this IEnumerable<T> source,
-                                                             IEqualityComparer<T>? comparer = null)
+        return Iterator(source, comparer ?? EqualityComparer<T>.Default);
+
+        static IEnumerable<T> Iterator(IEnumerable<T> source, IEqualityComparer<T> comparer)
         {
-            if (source == null) throw new ArgumentNullException(nameof(source));
+            using var enumerator = source.GetEnumerator();
 
-            return Iterator(source, comparer ?? EqualityComparer<T>.Default);
+            if (!enumerator.MoveNext())
+                yield break;
 
-            static IEnumerable<T> Iterator(IEnumerable<T> source, IEqualityComparer<T> comparer)
+            var running = enumerator.Current;
+            yield return running;
+
+            while (enumerator.MoveNext())
             {
-                using var enumerator = source.GetEnumerator();
+                var current = enumerator.Current;
 
-                if (!enumerator.MoveNext())
-                    yield break;
+                if (comparer.Equals(current, running))
+                    continue;
 
-                var running = enumerator.Current;
-                yield return running;
-
-                while (enumerator.MoveNext())
-                {
-                    var current = enumerator.Current;
-
-                    if (comparer.Equals(current, running))
-                        continue;
-
-                    running = current;
-                    yield return current;
-                }
+                running = current;
+                yield return current;
             }
         }
     }

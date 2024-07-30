@@ -17,25 +17,20 @@
 //
 #endregion
 
-namespace NCrontabViewer
+using System;
+using System.Windows.Forms;
+
+namespace NCrontabViewer;
+
+static class Program
 {
-    #region Imports
-
-    using System;
-    using System.Windows.Forms;
-
-    #endregion
-
-    static class Program
+    [STAThread]
+    static void Main()
     {
-        [STAThread]
-        static void Main()
-        {
-            _ = Application.SetHighDpiMode(HighDpiMode.SystemAware);
-            Application.EnableVisualStyles();
-            Application.SetCompatibleTextRenderingDefault(false);
-            using var form = new MainForm();
-            Application.Run(form);
-        }
+        _ = Application.SetHighDpiMode(HighDpiMode.SystemAware);
+        Application.EnableVisualStyles();
+        Application.SetCompatibleTextRenderingDefault(false);
+        using var form = new MainForm();
+        Application.Run(form);
     }
 }

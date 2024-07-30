@@ -18,33 +18,32 @@
 //
 #endregion
 
-namespace NCrontab
+using System.Collections.Generic;
+using System.Linq;
+using System;
+
+namespace NCrontab;
+
+static class Schedule
 {
-    using System.Collections.Generic;
-    using System.Linq;
-    using System;
+    /// <summary>
+    /// Generates a sequence of occurrences based on one or more schedules.
+    /// </summary>
 
-    static class Schedule
+    internal static IEnumerable<TResult>
+        GetOccurrences<T, TResult>(IEnumerable<T> source,
+                                   Func<T, IEnumerable<DateTime>> occurrencesSelector,
+                                   Func<T, DateTime, TResult> resultSelector)
     {
-        /// <summary>
-        /// Generates a sequence of occurrences based on one or more schedules.
-        /// </summary>
+        if (source == null) throw new ArgumentNullException(nameof(source));
+        if (occurrencesSelector == null) throw new ArgumentNullException(nameof(occurrencesSelector));
+        if (resultSelector == null) throw new ArgumentNullException(nameof(resultSelector));
 
-        internal static IEnumerable<TResult>
-            GetOccurrences<T, TResult>(IEnumerable<T> source,
-                                       Func<T, IEnumerable<DateTime>> occurrencesSelector,
-                                       Func<T, DateTime, TResult> resultSelector)
-        {
-            if (source == null) throw new ArgumentNullException(nameof(source));
-            if (occurrencesSelector == null) throw new ArgumentNullException(nameof(occurrencesSelector));
-            if (resultSelector == null) throw new ArgumentNullException(nameof(resultSelector));
+        return from e in source.Aggregate(Enumerable.Empty<KeyValuePair<T, DateTime>>(),
+                                           (a, s) => a.Merge(from e in occurrencesSelector(s)
+                                                             select Pair(s, e)))
+               select resultSelector(e.Key, e.Value);
 
-            return from e in source.Aggregate(Enumerable.Empty<KeyValuePair<T, DateTime>>(),
-                                               (a, s) => a.Merge(from e in occurrencesSelector(s)
-                                                                 select Pair(s, e)))
-                   select resultSelector(e.Key, e.Value);
-
-            static KeyValuePair<TKey, TValue> Pair<TKey, TValue>(TKey key, TValue value) => new(key, value);
-        }
+        static KeyValuePair<TKey, TValue> Pair<TKey, TValue>(TKey key, TValue value) => new(key, value);
     }
 }

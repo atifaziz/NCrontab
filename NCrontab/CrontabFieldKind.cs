@@ -18,15 +18,14 @@
 //
 #endregion
 
-namespace NCrontab
+namespace NCrontab;
+
+public enum CrontabFieldKind
 {
-    public enum CrontabFieldKind
-    {
-        Second    = 0, // Keep in order of appearance in expression
-        Minute    = 1,
-        Hour      = 2,
-        Day       = 3,
-        Month     = 4,
-        DayOfWeek = 5
-    }
+    Second    = 0, // Keep in order of appearance in expression
+    Minute    = 1,
+    Hour      = 2,
+    Day       = 3,
+    Month     = 4,
+    DayOfWeek = 5
 }
