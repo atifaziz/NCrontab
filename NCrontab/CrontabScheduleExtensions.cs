@@ -34,8 +34,9 @@ namespace NCrontab
         /// arguments are exclusive.
         /// </remarks>
 
-        public static IEnumerable<DateTime> GetNextOccurrences(this IEnumerable<CrontabSchedule> schedules,
-                                                               DateTime baseTime, DateTime endTime)
+        public static IEnumerable<DateTime>
+            GetNextOccurrences(this IEnumerable<CrontabSchedule> schedules,
+                               DateTime baseTime, DateTime endTime)
         {
             if (schedules == null) throw new ArgumentNullException(nameof(schedules));
 
