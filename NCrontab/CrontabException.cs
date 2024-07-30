@@ -18,21 +18,20 @@
 //
 #endregion
 
-namespace NCrontab
+using System;
+
+namespace NCrontab;
+
+// ReSharper disable once PartialTypeWithSinglePart
+
+public partial class CrontabException : Exception
 {
-    using System;
+    public CrontabException() :
+        base("Crontab error.") { } // TODO: Fix message and add it to resource.
 
-    // ReSharper disable once PartialTypeWithSinglePart
+    public CrontabException(string? message) :
+        base(message) { }
 
-    public partial class CrontabException : Exception
-    {
-        public CrontabException() :
-            base("Crontab error.") {} // TODO: Fix message and add it to resource.
-
-        public CrontabException(string? message) :
-            base(message) {}
-
-        public CrontabException(string? message, Exception? innerException) :
-            base(message, innerException) {}
-    }
+    public CrontabException(string? message, Exception? innerException) :
+        base(message, innerException) { }
 }

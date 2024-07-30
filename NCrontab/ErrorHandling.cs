@@ -18,13 +18,12 @@
 //
 #endregion
 
-namespace NCrontab
-{
-    using System;
+using System;
 
-    /// <summary>
-    /// Represents the method that will generate an <see cref="Exception"/> object.
-    /// </summary>
+namespace NCrontab;
 
-    public delegate Exception ExceptionProvider();
-}
+/// <summary>
+/// Represents the method that will generate an <see cref="Exception"/> object.
+/// </summary>
+
+public delegate Exception ExceptionProvider();

@@ -20,33 +20,32 @@
 
 #if SERIALIZATION
 
-namespace NCrontab
+using System;
+using System.Runtime.Serialization;
+
+namespace NCrontab;
+
+[Serializable]
+partial class CrontabException
 {
-    using System;
-    using System.Runtime.Serialization;
+    protected CrontabException(SerializationInfo info, StreamingContext context) :
+        base(info, context) { }
+}
 
-    [Serializable]
-    partial class CrontabException
-    {
-        protected CrontabException(SerializationInfo info, StreamingContext context) :
-            base(info, context) {}
-    }
+[Serializable]
+partial class CrontabField { }
 
+[Serializable]
+partial class CrontabSchedule
+{
     [Serializable]
-    partial class CrontabField {}
+    partial class ParseOptions { }
+}
 
-    [Serializable]
-    partial class CrontabSchedule
-    {
-        [Serializable]
-        partial class ParseOptions {}
-    }
-
-    [Serializable]
-    partial class CrontabFieldImpl : IObjectReference
-    {
-        object IObjectReference.GetRealObject(StreamingContext context) => FromKind(Kind);
-    }
+[Serializable]
+partial class CrontabFieldImpl : IObjectReference
+{
+    object IObjectReference.GetRealObject(StreamingContext context) => FromKind(Kind);
 }
 
 #endif

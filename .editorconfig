@@ -112,7 +112,7 @@ csharp_prefer_braces = when_multiline
 csharp_style_expression_bodied_local_functions = true
 
 # IDE0065: Misplaced using directive
-csharp_using_directive_placement = inside_namespace
+csharp_using_directive_placement = outside_namespace
 
 # IDE0048: Add parentheses for clarity
 dotnet_diagnostic.IDE0048.severity = suggestion
@@ -124,4 +124,4 @@ dotnet_diagnostic.IDE0055.severity = suggestion
 dotnet_diagnostic.IDE0046.severity = suggestion
 
 # IDE0160: Convert to block scoped namespace
-csharp_style_namespace_declarations = block_scoped
+csharp_style_namespace_declarations = file_scoped

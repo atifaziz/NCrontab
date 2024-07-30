@@ -18,14 +18,13 @@
 //
 #endregion
 
-namespace NCrontab
+namespace NCrontab;
+
+public interface ICrontabField
 {
-    public interface ICrontabField
-    {
-        int GetFirst();
+    int GetFirst();
 #pragma warning disable CA1716 // Identifiers should not match keywords (by design)
-        int Next(int start);
+    int Next(int start);
 #pragma warning restore CA1716 // Identifiers should not match keywords
-        bool Contains(int value);
-    }
+    bool Contains(int value);
 }

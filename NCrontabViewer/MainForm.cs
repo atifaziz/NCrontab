@@ -17,180 +17,175 @@
 //
 #endregion
 
-namespace NCrontabViewer
+using System;
+using System.Globalization;
+using System.Linq;
+using System.Text;
+using System.Windows.Forms;
+using NCrontab;
+
+namespace NCrontabViewer;
+
+public partial class MainForm : Form
 {
-    #region Imports
+    static readonly char[] Separators = [' '];
 
-    using System;
-    using System.Globalization;
-    using System.Linq;
-    using System.Text;
-    using System.Windows.Forms;
-    using NCrontab;
+    DateTime lastChangeTime;
+    bool dirty;
+    CrontabSchedule? crontab;
+    bool isSixPart;
+    DateTime startTime;
+    int totalOccurrenceCount;
 
-    #endregion
-
-    public partial class MainForm : Form
+    public MainForm()
     {
-        static readonly char[] Separators = [' '];
+        InitializeComponent();
+    }
 
-        DateTime lastChangeTime;
-        bool dirty;
-        CrontabSchedule? crontab;
-        bool isSixPart;
-        DateTime startTime;
-        int totalOccurrenceCount;
+    // ReSharper disable once InconsistentNaming
+    void CronBox_Changed(object sender, EventArgs args)
+    {
+        this.lastChangeTime = DateTime.Now;
+        this.dirty = true;
+        this.isSixPart = false;
+        this.crontab = null;
+    }
 
-        public MainForm()
+    // ReSharper disable once InconsistentNaming
+    void Timer_Tick(object sender, EventArgs args)
+    {
+        var changeLapse = DateTime.Now - this.lastChangeTime;
+
+        if (!this.dirty || changeLapse <= TimeSpan.FromMilliseconds(500))
+            return;
+
+        this.dirty = false;
+        DoCrontabbing();
+    }
+
+    void DoCrontabbing()
+    {
+        this.resultBox.Clear();
+        this.errorProvider.SetError(this.cronBox, null);
+        this.statusBarPanel.Text = "Ready";
+        this.moreButton.Enabled = false;
+
+        const string defaultCustomFormat = "dd/MM/yyyy HH:mm";
+
+        if (this.crontab == null)
         {
-            InitializeComponent();
-        }
-
-        // ReSharper disable once InconsistentNaming
-        void CronBox_Changed(object sender, EventArgs args)
-        {
-            this.lastChangeTime = DateTime.Now;
-            this.dirty = true;
-            this.isSixPart = false;
-            this.crontab = null;
-        }
-
-        // ReSharper disable once InconsistentNaming
-        void Timer_Tick(object sender, EventArgs args)
-        {
-            var changeLapse = DateTime.Now - this.lastChangeTime;
-
-            if (!this.dirty || changeLapse <= TimeSpan.FromMilliseconds(500))
-                return;
-
-            this.dirty = false;
-            DoCrontabbing();
-        }
-
-        void DoCrontabbing()
-        {
-            this.resultBox.Clear();
-            this.errorProvider.SetError(this.cronBox, null);
-            this.statusBarPanel.Text = "Ready";
-            this.moreButton.Enabled = false;
-
-            const string defaultCustomFormat = "dd/MM/yyyy HH:mm";
-
-            if (this.crontab == null)
+            try
             {
-                try
-                {
-                    var expression = this.cronBox.Text.Trim();
+                var expression = this.cronBox.Text.Trim();
 
-                    if (expression.Length == 0)
-                        return;
-
-                    this.isSixPart = expression.Split(Separators, StringSplitOptions.RemoveEmptyEntries).Length == 6;
-                    this.crontab = CrontabSchedule.Parse(expression, new CrontabSchedule.ParseOptions { IncludingSeconds = this.isSixPart });
-
-                    this.totalOccurrenceCount = 0;
-
-                    this.startTime = DateTime.ParseExact(this.startTimePicker.Text,
-                                                         this.startTimePicker.CustomFormat ?? defaultCustomFormat, CultureInfo.InvariantCulture,
-                                                         DateTimeStyles.AssumeLocal) - (this.isSixPart ? TimeSpan.FromSeconds(1): TimeSpan.FromMinutes(1));
-                }
-                catch (CrontabException e)
-                {
-                    this.errorProvider.SetError(this.cronBox, e.Message);
-
-                    var traceBuilder = new StringBuilder();
-
-                    Exception traceException = e;
-                    Exception lastException;
-
-                    do
-                    {
-                        _ = traceBuilder.Append(traceException.Message)
-                                        .Append("\r\n");
-                        lastException = traceException;
-                        traceException = traceException.GetBaseException();
-                    }
-                    while (lastException != traceException);
-
-                    this.resultBox.Text = traceBuilder.ToString();
+                if (expression.Length == 0)
                     return;
-                }
 
+                this.isSixPart = expression.Split(Separators, StringSplitOptions.RemoveEmptyEntries).Length == 6;
+                this.crontab = CrontabSchedule.Parse(expression, new CrontabSchedule.ParseOptions { IncludingSeconds = this.isSixPart });
+
+                this.totalOccurrenceCount = 0;
+
+                this.startTime = DateTime.ParseExact(this.startTimePicker.Text,
+                                                     this.startTimePicker.CustomFormat ?? defaultCustomFormat, CultureInfo.InvariantCulture,
+                                                     DateTimeStyles.AssumeLocal) - (this.isSixPart ? TimeSpan.FromSeconds(1): TimeSpan.FromMinutes(1));
             }
-
-            var endTime = DateTime.ParseExact(this.endTimePicker.Text,
-                this.endTimePicker.CustomFormat ?? defaultCustomFormat, CultureInfo.InvariantCulture,
-                DateTimeStyles.AssumeLocal);
-
-            var sb = new StringBuilder();
-
-            var count = 0;
-            const int maxCount = 500;
-            var info = DateTimeFormatInfo.CurrentInfo;
-            var dayWidth = info.AbbreviatedDayNames.Max(s => s.Length);
-            var monthWidth = info.AbbreviatedMonthNames.Max(s => s.Length);
-            var timeComponent = this.isSixPart ? "HH:mm:ss" : "HH:mm";
-            var timeFormat = $"{{0,-{dayWidth}:ddd}} {{0:dd}}, {{0,-{monthWidth}:MMM}} {{0:yyyy {timeComponent}}}";
-            var lastTimeString = new string('?', string.Format(null, timeFormat, DateTime.MinValue).Length);
-
-            foreach (var occurrence in this.crontab.GetNextOccurrences(this.startTime, endTime))
+            catch (CrontabException e)
             {
-                if (count + 1 > maxCount)
-                    break;
+                this.errorProvider.SetError(this.cronBox, e.Message);
 
-                this.startTime = occurrence;
-                this.totalOccurrenceCount++;
-                count++;
+                var traceBuilder = new StringBuilder();
 
-                var timeString = string.Format(null, timeFormat, occurrence);
+                Exception traceException = e;
+                Exception lastException;
 
-                _ = sb.Append(timeString)
-                      .Append(" | ");
-
-                var index = Diff(lastTimeString, timeString, 0, dayWidth, sb);
-                _ = sb.Append(' ');
-                index = Diff(lastTimeString, timeString, index + 1, 2, sb);
-                _ = sb.Append(", ");
-                index = Diff(lastTimeString, timeString, index + 2, monthWidth, sb);
-                _ = sb.Append(' ');
-                index = Diff(lastTimeString, timeString, index + 1, 4, sb);
-                _ = sb.Append(' ');
-                index = Diff(lastTimeString, timeString, index + 1, 2, sb);
-                _ = sb.Append(':');
-                index = Diff(lastTimeString, timeString, index + 1, 2, sb);
-                if (this.isSixPart)
+                do
                 {
-                    _ = sb.Append(':');
-                    _ = Diff(lastTimeString, timeString, index + 1, 2, sb);
+                    _ = traceBuilder.Append(traceException.Message)
+                                    .Append("\r\n");
+                    lastException = traceException;
+                    traceException = traceException.GetBaseException();
                 }
+                while (lastException != traceException);
 
-                lastTimeString = timeString;
-
-                _ = sb.Append("\r\n");
+                this.resultBox.Text = traceBuilder.ToString();
+                return;
             }
 
-            this.moreButton.Enabled = count == maxCount;
-
-            this.statusBarPanel.Text = $"Last count = {count:N0}, Total = {this.totalOccurrenceCount:N0}";
-
-            this.resultBox.Text = sb.ToString();
-            this.resultBox.Select(0, 0);
-            this.resultBox.ScrollToCaret();
         }
 
-        static int Diff(string oldString, string newString, int index, int length, StringBuilder builder)
+        var endTime = DateTime.ParseExact(this.endTimePicker.Text,
+            this.endTimePicker.CustomFormat ?? defaultCustomFormat, CultureInfo.InvariantCulture,
+            DateTimeStyles.AssumeLocal);
+
+        var sb = new StringBuilder();
+
+        var count = 0;
+        const int maxCount = 500;
+        var info = DateTimeFormatInfo.CurrentInfo;
+        var dayWidth = info.AbbreviatedDayNames.Max(s => s.Length);
+        var monthWidth = info.AbbreviatedMonthNames.Max(s => s.Length);
+        var timeComponent = this.isSixPart ? "HH:mm:ss" : "HH:mm";
+        var timeFormat = $"{{0,-{dayWidth}:ddd}} {{0:dd}}, {{0,-{monthWidth}:MMM}} {{0:yyyy {timeComponent}}}";
+        var lastTimeString = new string('?', string.Format(null, timeFormat, DateTime.MinValue).Length);
+
+        foreach (var occurrence in this.crontab.GetNextOccurrences(this.startTime, endTime))
         {
+            if (count + 1 > maxCount)
+                break;
+
+            this.startTime = occurrence;
+            this.totalOccurrenceCount++;
+            count++;
+
+            var timeString = string.Format(null, timeFormat, occurrence);
+
+            _ = sb.Append(timeString)
+                  .Append(" | ");
+
+            var index = Diff(lastTimeString, timeString, 0, dayWidth, sb);
+            _ = sb.Append(' ');
+            index = Diff(lastTimeString, timeString, index + 1, 2, sb);
+            _ = sb.Append(", ");
+            index = Diff(lastTimeString, timeString, index + 2, monthWidth, sb);
+            _ = sb.Append(' ');
+            index = Diff(lastTimeString, timeString, index + 1, 4, sb);
+            _ = sb.Append(' ');
+            index = Diff(lastTimeString, timeString, index + 1, 2, sb);
+            _ = sb.Append(':');
+            index = Diff(lastTimeString, timeString, index + 1, 2, sb);
+            if (this.isSixPart)
+            {
+                _ = sb.Append(':');
+                _ = Diff(lastTimeString, timeString, index + 1, 2, sb);
+            }
+
+            lastTimeString = timeString;
+
+            _ = sb.Append("\r\n");
+        }
+
+        this.moreButton.Enabled = count == maxCount;
+
+        this.statusBarPanel.Text = $"Last count = {count:N0}, Total = {this.totalOccurrenceCount:N0}";
+
+        this.resultBox.Text = sb.ToString();
+        this.resultBox.Select(0, 0);
+        this.resultBox.ScrollToCaret();
+    }
+
+    static int Diff(string oldString, string newString, int index, int length, StringBuilder builder)
+    {
 #pragma warning disable IDE0045 // Convert to conditional expression (has side-effects)
-            if (string.CompareOrdinal(oldString, index, newString, index, length) == 0)
-                _ = builder.Append('-', length);
-            else
-                _ = builder.Append(newString, index, length);
+        if (string.CompareOrdinal(oldString, index, newString, index, length) == 0)
+            _ = builder.Append('-', length);
+        else
+            _ = builder.Append(newString, index, length);
 #pragma warning restore IDE0045 // Convert to conditional expression
 
-            return index + length;
-        }
-
-        // ReSharper disable once InconsistentNaming
-        void More_Click(object sender, EventArgs e) => DoCrontabbing();
+        return index + length;
     }
+
+    // ReSharper disable once InconsistentNaming
+    void More_Click(object sender, EventArgs e) => DoCrontabbing();
 }
