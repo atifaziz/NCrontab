@@ -10,7 +10,7 @@ branches:
     - wip
 skip_commits:
   files:
-    - '.gitignore'
+    - '.git*'
     - '*.md'
     - '*.txt'
 skip_tags: true
