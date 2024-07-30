@@ -32,7 +32,7 @@ namespace NCrontabViewer
 
     public partial class MainForm : Form
     {
-        static readonly char[] Separators = { ' ' };
+        static readonly char[] Separators = [' '];
 
         DateTime lastChangeTime;
         bool dirty;

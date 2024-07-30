@@ -32,12 +32,12 @@ namespace NCrontab.Tests
         const string TimeFormat = "dd/MM/yyyy HH:mm:ss";
 
         static readonly string[] TimeFormats =
-        {
+        [
             "yyyy-MM-dd",
             "yyyy-MM-dd HH:mm",
             "yyyy-MM-dd HH:mm:ss",
             "dd/MM/yyyy HH:mm:ss"
-        };
+        ];
 
         [Test]
         public void CannotParseNullString()

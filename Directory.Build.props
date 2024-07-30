@@ -1,6 +1,6 @@
 <Project>
   <PropertyGroup>
-    <LangVersion>11</LangVersion>
+    <LangVersion>12</LangVersion>
     <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
     <AnalysisLevel>8.0-all</AnalysisLevel>
     <Nullable>enable</Nullable>

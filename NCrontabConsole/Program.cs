@@ -83,10 +83,10 @@ static DateTime ParseDateArgument(string arg, string hint)
      : throw new ApplicationException("Invalid " + hint + " date or date format argument.");
 
 #pragma warning disable CA1064 // Exceptions should be public
-sealed class ApplicationException : Exception
+sealed class ApplicationException(string? message, Exception? innerException) :
+    Exception(message, innerException)
 #pragma warning restore CA1064 // Exceptions should be public
 {
     public ApplicationException() : this(null) { }
     public ApplicationException(string? message) : this(message, null) { }
-    public ApplicationException(string? message, Exception? innerException) : base(message, innerException) { }
 }
