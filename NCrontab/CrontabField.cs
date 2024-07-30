@@ -43,10 +43,10 @@ public sealed partial class CrontabField : ICrontabField
     /// </summary>
 
     public static CrontabField Parse(CrontabFieldKind kind, string expression) =>
-        TryParse(kind, expression, v => v, e => throw e());
+        TryParse(kind, expression, v => v, static e => throw e());
 
     public static CrontabField? TryParse(CrontabFieldKind kind, string expression) =>
-        TryParse(kind, expression, v => (CrontabField?)v, _ => null);
+        TryParse(kind, expression, static v => (CrontabField?)v, _ => null);
 
     public static T TryParse<T>(CrontabFieldKind kind, string expression,
                                 Func<CrontabField, T> valueSelector,
@@ -56,7 +56,7 @@ public sealed partial class CrontabField : ICrontabField
         if (errorSelector == null) throw new ArgumentNullException(nameof(errorSelector));
 
         var field = new CrontabField(CrontabFieldImpl.FromKind(kind));
-        var error = field.impl.TryParse(expression, field.Accumulate, null, e => e);
+        var error = field.impl.TryParse(expression, field.Accumulate, null, static e => e);
         return error == null ? valueSelector(field) : errorSelector(error);
     }
 
