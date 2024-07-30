@@ -10,3 +10,6 @@ dotnet_diagnostic.CA2201.severity = suggestion
 
 # CA1062: Validate arguments of public methods
 dotnet_diagnostic.CA1062.severity = none
+
+# CA1861: Avoid constant arrays as arguments
+dotnet_diagnostic.CA1861.severity = suggestion
