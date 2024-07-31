@@ -239,28 +239,29 @@ sealed partial class CrontabFieldImpl
         return every is { } someEvery
              ? acc(value, MaxValue, someEvery, success, errorSelector)
              : acc(value, value, 1, success, errorSelector);
+
+        int ParseValue(string str)
+        {
+            if (str.Length == 0)
+                throw new CrontabException("A crontab field value cannot be empty.");
+
+            if (str[0] is >= '0' and <= '9')
+                return int.Parse(str, CultureInfo.InvariantCulture);
+
+            if (this.names == null)
+            {
+                throw new CrontabException($"'{str}' is not a valid [{Kind}] crontab field value. It must be a numeric value between {MinValue} and {MaxValue} (all inclusive).");
+            }
+
+            for (var i = 0; i < this.names.Length; i++)
+            {
+                if (Comparer.IsPrefix(this.names[i], str, CompareOptions.IgnoreCase))
+                    return i + MinValue;
+            }
+
+            var names = string.Join(", ", this.names);
+            throw new CrontabException($"'{str}' is not a known value name. Use one of the following: {names}.");
+        }
     }
 
-    int ParseValue(string str)
-    {
-        if (str.Length == 0)
-            throw new CrontabException("A crontab field value cannot be empty.");
-
-        if (str[0] is >= '0' and <= '9')
-            return int.Parse(str, CultureInfo.InvariantCulture);
-
-        if (this.names == null)
-        {
-            throw new CrontabException($"'{str}' is not a valid [{Kind}] crontab field value. It must be a numeric value between {MinValue} and {MaxValue} (all inclusive).");
-        }
-
-        for (var i = 0; i < this.names.Length; i++)
-        {
-            if (Comparer.IsPrefix(this.names[i], str, CompareOptions.IgnoreCase))
-                return i + MinValue;
-        }
-
-        var names = string.Join(", ", this.names);
-        throw new CrontabException($"'{str}' is not a known value name. Use one of the following: {names}.");
-    }
 }
