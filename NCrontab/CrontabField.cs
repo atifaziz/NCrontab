@@ -117,8 +117,8 @@ public sealed partial class CrontabField : ICrontabField
     public int GetFirst() => this.minValueSet < int.MaxValue ? this.minValueSet : -1;
 
     /// <summary>
-    /// Gets the next value of the field that occurs after the given
-    /// start value or -1 if there is no next value available.
+    /// Gets the next value of the field that occurs after the given start value or -1 if there is
+    /// no next value available.
     /// </summary>
 
     public int Next(int start)
@@ -148,13 +148,12 @@ public sealed partial class CrontabField : ICrontabField
     public bool Contains(int value) => this.bits[ValueToIndex(value)];
 
     /// <summary>
-    /// Accumulates the given range (start to end) and interval of values
-    /// into the current set of the field.
+    /// Accumulates the given range (start to end) and interval of values into the current set of
+    /// the field.
     /// </summary>
     /// <remarks>
-    /// To set the entire range of values representable by the field,
-    /// set <param name="start" /> and <param name="end" /> to -1 and
-    /// <param name="interval" /> to 1.
+    /// To set the entire range of values representable by the field, set <param name="start" /> and
+    /// <param name="end" /> to -1 and <param name="interval" /> to 1.
     /// </remarks>
 
     T Accumulate<T>(int start, int end, int interval, T success, Func<ExceptionProvider, T> errorSelector)
@@ -225,17 +224,15 @@ public sealed partial class CrontabField : ICrontabField
         int i;
 
         //
-        // Populate the _bits table by setting all the bits corresponding to
-        // the valid field values.
+        // Populate the _bits table by setting all the bits corresponding to the valid field values.
         //
 
         for (i = start - minValue; i <= (end - minValue); i += interval)
             this.bits[i] = true;
 
         //
-        // Make sure we remember the minimum value set so far Keep track of
-        // the highest and lowest values that have been added to this field
-        // so far.
+        // Make sure we remember the minimum value set so far Keep track of the highest and lowest
+        // values that have been added to this field so far.
         //
 
         if (this.minValueSet > start)
