@@ -112,7 +112,6 @@ public static class CrontabScheduleExtensions
             {
                 case Sides.First: // Only first sequence has a value.
                 {
-                    // Either MoveNext value exists at 1.
                     yield return enumerator1.Current;
                     have1 = enumerator1.MoveNext();
                     break;
