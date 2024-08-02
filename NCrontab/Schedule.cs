@@ -101,16 +101,16 @@ static class Schedule
 
                     if (occurrence1.Value.CompareTo(occurrence2.Value) > 0)
                     {
-                        // Second has the earlier time, yield it and progress to
-                        // the next value in the second sequence.
+                        // Second has the earlier time, yield it and progress to the next value in
+                        // the second sequence.
 
                         yield return occurrence2;
                         have2 = enumerator2.MoveNext();
                     }
                     else
                     {
-                        // First has the earlier time, yield it and progress to
-                        // the next value in the first sequence.
+                        // First has the earlier time, yield it and progress to the next value in
+                        // the first sequence.
 
                         yield return occurrence1;
                         have1 = enumerator1.MoveNext();

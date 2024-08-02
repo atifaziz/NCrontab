@@ -26,12 +26,11 @@ namespace NCrontab;
 public static class CrontabScheduleExtensions
 {
     /// <summary>
-    /// Generates a sequence of unique next occurrences (in order) between two
-    /// dates based on one or more schedules.
+    /// Generates a sequence of unique next occurrences (in order) between two dates based on one or
+    /// more schedules.
     /// </summary>
     /// <remarks>
-    /// The <paramref name="baseTime"/> and <paramref name="endTime"/> arguments
-    /// are exclusive.
+    /// The <paramref name="baseTime"/> and <paramref name="endTime"/> arguments are exclusive.
     /// </remarks>
 
     public static IEnumerable<DateTime>
@@ -44,19 +43,18 @@ public static class CrontabScheduleExtensions
     }
 
     /// <summary>
-    /// Generates a sequence of next occurrences (in order) between two dates
-    /// and based on one or more schedules. An additional parameter specifies a
-    /// function that projects the items of the resulting sequence where each
-    /// invocation of the function is given the schedule that produced the
-    /// occurrence and the occurrence itself.
+    /// Generates a sequence of next occurrences (in order) between two dates and based on one or
+    /// more schedules. An additional parameter specifies a function that projects the items of the
+    /// resulting sequence where each invocation of the function is given the schedule that produced
+    /// the occurrence and the occurrence itself.
     /// </summary>
     /// <remarks>
     /// <para>
-    /// The <paramref name="baseTime"/> and <paramref name="endTime"/> arguments
-    /// are exclusive.</para>
+    /// The <paramref name="baseTime"/> and <paramref name="endTime"/> arguments are
+    /// exclusive.</para>
     /// <para>
-    /// The resulting sequence can contain duplicate occurrences if multiple
-    /// schedules produce the same occurrence.</para>
+    /// The resulting sequence can contain duplicate occurrences if multiple schedules produce the
+    /// same occurrence.</para>
     /// </remarks>
 
     public static IEnumerable<T>
