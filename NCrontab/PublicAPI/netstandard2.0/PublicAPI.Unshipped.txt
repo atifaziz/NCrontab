@@ -1,1 +1,5 @@
 #nullable enable
+const NCrontab.CronExpressions.Daily = "0 0 * * *" -> string!
+const NCrontab.CronExpressions.Hourly = "0 * * * *" -> string!
+const NCrontab.CronExpressions.Monthly = "0 0 1 * *" -> string!
+const NCrontab.CronExpressions.Weekly = "0 0 * * 0" -> string!
