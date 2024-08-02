@@ -8,7 +8,6 @@
     <Authors>Atif Aziz</Authors>
     <TargetFrameworks>netstandard2.0;netstandard1.0;net35</TargetFrameworks>
     <LangVersion>12</LangVersion>
-    <DebugType>portable</DebugType>
     <OutputType>Library</OutputType>
     <NoWarn>CS1591;CS1573</NoWarn>
     <GenerateDocumentationFile>True</GenerateDocumentationFile>
@@ -23,7 +22,6 @@
     <GenerateAssemblyCopyrightAttribute>false</GenerateAssemblyCopyrightAttribute>
     <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
     <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
-    <AllowedOutputExtensionsInPackageBuildOutputFolder>$(AllowedOutputExtensionsInPackageBuildOutputFolder);.pdb</AllowedOutputExtensionsInPackageBuildOutputFolder>
   </PropertyGroup>
 
   <ItemGroup>
