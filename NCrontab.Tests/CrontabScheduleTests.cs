@@ -425,6 +425,32 @@ public sealed class CrontabScheduleTests
         Assert.AreEqual(expected, occurrence);
     }
 
+    [Test]
+    public void GetNextOccurrencesWithNullSchedule()
+    {
+        // Overload 1
+
+        Assert.That(() => CrontabScheduleExtensions.GetNextOccurrences(null!, DateTime.MinValue, DateTime.MaxValue),
+                    Throws.ArgumentNullException
+                          .With.Property(nameof(ArgumentNullException.ParamName)).EqualTo("schedules"));
+
+        // Overload 2
+
+        Assert.That(() => CrontabScheduleExtensions.GetNextOccurrences<object>(null!, DateTime.MinValue, DateTime.MaxValue,
+                                                                               delegate { throw new NotImplementedException(); }),
+                    Throws.ArgumentNullException
+                          .With.Property(nameof(ArgumentNullException.ParamName)).EqualTo("schedules"));
+    }
+
+    [Test]
+    public void GetNextOccurrencesWithNullResultSelector()
+    {
+        Assert.That(() => _ = Enumerable.Empty<CrontabSchedule>()
+                                        .GetNextOccurrences<object>(DateTime.MinValue, DateTime.MaxValue, resultSelector: null!),
+                    Throws.ArgumentNullException
+                          .With.Property(nameof(ArgumentNullException.ParamName)).EqualTo("resultSelector"));
+    }
+
     [TestCase(new[] { "0 * * * *" }, null,
               new[] { "01/01/2003 01:00:00", "01/01/2003 02:00:00", "01/01/2003 03:00:00" })]
     [TestCase(new[] { "0 1 * * *", " 0 2 * * *", " 0 3 * * *" }, null,
