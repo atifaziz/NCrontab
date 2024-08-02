@@ -27,9 +27,7 @@ static class Program
     [STAThread]
     static void Main()
     {
-        _ = Application.SetHighDpiMode(HighDpiMode.SystemAware);
-        Application.EnableVisualStyles();
-        Application.SetCompatibleTextRenderingDefault(false);
+        ApplicationConfiguration.Initialize();
         using var form = new MainForm();
         Application.Run(form);
     }
