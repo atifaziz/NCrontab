@@ -30,7 +30,7 @@ static class Schedule
     /// Generates a sequence of occurrences based on one or more schedules.
     /// </summary>
 
-    internal static IEnumerable<TResult>
+    public static IEnumerable<TResult>
         GetOccurrences<T, TResult>(IEnumerable<T> source,
                                    Func<T, IEnumerable<DateTime>> occurrencesSelector,
                                    Func<T, DateTime, TResult> resultSelector)
