@@ -1,4 +1,4 @@
-﻿<Project>
+<Project>
 
   <PropertyGroup>
     <Description>NCrontab is crontab for all .NET runtimes supported by .NET Standard 1.0. It provides parsing and formatting of crontab expressions as well as calculation of occurrences of time based on a schedule expressed in the crontab format.</Description>
