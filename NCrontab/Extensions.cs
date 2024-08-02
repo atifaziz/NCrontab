@@ -26,9 +26,9 @@ namespace NCrontab;
 static class Extensions
 {
     /// <summary>
-    /// Iterates over the given sequence and yields the first occurrence
-    /// of each consecutively repeating element, e.g.
-    /// <c>[1, 2, 2, 3, 3, 3, 2, 4]</c> &#x2192; <c>[1, 2, 3, 2, 4]</c>.
+    /// Iterates over the given sequence and yields the first occurrence of each
+    /// consecutively repeating element, e.g. <c>[1, 2, 2, 3, 3, 3, 2, 4]</c>
+    /// &#x2192; <c>[1, 2, 3, 2, 4]</c>.
     /// </summary>
 
     public static IEnumerable<T> DistinctUntilChanged<T>(this IEnumerable<T> source,

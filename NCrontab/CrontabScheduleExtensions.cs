@@ -26,12 +26,12 @@ namespace NCrontab;
 public static class CrontabScheduleExtensions
 {
     /// <summary>
-    /// Generates a sequence of unique next occurrences (in order) between
-    /// two dates based on one or more schedules.
+    /// Generates a sequence of unique next occurrences (in order) between two
+    /// dates based on one or more schedules.
     /// </summary>
     /// <remarks>
-    /// The <paramref name="baseTime"/> and <paramref name="endTime"/>
-    /// arguments are exclusive.
+    /// The <paramref name="baseTime"/> and <paramref name="endTime"/> arguments
+    /// are exclusive.
     /// </remarks>
 
     public static IEnumerable<DateTime>
@@ -44,15 +44,19 @@ public static class CrontabScheduleExtensions
     }
 
     /// <summary>
-    /// Generates a sequence of next occurrences (in order) between
-    /// two dates and based on one or more schedules. An additional
-    /// parameter specifies a function that projects the items of the
-    /// resulting sequence where each invocation of the function is given
-    /// the schedule that caused the occurrence and the occurrence itself.
+    /// Generates a sequence of next occurrences (in order) between two dates
+    /// and based on one or more schedules. An additional parameter specifies a
+    /// function that projects the items of the resulting sequence where each
+    /// invocation of the function is given the schedule that produced the
+    /// occurrence and the occurrence itself.
     /// </summary>
     /// <remarks>
-    /// The <paramref name="baseTime"/> and <paramref name="endTime"/>
-    /// arguments are exclusive.
+    /// <para>
+    /// The <paramref name="baseTime"/> and <paramref name="endTime"/> arguments
+    /// are exclusive.</para>
+    /// <para>
+    /// The resulting sequence can contain duplicate occurrences if multiple
+    /// schedules produce the same occurrence.</para>
     /// </remarks>
 
     public static IEnumerable<T>
@@ -70,6 +74,13 @@ public static class CrontabScheduleExtensions
 
     enum Sides { None, First, Second, Both }
 
+    /// <remarks>
+    /// The schedules, <paramref name="schedule1"/> and <paramref
+    /// name="schedule2"/>, are expected to produce a timeline of unique
+    /// occurrences in order of earliest to latest time. The behaviour is
+    /// otherwise undefined.
+    /// </remarks>
+
     internal static IEnumerable<KeyValuePair<T, DateTime>>
         Merge<T>(this IEnumerable<KeyValuePair<T, DateTime>> schedule1,
                  IEnumerable<KeyValuePair<T, DateTime>> schedule2)
@@ -84,7 +95,7 @@ public static class CrontabScheduleExtensions
         var have1 = enumerator1.MoveNext();
         var have2 = enumerator2.MoveNext();
 
-        // Enumerate and yield the items in order of smallest due time.
+        // Enumerate and yield the items in order of earliest to latest time.
 
         for (;;)
         {
@@ -114,14 +125,14 @@ public static class CrontabScheduleExtensions
                 }
                 case Sides.Both: // Both sequences have a value.
                 {
-                    // Determine which enumerator has the next smallest due time.
+                    // Determine which of the two has the next earliest time.
 
                     var occurrence1 = enumerator1.Current;
                     var occurrence2 = enumerator2.Current;
 
                     if (occurrence1.Value.CompareTo(occurrence2.Value) > 0)
                     {
-                        // Second has smaller due time, yield it and progress to
+                        // Second has the earlier time, yield it and progress to
                         // the next value in the second sequence.
 
                         yield return occurrence2;
@@ -129,7 +140,7 @@ public static class CrontabScheduleExtensions
                     }
                     else
                     {
-                        // First has smaller due time, yield it and progress to
+                        // First has the earlier time, yield it and progress to
                         // the next value in the first sequence.
 
                         yield return occurrence1;
@@ -140,7 +151,7 @@ public static class CrontabScheduleExtensions
                 }
                 case Sides.None:
                 {
-                    // No value left in either sequence so end enumerating.
+                    // No value left in either sequence, so end enumerating.
 
                     yield break;
                 }
