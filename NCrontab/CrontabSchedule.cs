@@ -63,15 +63,14 @@ public sealed partial class CrontabSchedule
     // | +----------- hour (0 - 23)
     // +------------- min (0 - 59)
     //
-    // Star (*) in the value field above means all legal values as in
-    // braces for that column. The value column can have a * or a list
-    // of elements separated by commas. An element is either a number in
-    // the ranges shown above or two numbers in the range separated by a
-    // hyphen (meaning an inclusive range).
+    // Star (*) in the value field above means all legal values as in braces for that column. The
+    // value column can have a * or a list of elements separated by commas. An element is either a
+    // number in the ranges shown above or two numbers in the range separated by a hyphen (meaning
+    // an inclusive range).
     //
     // Source: http://www.adminschoice.com/docs/crontab.htm
     //
-
+    //
     // Six-part expression format:
     //
     // * * * * * *
@@ -84,9 +83,8 @@ public sealed partial class CrontabSchedule
     // | +----------- min (0 - 59)
     // +------------- sec (0 - 59)
     //
-    // The six-part expression behaves similarly to the traditional
-    // crontab format except that it can denotate more precise schedules
-    // that use a seconds component.
+    // The six-part expression behaves similarly to the traditional crontab format except that it
+    // can denotate more precise schedules that use a seconds component.
     //
 
     public static CrontabSchedule Parse(string expression) => Parse(expression, null);
@@ -159,20 +157,17 @@ public sealed partial class CrontabSchedule
     }
 
     /// <summary>
-    /// Enumerates all the occurrences of this schedule starting with a
-    /// base time and up to an end time limit. This method uses deferred
-    /// execution such that the occurrences are only calculated as they
-    /// are enumerated.
+    /// Enumerates all the occurrences of this schedule starting with a base time and up to an end
+    /// time limit. This method uses deferred execution such that the occurrences are only
+    /// calculated as they are enumerated.
     /// </summary>
     /// <remarks>
-    /// This method does not return the value of <paramref name="baseTime"/>
-    /// itself if it falls on the schedule. For example, if <paramref name="baseTime" />
-    /// is midnight and the schedule was created from the expression <c>* * * * *</c>
-    /// (meaning every minute) then the next occurrence of the schedule
-    /// will be at one minute past midnight and not midnight itself.
-    /// The method returns the <em>next</em> occurrence <em>after</em>
-    /// <paramref name="baseTime"/>. Also, <param name="endTime" /> is
-    /// exclusive.
+    /// This method does not return the value of <paramref name="baseTime"/> itself if it falls on
+    /// the schedule. For example, if <paramref name="baseTime" /> is midnight and the schedule was
+    /// created from the expression <c>* * * * *</c> (meaning every minute) then the next occurrence
+    /// of the schedule will be at one minute past midnight and not midnight itself. The method
+    /// returns the <em>next</em> occurrence <em>after</em> <paramref name="baseTime"/>. Also,
+    /// <param name="endTime" /> is exclusive.
     /// </remarks>
 
     public IEnumerable<DateTime> GetNextOccurrences(DateTime baseTime, DateTime endTime)
@@ -193,18 +188,16 @@ public sealed partial class CrontabSchedule
         GetNextOccurrence(baseTime, DateTime.MaxValue);
 
     /// <summary>
-    /// Gets the next occurrence of this schedule starting with a base
-    /// time and up to an end time limit.
+    /// Gets the next occurrence of this schedule starting with a base time and up to an end time
+    /// limit.
     /// </summary>
     /// <remarks>
-    /// This method does not return the value of <paramref name="baseTime"/>
-    /// itself if it falls on the schedule. For example, if <paramref name="baseTime" />
-    /// is midnight and the schedule was created from the expression <c>* * * * *</c>
-    /// (meaning every minute) then the next occurrence of the schedule
-    /// will be at one minute past midnight and not midnight itself.
-    /// The method returns the <em>next</em> occurrence <em>after</em>
-    /// <paramref name="baseTime"/>. Also, <param name="endTime" /> is
-    /// exclusive.
+    /// This method does not return the value of <paramref name="baseTime"/> itself if it falls on
+    /// the schedule. For example, if <paramref name="baseTime" /> is midnight and the schedule was
+    /// created from the expression <c>* * * * *</c> (meaning every minute) then the next occurrence
+    /// of the schedule will be at one minute past midnight and not midnight itself. The method
+    /// returns the <em>next</em> occurrence <em>after</em> <paramref name="baseTime"/>. Also,
+    /// <param name="endTime" /> is exclusive.
     /// </remarks>
 
     public DateTime GetNextOccurrence(DateTime baseTime, DateTime endTime) =>
@@ -327,26 +320,23 @@ public sealed partial class CrontabSchedule
         }
 
         //
-        // Stop processing when year is too large for the datetime or calendar
-        // object. Otherwise we would get an exception.
+        // Stop processing when year is too large for the datetime or calendar object. Otherwise we
+        // would get an exception.
         //
 
         if (year > Calendar.MaxSupportedDateTime.Year)
             return null;
 
         //
-        // The day field in a cron expression spans the entire range of days
-        // in a month, which is from 1 to 31. However, the number of days in
-        // a month tend to be variable depending on the month (and the year
-        // in case of February). So a check is needed here to see if the
-        // date is a border case. If the day happens to be beyond 28
-        // (meaning that we're dealing with the suspicious range of 29-31)
-        // and the date part has changed then we need to determine whether
-        // the day still makes sense for the given year and month. If the
-        // day is beyond the last possible value, then the day/month part
-        // for the schedule is re-evaluated. So an expression like "0 0
-        // 15,31 * *" will yield the following sequence starting on midnight
-        // of Jan 1, 2000:
+        // The day field in a cron expression spans the entire range of days in a month, which is
+        // from 1 to 31. However, the number of days in a month tend to be variable depending on the
+        // month (and the year in case of February). So a check is needed here to see if the date is
+        // a border case. If the day happens to be beyond 28 (meaning that we're dealing with the
+        // suspicious range of 29-31) and the date part has changed then we need to determine
+        // whether the day still makes sense for the given year and month. If the day is beyond the
+        // last possible value, then the day/month part for the schedule is re-evaluated. So an
+        // expression like "0 0 15,31 * *" will yield the following sequence starting on midnight of
+        // Jan 1, 2000:
         //
         //  Jan 15, Jan 31, Feb 15, Mar 15, Apr 15, Apr 31, ...
         //
@@ -382,8 +372,7 @@ public sealed partial class CrontabSchedule
     }
 
     /// <summary>
-    /// Returns a string in crontab expression (expanded) that represents
-    /// this schedule.
+    /// Returns a string in crontab expression (expanded) that represents this schedule.
     /// </summary>
 
     public override string ToString()

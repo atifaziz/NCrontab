@@ -34,6 +34,17 @@ build_script:
 - ps: |-
     $id = ([datetimeoffset]$env:APPVEYOR_REPO_COMMIT_TIMESTAMP).ToUniversalTime().ToString('yyyyMMdd''t''HHmm')
     if ($isWindows) { .\pack.cmd ci-$id }
+after_build:
+- ps: |
+    if ($isWindows) {
+      dotnet tool restore
+      dir dist\*.nupkg | % {
+        dotnet meziantou.validate-nuget-package --excluded-rules IconMustBeSet $_
+        if ($LASTEXITCODE) {
+          throw "Package validation failed: $_"
+        }
+      }
+    }
 test_script:
 - cmd: |
     call test.cmd
@@ -55,7 +66,7 @@ for:
       secure: fhGwXyO35FSshRzs5GWmF1LJTrd1sIqmS/jNCSfO2LfOciuYAKiXuFMYZFGiTAl+
     symbol_server: https://www.myget.org/F/raboof/symbols/api/v2/package
     on:
-      branch: deploy
+      branch: master
 notifications:
 - provider: Email
   to:
