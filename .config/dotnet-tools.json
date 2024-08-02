@@ -6,7 +6,15 @@
       "version": "5.1.22",
       "commands": [
         "reportgenerator"
-      ]
+      ],
+      "rollForward": false
+    },
+    "meziantou.framework.nugetpackagevalidation.tool": {
+      "version": "1.0.16",
+      "commands": [
+        "meziantou.validate-nuget-package"
+      ],
+      "rollForward": false
     }
   }
 }
