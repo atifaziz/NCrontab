@@ -1,6 +1,6 @@
 @echo off
 pushd "%~dp0"
-call :main
+call :main %*
 popd
 goto :EOF
 

@@ -1,0 +1,54 @@
+<Project>
+
+  <PropertyGroup>
+    <Description>NCrontab is crontab for all .NET runtimes supported by .NET Standard 1.0. It provides parsing and formatting of crontab expressions as well as calculation of occurrences of time based on a schedule expressed in the crontab format.</Description>
+    <Copyright>Copyright © 2008 Atif Aziz. All rights reserved. Portions Copyright © 2001 The OpenSymphony Group. All rights reserved.</Copyright>
+    <NeutralLanguage>en-US</NeutralLanguage>
+    <VersionPrefix>3.4.0</VersionPrefix>
+    <Authors>Atif Aziz</Authors>
+    <TargetFrameworks>netstandard2.0;netstandard1.0;net35</TargetFrameworks>
+    <LangVersion>12</LangVersion>
+    <OutputType>Library</OutputType>
+    <NoWarn>CS1591;CS1573</NoWarn>
+    <GenerateDocumentationFile>True</GenerateDocumentationFile>
+    <PackageTags>cron;schedule;time</PackageTags>
+    <PackageProjectUrl>https://github.com/atifaziz/NCrontab</PackageProjectUrl>
+    <PublishRepositoryUrl>true</PublishRepositoryUrl>
+    <PackageLicenseFile>COPYING.txt</PackageLicenseFile>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageOutputPath>..\dist</PackageOutputPath>
+    <GenerateAssemblyDescriptionAttribute>false</GenerateAssemblyDescriptionAttribute>
+    <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
+    <GenerateAssemblyCopyrightAttribute>false</GenerateAssemblyCopyrightAttribute>
+    <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
+    <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="..\SolutionInfo.cs" />
+    <None Include="..\COPYING.txt" Pack="true" PackagePath="$(PackageLicenseFile)" />
+    <None Include="..\README.md" Pack="true" PackagePath="$(PackageReadmeFile)" />
+  </ItemGroup>
+
+  <ItemGroup Condition=" '$(TargetFramework)' == 'net35' ">
+    <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies.net35" Version="1.0.3" />
+  </ItemGroup>
+
+  <PropertyGroup Condition=" '$(TargetFramework)' == 'net35' ">
+    <DefineConstants>$(DefineConstants);SERIALIZATION</DefineConstants>
+  </PropertyGroup>
+
+  <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard1.0' ">
+    <PackageReference Include="System.Collections" Version="4.3.0" />
+    <PackageReference Include="System.Diagnostics.Debug" Version="4.3.0" />
+    <PackageReference Include="System.Globalization" Version="4.3.0" />
+    <PackageReference Include="System.IO" Version="4.3.0" />
+    <PackageReference Include="System.Resources.ResourceManager" Version="4.3.0" />
+    <PackageReference Include="System.Net.Primitives" Version="4.3.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="DotNet.ReproducibleBuilds" Version="1.2.4" PrivateAssets="all" />
+  </ItemGroup>
+
+</Project>

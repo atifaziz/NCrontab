@@ -1,4 +1,4 @@
-﻿@page "/"
+@page "/"
 @using System.Globalization
 @using System.Text
 @using NCrontab;
@@ -48,8 +48,8 @@
 {
     DateTime _startTime;
     DateTime _endTime;
-    string _expression;
-    Exception _parseError;
+    string _expression = null!;
+    Exception? _parseError;
     bool _hasMoreOccurrences;
     readonly List<string> _occurrences = new List<string>();
 
@@ -76,8 +76,6 @@
             Refresh();
         }
     }
-
-    static readonly char[] FieldSeparators = { ' ' };
 
     string Expression
     {
@@ -106,14 +104,14 @@
         _hasMoreOccurrences = false;
         _occurrences.Clear();
 
-        var fields = Expression.Split(FieldSeparators,  StringSplitOptions.RemoveEmptyEntries);
+        var fields = Expression.Split(' ', StringSplitOptions.RemoveEmptyEntries);
         var isSixPart = fields.Length == 6;
 
         var (schedule, parseError) =
             CrontabSchedule.TryParse(Expression,
                 new CrontabSchedule.ParseOptions { IncludingSeconds = isSixPart },
-                s  => (s, (Exception)null),
-                ep => ((CrontabSchedule)null, ep()));
+                s  => (s, (Exception?)null),
+                ep => ((CrontabSchedule?)null, ep()));
 
         _parseError = parseError;
 

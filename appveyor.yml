@@ -1,6 +1,6 @@
 version: '{build}'
 image:
-  - Visual Studio 2019
+  - Visual Studio 2022
   - Ubuntu
 branches:
   only:
@@ -10,6 +10,7 @@ branches:
     - wip
 skip_commits:
   files:
+    - '.git*'
     - '*.md'
     - '*.txt'
 skip_tags: true
@@ -21,12 +22,11 @@ environment:
 install:
   - cmd: curl -OsSL https://dot.net/v1/dotnet-install.ps1
   - ps: if ($isWindows) { ./dotnet-install.ps1 -JsonFile global.json }
+  - ps: if ($isWindows) { ./dotnet-install.ps1 -Runtime dotnet -Version 6.0.16 }
   - sh: curl -OsSL https://dot.net/v1/dotnet-install.sh
   - sh: chmod +x dotnet-install.sh
-  # https://github.com/dotnet/install-scripts/issues/71
-# - sh: ./dotnet-install.sh --jsonfile global.json
-  - sh: sudo apt-get install -y jq > /dev/null
-  - sh: ./dotnet-install.sh --version $(jq -r .sdk.version global.json)
+  - sh: ./dotnet-install.sh --jsonfile global.json
+  - sh: ./dotnet-install.sh --runtime dotnet --version 6.0.16
   - sh: export PATH="$HOME/.dotnet:$PATH"
 before_build:
 - dotnet --info
@@ -34,16 +34,31 @@ build_script:
 - ps: |-
     $id = ([datetimeoffset]$env:APPVEYOR_REPO_COMMIT_TIMESTAMP).ToUniversalTime().ToString('yyyyMMdd''t''HHmm')
     if ($isWindows) { .\pack.cmd ci-$id }
+after_build:
+- ps: |
+    if ($isWindows) {
+      dotnet tool restore
+      dir dist\*.nupkg | % {
+        dotnet meziantou.validate-nuget-package --excluded-rules IconMustBeSet $_
+        if ($LASTEXITCODE) {
+          throw "Package validation failed: $_"
+        }
+      }
+    }
 test_script:
-- cmd: test.cmd
+- cmd: |
+    call test.cmd
+    curl -OsSL https://uploader.codecov.io/latest/windows/codecov.exe
+    codecov
 - sh: ./test.sh
 for:
 -
   matrix:
     only:
-      - image: Visual Studio 2019
+      - image: Visual Studio 2022
   artifacts:
   - path: dist\*.nupkg
+  - path: etc\coverage
   deploy:
   - provider: NuGet
     server: https://www.myget.org/F/raboof/api/v2/package
@@ -51,7 +66,7 @@ for:
       secure: fhGwXyO35FSshRzs5GWmF1LJTrd1sIqmS/jNCSfO2LfOciuYAKiXuFMYZFGiTAl+
     symbol_server: https://www.myget.org/F/raboof/symbols/api/v2/package
     on:
-      branch: deploy
+      branch: master
 notifications:
 - provider: Email
   to:

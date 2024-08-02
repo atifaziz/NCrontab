@@ -17,83 +17,76 @@
 //
 #endregion
 
-namespace NCrontabConsole
+#pragma warning disable CA1852 // Seal internal types (incorrect)
+                               // Type 'Program' can be sealed because it has no subtypes in its
+                               // containing assembly and is not externally visible.
+                               // See: https://github.com/dotnet/roslyn-analyzers/issues/6141
+
+using System;
+using System.Collections.Generic;
+using System.Globalization;
+using NCrontab;
+
+var verbose = false;
+
+try
 {
-    #region Imports
+    var argList = new List<string>(args);
+    var verboseIndex = argList.IndexOf("--verbose") is var vi and >= 0 ? vi
+                     : argList.IndexOf("-v");
+    // ReSharper disable once AssignmentInConditionalExpression
+    if (verbose = verboseIndex >= 0)
+        argList.RemoveAt(verboseIndex);
 
-    using System;
-    using System.Collections.Generic;
-    using System.Globalization;
-    using NCrontab;
+    var (expression, startTimeString, endTimeString, format) =
+        argList switch
+        {
+            [var exa, var sta, var eta] => (exa, sta, eta, null),
+            [var exa, var sta, var eta, var fma, ..] => (exa, sta, eta, fma),
+            _ => throw new ApplicationException("Missing required arguments. You must at least supply CRONTAB-EXPRESSION START-DATE END-DATE."),
+        };
 
-    #endregion
-
-    static class Program
+    expression = expression.Trim();
+    var options = new CrontabSchedule.ParseOptions
     {
-        static int Main(string[] args)
-        {
-            var verbose = false;
+        IncludingSeconds = expression.Split(' ').Length > 5,
+    };
 
-            try
-            {
-                var argList = new List<string>(args);
-                var verboseIndex = argList.IndexOf("--verbose");
-                // ReSharper disable once AssignmentInConditionalExpression
-                if (verbose = verboseIndex >= 0)
-                    argList.RemoveAt(verboseIndex);
+    var start = ParseDateArgument(startTimeString, "start");
+    var end = ParseDateArgument(endTimeString, "end");
+    format ??= options.IncludingSeconds ? "ddd, dd MMM yyyy HH:mm:ss"
+                                        : "ddd, dd MMM yyyy HH:mm";
 
-                if (argList.Count < 3)
-                    throw new ApplicationException("Missing required arguments. You must at least supply CRONTAB-EXPRESSION START-DATE END-DATE.");
+    var schedule = CrontabSchedule.Parse(expression, options);
 
-                var expression = argList[0].Trim();
-                var options = new CrontabSchedule.ParseOptions
-                {
-                    IncludingSeconds = expression.Split(' ').Length > 5,
-                };
+    foreach (var occurrence in schedule.GetNextOccurrences(start, end))
+        Console.Out.WriteLine(occurrence.ToString(format, null));
 
-                var start = ParseDateArgument(argList[1], "start");
-                var end = ParseDateArgument(argList[2], "end");
-                var format =
-                    argList.Count > 3 ? argList[3]
-                    : options.IncludingSeconds ? "ddd, dd MMM yyyy HH:mm:ss"
-                    : "ddd, dd MMM yyyy HH:mm";
+    return 0;
+}
+#pragma warning disable CA1031 // Do not catch general exception types
+catch (Exception e)
+#pragma warning restore CA1031 // Do not catch general exception types
+{
+    var error =
+        verbose
+        ? e.ToString()
+        : e is ApplicationException
+        ? e.Message
+        : e.GetBaseException().Message;
+    Console.Error.WriteLine(error);
+    return 1;
+}
 
-                var schedule = CrontabSchedule.Parse(expression, options);
+static DateTime ParseDateArgument(string arg, string hint)
+    => DateTime.TryParse(arg, null, DateTimeStyles.AssumeLocal, out var v) ? v
+     : throw new ApplicationException("Invalid " + hint + " date or date format argument.");
 
-                foreach (var occurrence in schedule.GetNextOccurrences(start, end))
-                    Console.Out.WriteLine(occurrence.ToString(format));
-
-                return 0;
-            }
-            catch (Exception e)
-            {
-                var error =
-                    verbose
-                    ? e.ToString()
-                    : e is ApplicationException
-                    ? e.Message : e.GetBaseException().Message;
-                Console.Error.WriteLine(error);
-                return 1;
-            }
-        }
-
-        static DateTime ParseDateArgument(string arg, string hint)
-        {
-            try
-            {
-                return DateTime.Parse(arg, null, DateTimeStyles.AssumeLocal);
-            }
-            catch (FormatException e)
-            {
-                throw new ApplicationException("Invalid " + hint + " date or date format argument.", e);
-            }
-        }
-
-        sealed class ApplicationException : Exception
-        {
-            public ApplicationException() {}
-            public ApplicationException(string message) : base(message) {}
-            public ApplicationException(string message, Exception inner) : base(message, inner) {}
-        }
-    }
+#pragma warning disable CA1064 // Exceptions should be public
+sealed class ApplicationException(string? message, Exception? innerException) :
+    Exception(message, innerException)
+#pragma warning restore CA1064 // Exceptions should be public
+{
+    public ApplicationException() : this(null) { }
+    public ApplicationException(string? message) : this(message, null) { }
 }

@@ -1,0 +1,49 @@
+#nullable enable
+NCrontab.CrontabException
+NCrontab.CrontabException.CrontabException() -> void
+NCrontab.CrontabException.CrontabException(string? message) -> void
+NCrontab.CrontabException.CrontabException(string? message, System.Exception? innerException) -> void
+NCrontab.CrontabField
+NCrontab.CrontabField.Contains(int value) -> bool
+NCrontab.CrontabField.Format(System.IO.TextWriter! writer) -> void
+NCrontab.CrontabField.Format(System.IO.TextWriter! writer, bool noNames) -> void
+NCrontab.CrontabField.GetFirst() -> int
+NCrontab.CrontabField.Next(int start) -> int
+NCrontab.CrontabField.ToString(string? format) -> string!
+NCrontab.CrontabFieldKind
+NCrontab.CrontabFieldKind.Day = 3 -> NCrontab.CrontabFieldKind
+NCrontab.CrontabFieldKind.DayOfWeek = 5 -> NCrontab.CrontabFieldKind
+NCrontab.CrontabFieldKind.Hour = 2 -> NCrontab.CrontabFieldKind
+NCrontab.CrontabFieldKind.Minute = 1 -> NCrontab.CrontabFieldKind
+NCrontab.CrontabFieldKind.Month = 4 -> NCrontab.CrontabFieldKind
+NCrontab.CrontabFieldKind.Second = 0 -> NCrontab.CrontabFieldKind
+NCrontab.CrontabSchedule
+NCrontab.CrontabSchedule.GetNextOccurrence(System.DateTime baseTime) -> System.DateTime
+NCrontab.CrontabSchedule.GetNextOccurrence(System.DateTime baseTime, System.DateTime endTime) -> System.DateTime
+NCrontab.CrontabSchedule.GetNextOccurrences(System.DateTime baseTime, System.DateTime endTime) -> System.Collections.Generic.IEnumerable<System.DateTime>!
+NCrontab.CrontabSchedule.ParseOptions
+NCrontab.CrontabSchedule.ParseOptions.IncludingSeconds.get -> bool
+NCrontab.CrontabSchedule.ParseOptions.IncludingSeconds.set -> void
+NCrontab.CrontabSchedule.ParseOptions.ParseOptions() -> void
+NCrontab.ExceptionProvider
+NCrontab.ICrontabField
+NCrontab.ICrontabField.Contains(int value) -> bool
+NCrontab.ICrontabField.GetFirst() -> int
+NCrontab.ICrontabField.Next(int start) -> int
+override NCrontab.CrontabField.ToString() -> string!
+override NCrontab.CrontabSchedule.ToString() -> string!
+static NCrontab.CrontabField.Days(string! expression) -> NCrontab.CrontabField!
+static NCrontab.CrontabField.DaysOfWeek(string! expression) -> NCrontab.CrontabField!
+static NCrontab.CrontabField.Hours(string! expression) -> NCrontab.CrontabField!
+static NCrontab.CrontabField.Minutes(string! expression) -> NCrontab.CrontabField!
+static NCrontab.CrontabField.Months(string! expression) -> NCrontab.CrontabField!
+static NCrontab.CrontabField.Parse(NCrontab.CrontabFieldKind kind, string! expression) -> NCrontab.CrontabField!
+static NCrontab.CrontabField.Seconds(string! expression) -> NCrontab.CrontabField!
+static NCrontab.CrontabField.TryParse(NCrontab.CrontabFieldKind kind, string! expression) -> NCrontab.CrontabField?
+static NCrontab.CrontabField.TryParse<T>(NCrontab.CrontabFieldKind kind, string! expression, System.Func<NCrontab.CrontabField!, T>! valueSelector, System.Func<NCrontab.ExceptionProvider!, T>! errorSelector) -> T
+static NCrontab.CrontabSchedule.Parse(string! expression) -> NCrontab.CrontabSchedule!
+static NCrontab.CrontabSchedule.Parse(string! expression, NCrontab.CrontabSchedule.ParseOptions? options) -> NCrontab.CrontabSchedule!
+static NCrontab.CrontabSchedule.TryParse(string! expression) -> NCrontab.CrontabSchedule?
+static NCrontab.CrontabSchedule.TryParse(string! expression, NCrontab.CrontabSchedule.ParseOptions? options) -> NCrontab.CrontabSchedule?
+static NCrontab.CrontabSchedule.TryParse<T>(string! expression, NCrontab.CrontabSchedule.ParseOptions? options, System.Func<NCrontab.CrontabSchedule!, T>! valueSelector, System.Func<NCrontab.ExceptionProvider!, T>! errorSelector) -> T
+static NCrontab.CrontabSchedule.TryParse<T>(string! expression, System.Func<NCrontab.CrontabSchedule!, T>! valueSelector, System.Func<NCrontab.ExceptionProvider!, T>! errorSelector) -> T

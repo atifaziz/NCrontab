@@ -1,31 +1,13 @@
-﻿namespace NCrontabViewer
-{
-    using System;
-    using System.Net.Http;
-    using System.Threading.Tasks;
-    using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
-    using Microsoft.Extensions.DependencyInjection;
+using Microsoft.AspNetCore.Components.Web;
+using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
+using NCrontabViewer;
 
-    static class Program
-    {
-        static async Task<int> Main(string[] args)
-        {
-            try
-            {
-                var builder = WebAssemblyHostBuilder.CreateDefault(args);
-                builder.RootComponents.Add<App>("app");
-                builder.Services.AddTransient(sp => new HttpClient
-                {
-                    BaseAddress = new Uri(builder.HostEnvironment.BaseAddress)
-                });
-                await builder.Build().RunAsync();
-                return 0;
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e);
-                return 0xbad;
-            }
-        }
-    }
-}
+var builder = WebAssemblyHostBuilder.CreateDefault(args);
+builder.RootComponents.Add<App>("#app");
+builder.RootComponents.Add<HeadOutlet>("head::after");
+
+builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });
+
+#pragma warning disable CA2007 // Consider calling ConfigureAwait on the awaited task
+await builder.Build().RunAsync();
+#pragma warning restore CA2007 // Consider calling ConfigureAwait on the awaited task
