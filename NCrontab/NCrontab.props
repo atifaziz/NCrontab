@@ -10,6 +10,8 @@
     <LangVersion>12</LangVersion>
     <DebugType>portable</DebugType>
     <OutputType>Library</OutputType>
+    <NoWarn>CS1591;CS1573</NoWarn>
+    <GenerateDocumentationFile>True</GenerateDocumentationFile>
     <PackageTags>cron;schedule;time</PackageTags>
     <PackageProjectUrl>https://github.com/atifaziz/NCrontab</PackageProjectUrl>
     <PublishRepositoryUrl>true</PublishRepositoryUrl>
