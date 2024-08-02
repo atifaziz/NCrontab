@@ -36,6 +36,7 @@ build_script:
     if ($isWindows) { .\pack.cmd ci-$id }
 after_build:
 - ps: |
+    dotnet tool restore
     dir dist\*.nupkg | % {
       dotnet meziantou.validate-nuget-package --excluded-rules IconMustBeSet $_
       if ($LASTEXITCODE) {
