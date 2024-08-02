@@ -37,7 +37,7 @@ build_script:
 after_build:
 - ps: |
     dotnet tool restore
-    dir dist\*.nupkg | % {
+    dir (Join-Path dist *.nupkg) | % {
       dotnet meziantou.validate-nuget-package --excluded-rules IconMustBeSet $_
       if ($LASTEXITCODE) {
         throw "Package validation failed: $_"
