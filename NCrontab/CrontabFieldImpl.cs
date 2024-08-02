@@ -36,10 +36,10 @@ sealed partial class CrontabFieldImpl
     public static readonly CrontabFieldImpl Minute    = new(CrontabFieldKind.Minute, 0, 59, null);
     public static readonly CrontabFieldImpl Hour      = new(CrontabFieldKind.Hour, 0, 23, null);
     public static readonly CrontabFieldImpl Day       = new(CrontabFieldKind.Day, 1, 31, null);
-    public static readonly CrontabFieldImpl Month     = new(CrontabFieldKind.Month, 1, 12, new[] { "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December" });
-    public static readonly CrontabFieldImpl DayOfWeek = new(CrontabFieldKind.DayOfWeek, 0, 6, new[] { "Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday" });
+    public static readonly CrontabFieldImpl Month     = new(CrontabFieldKind.Month, 1, 12, ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]);
+    public static readonly CrontabFieldImpl DayOfWeek = new(CrontabFieldKind.DayOfWeek, 0, 6, ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"]);
 
-    static readonly CrontabFieldImpl[] FieldByKind = { Second, Minute, Hour, Day, Month, DayOfWeek };
+    static readonly CrontabFieldImpl[] FieldByKind = [Second, Minute, Hour, Day, Month, DayOfWeek];
 
     static readonly CompareInfo Comparer = CultureInfo.InvariantCulture.CompareInfo;
 
@@ -159,7 +159,7 @@ sealed partial class CrontabFieldImpl
     }
 
     public void Parse(string str, CrontabFieldAccumulator<ExceptionProvider?> acc) =>
-        _ = TryParse(str, acc, null, ep => throw ep());
+        _ = TryParse(str, acc, null, static ep => throw ep());
 
     public T TryParse<T>(string str, CrontabFieldAccumulator<T> acc, T success,
                          Func<ExceptionProvider, T> errorSelector)
@@ -239,28 +239,29 @@ sealed partial class CrontabFieldImpl
         return every is { } someEvery
              ? acc(value, MaxValue, someEvery, success, errorSelector)
              : acc(value, value, 1, success, errorSelector);
+
+        int ParseValue(string str)
+        {
+            if (str.Length == 0)
+                throw new CrontabException("A crontab field value cannot be empty.");
+
+            if (str[0] is >= '0' and <= '9')
+                return int.Parse(str, CultureInfo.InvariantCulture);
+
+            if (this.names == null)
+            {
+                throw new CrontabException($"'{str}' is not a valid [{Kind}] crontab field value. It must be a numeric value between {MinValue} and {MaxValue} (all inclusive).");
+            }
+
+            for (var i = 0; i < this.names.Length; i++)
+            {
+                if (Comparer.IsPrefix(this.names[i], str, CompareOptions.IgnoreCase))
+                    return i + MinValue;
+            }
+
+            var names = string.Join(", ", this.names);
+            throw new CrontabException($"'{str}' is not a known value name. Use one of the following: {names}.");
+        }
     }
 
-    int ParseValue(string str)
-    {
-        if (str.Length == 0)
-            throw new CrontabException("A crontab field value cannot be empty.");
-
-        if (str[0] is >= '0' and <= '9')
-            return int.Parse(str, CultureInfo.InvariantCulture);
-
-        if (this.names == null)
-        {
-            throw new CrontabException($"'{str}' is not a valid [{Kind}] crontab field value. It must be a numeric value between {MinValue} and {MaxValue} (all inclusive).");
-        }
-
-        for (var i = 0; i < this.names.Length; i++)
-        {
-            if (Comparer.IsPrefix(this.names[i], str, CompareOptions.IgnoreCase))
-                return i + MinValue;
-        }
-
-        var names = string.Join(", ", this.names);
-        throw new CrontabException($"'{str}' is not a known value name. Use one of the following: {names}.");
-    }
 }

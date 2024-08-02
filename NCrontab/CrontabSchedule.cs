@@ -92,12 +92,12 @@ public sealed partial class CrontabSchedule
     public static CrontabSchedule Parse(string expression) => Parse(expression, null);
 
     public static CrontabSchedule Parse(string expression, ParseOptions? options) =>
-        TryParse(expression, options, v => v, e => throw e());
+        TryParse(expression, options, static v => v, e => throw e());
 
     public static CrontabSchedule? TryParse(string expression) => TryParse(expression, null);
 
     public static CrontabSchedule? TryParse(string expression, ParseOptions? options) =>
-        TryParse(expression ?? string.Empty, options, v => (CrontabSchedule?)v, _ => null);
+        TryParse(expression ?? string.Empty, options, static v => (CrontabSchedule?)v, _ => null);
 
     public static T TryParse<T>(string expression,
                                 Func<CrontabSchedule, T> valueSelector,
@@ -134,8 +134,8 @@ public sealed partial class CrontabSchedule
         for (var i = 0; i < tokens.Length; i++)
         {
             var kind = (CrontabFieldKind)i + offset;
-            var field = CrontabField.TryParse(kind, tokens[i], v => new { ErrorProvider = (ExceptionProvider?)null, Value = (CrontabField?)v    },
-                                                               e => new { ErrorProvider = (ExceptionProvider?)e   , Value = (CrontabField?)null }) ;
+            var field = CrontabField.TryParse(kind, tokens[i], static v => new { ErrorProvider = (ExceptionProvider?)null, Value = (CrontabField?)v    },
+                                                               static e => new { ErrorProvider = (ExceptionProvider?)e   , Value = (CrontabField?)null }) ;
 
             if (field.ErrorProvider != null)
                 return errorSelector(field.ErrorProvider);

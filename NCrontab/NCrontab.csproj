@@ -8,7 +8,7 @@
     <VersionPrefix>3.4.0</VersionPrefix>
     <Authors>Atif Aziz</Authors>
     <TargetFrameworks>net35;netstandard1.0;netstandard2.0</TargetFrameworks>
-    <LangVersion>11</LangVersion>
+    <LangVersion>12</LangVersion>
     <DebugType>portable</DebugType>
     <AssemblyName>NCrontab</AssemblyName>
     <OutputType>Library</OutputType>
