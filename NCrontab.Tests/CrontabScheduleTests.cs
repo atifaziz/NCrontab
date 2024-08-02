@@ -425,6 +425,61 @@ public sealed class CrontabScheduleTests
         Assert.AreEqual(expected, occurrence);
     }
 
+    [Test]
+    public void GetNextOccurrencesWithNullSchedule()
+    {
+        // Overload 1
+
+        Assert.That(() => CrontabScheduleExtensions.GetNextOccurrences(null!, DateTime.MinValue, DateTime.MaxValue),
+                    Throws.ArgumentNullException
+                          .With.Property(nameof(ArgumentNullException.ParamName)).EqualTo("schedules"));
+
+        // Overload 2
+
+        Assert.That(() => CrontabScheduleExtensions.GetNextOccurrences<object>(null!, DateTime.MinValue, DateTime.MaxValue,
+                                                                               delegate { throw new NotImplementedException(); }),
+                    Throws.ArgumentNullException
+                          .With.Property(nameof(ArgumentNullException.ParamName)).EqualTo("schedules"));
+    }
+
+    [Test]
+    public void GetNextOccurrencesWithNullResultSelector()
+    {
+        Assert.That(() => _ = Enumerable.Empty<CrontabSchedule>()
+                                        .GetNextOccurrences<object>(DateTime.MinValue, DateTime.MaxValue, resultSelector: null!),
+                    Throws.ArgumentNullException
+                          .With.Property(nameof(ArgumentNullException.ParamName)).EqualTo("resultSelector"));
+    }
+
+    [TestCase(new[] { "0 * * * *" }, null,
+              new[] { "01/01/2003 01:00:00", "01/01/2003 02:00:00", "01/01/2003 03:00:00" })]
+    [TestCase(new[] { "0 1 * * *", " 0 2 * * *", " 0 3 * * *" }, null,
+              new[] { "01/01/2003 01:00:00", "01/01/2003 02:00:00", "01/01/2003 03:00:00",
+                      "02/01/2003 01:00:00", "02/01/2003 02:00:00", "02/01/2003 03:00:00" })]
+    [TestCase(new[] { "0 2 * * *", "0 3 * * *", "0 1 * * *" }, null,
+              new[] { "01/01/2003 01:00:00", "01/01/2003 02:00:00", "01/01/2003 03:00:00",
+                      "02/01/2003 01:00:00", "02/01/2003 02:00:00", "02/01/2003 03:00:00" })]
+    [TestCase(new[] { "0 * * * *", "0 * * * *" }, "01/01/2003 03:30:00",
+              new[] { "01/01/2003 01:00:00", "01/01/2003 02:00:00", "01/01/2003 03:00:00" })]
+    [TestCase(new[] { "0 7-9 * * Mon", "0 6,18 * * Tue", "0 3,*/6 * * Fri" }, null,
+              new[] { "03/01/2003 00:00:00", "03/01/2003 03:00:00", "03/01/2003 06:00:00", "03/01/2003 12:00:00", "03/01/2003 18:00:00",
+                      "06/01/2003 07:00:00", "06/01/2003 08:00:00", "06/01/2003 09:00:00",
+                      "07/01/2003 06:00:00", "07/01/2003 18:00:00" })]
+    public void NextOccurrencesFromMultipleSchedules(string[] expressions, string? endTimeString, string[] times)
+    {
+        var occurrences =
+            expressions
+                .Select(CrontabSchedule.Parse)
+                .GetNextOccurrences(new DateTime(2003, 1, 1),
+                                    endTimeString is { Length: > 0 } someEndTimeString
+                                        ? Time(someEndTimeString)
+                                        : DateTime.MaxValue)
+                .Select(TimeString);
+
+        Assert.That(endTimeString is null ? occurrences.Take(times.Length)
+                                          : occurrences,
+                    Is.EquivalentTo(times));
+    }
 
     static void CronCall(string startTimeString, string cronExpression, string nextTimeString, ParseOptions options)
     {

@@ -25,6 +25,7 @@
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Linq;
 using NCrontab;
 
 var verbose = false;
@@ -46,20 +47,36 @@ try
             _ => throw new ApplicationException("Missing required arguments. You must at least supply CRONTAB-EXPRESSION START-DATE END-DATE."),
         };
 
-    expression = expression.Trim();
-    var options = new CrontabSchedule.ParseOptions
-    {
-        IncludingSeconds = expression.Split(' ').Length > 5,
-    };
+    var expressions = expression.Split(';')
+                                .Select(s => s.Trim())
+                                .Where(s => s.Length > 0)
+                                .ToArray();
 
     var start = ParseDateArgument(startTimeString, "start");
     var end = ParseDateArgument(endTimeString, "end");
-    format ??= options.IncludingSeconds ? "ddd, dd MMM yyyy HH:mm:ss"
-                                        : "ddd, dd MMM yyyy HH:mm";
 
-    var schedule = CrontabSchedule.Parse(expression, options);
+    var exopts =
+        expressions
+            .Select(expression => new
+            {
+                Expression = expression,
+                Options = new CrontabSchedule.ParseOptions
+                {
+                    IncludingSeconds = expression.Split(' ', StringSplitOptions.RemoveEmptyEntries)
+                                                 .Length == 6,
+                },
+            })
+            .ToArray();
 
-    foreach (var occurrence in schedule.GetNextOccurrences(start, end))
+    format ??= exopts.Any(e => e.Options.IncludingSeconds)
+             ? "ddd, dd MMM yyyy HH:mm:ss"
+             : "ddd, dd MMM yyyy HH:mm";
+
+    var schedules =
+        from e in exopts
+        select CrontabSchedule.Parse(e.Expression, e.Options);
+
+    foreach (var occurrence in schedules.GetNextOccurrences(start, end))
         Console.Out.WriteLine(occurrence.ToString(format, null));
 
     return 0;
