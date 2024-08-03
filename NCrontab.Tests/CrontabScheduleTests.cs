@@ -42,15 +42,15 @@ public sealed class CrontabScheduleTests
     [Test]
     public void CannotParseNullString()
     {
-        var e = Assert.Throws<ArgumentNullException>(() => CrontabSchedule.Parse(null!))
-                ?? throw new NullReferenceException();
-        Assert.That(e.ParamName, Is.EqualTo("expression"));
+        Assert.That(() => CrontabSchedule.Parse(null!),
+                    Throws.ArgumentNullException
+                          .With.Property(nameof(ArgumentNullException.ParamName)).EqualTo("expression"));
     }
 
     [Test]
     public void CannotParseEmptyString()
     {
-        _ = Assert.Throws<CrontabException>(() => CrontabSchedule.Parse(string.Empty));
+        Assert.That(() => CrontabSchedule.Parse(string.Empty), Throws.TypeOf<CrontabException>());
     }
 
     [Test]
@@ -64,19 +64,22 @@ public sealed class CrontabScheduleTests
     [Test]
     public void AllTimeString()
     {
-        Assert.AreEqual("* * * * *", CrontabSchedule.Parse("* * * * *").ToString());
+        var result = CrontabSchedule.Parse("* * * * *").ToString();
+        Assert.That(result, Is.EqualTo("* * * * *"));
     }
 
     [Test]
     public void SixPartAllTimeString()
     {
-        Assert.AreEqual("* * * * * *", CrontabSchedule.Parse("* * * * * *", new ParseOptions { IncludingSeconds = true }).ToString());
+        var result = CrontabSchedule.Parse("* * * * * *", new ParseOptions { IncludingSeconds = true }).ToString();
+        Assert.That(result, Is.EqualTo("* * * * * *"));
     }
 
     [Test]
     public void CannotParseWhenSecondsRequired()
     {
-        _ = Assert.Throws<CrontabException>(() => CrontabSchedule.Parse("* * * * *", new ParseOptions { IncludingSeconds = true }));
+        Assert.That(() => CrontabSchedule.Parse("* * * * *", new ParseOptions { IncludingSeconds = true }),
+                    Throws.TypeOf<CrontabException>());
     }
 
     [TestCase("* 1-3 * * *"            , "* 1-2,3 * * *"                   , false)]
@@ -90,7 +93,8 @@ public sealed class CrontabScheduleTests
     public void Formatting(string format, string expression, bool includingSeconds)
     {
         var options = new ParseOptions { IncludingSeconds = includingSeconds };
-        Assert.AreEqual(format, CrontabSchedule.Parse(expression, options).ToString());
+        var result = CrontabSchedule.Parse(expression, options).ToString();
+        Assert.That(result, Is.EqualTo(format));
     }
 
     /// <summary>
@@ -335,7 +339,8 @@ public sealed class CrontabScheduleTests
         {
             IncludingSeconds = includingSeconds
         };
-        _ = Assert.Throws<CrontabException>(() => CrontabSchedule.Parse(expression, options));
+        Assert.That(() => CrontabSchedule.Parse(expression, options),
+                    Throws.TypeOf<CrontabException>());
         Assert.That(CrontabSchedule.TryParse(expression, options), Is.Null);
     }
 
@@ -400,7 +405,7 @@ public sealed class CrontabScheduleTests
     {
         var schedule = CrontabSchedule.Parse("0 0 29 Feb Mon");
         var occurrences = schedule.GetNextOccurrences(new DateTime(9988, 1, 1), DateTime.MaxValue);
-        Assert.AreEqual(new DateTime(9988, 2, 29), occurrences.Last());
+        Assert.That(occurrences.Last(), Is.EqualTo(new DateTime(9988, 2, 29)));
     }
 
     // Instead of using strings and parsing as date,
@@ -418,7 +423,7 @@ public sealed class CrontabScheduleTests
 
         var occurrence = schedule.GetNextOccurrence(start, end);
 
-        Assert.AreEqual(expected, occurrence);
+        Assert.That(occurrence, Is.EqualTo(expected));
     }
 
     [Test]
@@ -482,8 +487,8 @@ public sealed class CrontabScheduleTests
         var schedule = CrontabSchedule.Parse(cronExpression, options);
         var next = schedule.GetNextOccurrence(Time(startTimeString));
 
-        Assert.AreEqual(nextTimeString, TimeString(next),
-            "Occurrence of <{0}> after <{1}>.", cronExpression, startTimeString);
+        Assert.That(TimeString(next), Is.EqualTo(nextTimeString),
+                    "Occurrence of <{0}> after <{1}>.", cronExpression, startTimeString);
     }
 
     static void CronFinite(string cronExpression, string startTimeString, string endTimeString, ParseOptions options)
@@ -491,9 +496,9 @@ public sealed class CrontabScheduleTests
         var schedule = CrontabSchedule.Parse(cronExpression, options);
         var occurrence = schedule.GetNextOccurrence(Time(startTimeString), Time(endTimeString));
 
-        Assert.AreEqual(endTimeString, TimeString(occurrence),
-            "Occurrence of <{0}> after <{1}> did not terminate with <{2}>.",
-            cronExpression, startTimeString, endTimeString);
+        Assert.That(TimeString(occurrence), Is.EqualTo(endTimeString),
+                    "Occurrence of <{0}> after <{1}> did not terminate with <{2}>.",
+                    cronExpression, startTimeString, endTimeString);
     }
 
     static string TimeString(DateTime time) => time.ToString(TimeFormat, CultureInfo.InvariantCulture);
