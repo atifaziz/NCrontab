@@ -1,0 +1,208 @@
+@page "/"
+@using System.Globalization
+@using System.Text
+@using NCrontab;
+@using Microsoft.AspNetCore.WebUtilities
+@inject NavigationManager NavigationManager
+@inject IJSRuntime JSRuntime
+<div class="content px-4">
+
+    <span>
+        <label>Start:</label>
+        <input type="date" @bind="StartTime"/>
+    </span>
+
+    <span>
+        <label>End:</label>
+        <input type="date" @bind="EndTime"/>
+    </span>
+
+    <span>
+        <label>Expression:</label>
+        <input @bind-value="Expression" @bind-value:event="oninput"/>
+    </span>
+
+    <button @onclick="CopyLink" type="button" class="btn btn-light">Copy Link</button>
+
+    <h2>Occurrences (@_occurrences.Count@(_hasMoreOccurrences ? "+" : null))</h2>
+
+    @if (_occurrences.Any())
+    {
+        <ol id="occurrences">
+            @foreach (var occurrence in _occurrences)
+            {
+                <li><span class="occurrence">@occurrence</span></li>
+            }
+        </ol>
+    }
+    else if (_parseError is Exception e)
+    {
+        <div class="alert alert-danger" role="alert">
+            @e.Message
+        </div>
+    }
+
+</div>
+
+@code
+{
+    DateTime _startTime;
+    DateTime _endTime;
+    string _expression = null!;
+    Exception? _parseError;
+    bool _hasMoreOccurrences;
+    readonly List<string> _occurrences = new List<string>();
+
+    DateTime StartTime
+    {
+        get => _startTime;
+        set
+        {
+            if (value == _startTime)
+                return;
+            _startTime = value;
+            Refresh();
+        }
+    }
+
+    DateTime EndTime
+    {
+        get => _endTime;
+        set
+        {
+            if (value == _endTime)
+                return;
+            _endTime = value;
+            Refresh();
+        }
+    }
+
+    string Expression
+    {
+        get => _expression;
+        set
+        {
+            if (value == _expression)
+                return;
+            _expression = value;
+            Refresh();
+        }
+    }
+
+    protected override Task OnInitializedAsync()
+    {
+        var uri = new Uri(NavigationManager.Uri);
+        var query = QueryHelpers.ParseQuery(uri.Query);
+        _expression = query.TryGetValue("expression", out var vs) && vs.First() is { } queryExpression
+                    ? queryExpression
+                    : "* * * * *";
+        var today = DateTime.Today;
+        _startTime = today;
+        _endTime = today.AddDays(1);
+        Refresh();
+        return base.OnInitializedAsync();
+    }
+
+    void Refresh()
+    {
+        _hasMoreOccurrences = false;
+        _occurrences.Clear();
+
+        var fields = Expression.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+        var isSixPart = fields.Length == 6;
+
+        var (schedule, parseError) =
+            CrontabSchedule.TryParse(Expression,
+                new CrontabSchedule.ParseOptions { IncludingSeconds = isSixPart },
+                s  => (s, (Exception?)null),
+                ep => ((CrontabSchedule?)null, ep()));
+
+        _parseError = parseError;
+
+        if (schedule != null)
+            DoCrontabbing(schedule, isSixPart);
+    }
+
+    void DoCrontabbing(CrontabSchedule schedule, bool includingSeconds)
+    {
+        var count = 0;
+        const int maxCount = 500;
+
+        foreach (var (_, s) in GetFormattedOccurrences(schedule, includingSeconds))
+        {
+            if (count + 1 > maxCount)
+            {
+                _hasMoreOccurrences = true;
+                break;
+            }
+
+            //_startTime = occurrence;
+            //_totalOccurrenceCount++;
+            count++;
+
+            _occurrences.Add(s);
+        }
+    }
+
+    IEnumerable<(DateTime, string)> GetFormattedOccurrences(CrontabSchedule schedule, bool includingSeconds)
+    {
+        var info = DateTimeFormatInfo.CurrentInfo;
+        var dayWidth = info.AbbreviatedDayNames.Max(s => s.Length);
+        var monthWidth = info.AbbreviatedMonthNames.Max(s => s.Length);
+        var timeComponent = includingSeconds ? "HH:mm:ss" : "HH:mm";
+        var timeFormat = $"{{0,-{dayWidth}:ddd}} {{0:dd}}, {{0,-{monthWidth}:MMM}} {{0:yyyy {timeComponent}}}";
+        var lastTimeString = new string('?', string.Format(timeFormat, DateTime.MinValue).Length);
+
+        var sb = new StringBuilder();
+
+        foreach (var occurrence in schedule.GetNextOccurrences(StartTime, EndTime))
+        {
+            sb.Length = 0;
+
+            var timeString = string.Format(timeFormat, occurrence);
+
+            sb.Append(timeString);
+            sb.Append(" | ");
+
+            var index = Diff(lastTimeString, timeString, 0, dayWidth, sb);
+            sb.Append(' ');
+            index = Diff(lastTimeString, timeString, index + 1, 2, sb);
+            sb.Append(", ");
+            index = Diff(lastTimeString, timeString, index + 2, monthWidth, sb);
+            sb.Append(' ');
+            index = Diff(lastTimeString, timeString, index + 1, 4, sb);
+            sb.Append(' ');
+            index = Diff(lastTimeString, timeString, index + 1, 2, sb);
+            sb.Append(':');
+            index = Diff(lastTimeString, timeString, index + 1, 2, sb);
+            if (includingSeconds)
+            {
+                sb.Append(':');
+                Diff(lastTimeString, timeString, index + 1, 2, sb);
+            }
+
+            lastTimeString = timeString;
+
+            yield return (occurrence, sb.ToString());
+        }
+
+        static int Diff(string oldString, string newString, int index, int length, StringBuilder builder)
+        {
+            if (string.CompareOrdinal(oldString, index, newString, index, length) == 0)
+                builder.Append('-', length);
+            else
+                builder.Append(newString, index, length);
+
+            return index + length;
+        }
+    }
+
+    void CopyLink()
+    {
+        var uri = new Uri(NavigationManager.Uri);
+        var query = QueryHelpers.ParseQuery(uri.Query);
+        query["expression"] = new Microsoft.Extensions.Primitives.StringValues(_expression);
+        var uriToCopy = QueryHelpers.AddQueryString(uri.GetComponents(UriComponents.SchemeAndServer | UriComponents.Path, UriFormat.UriEscaped), "expression", _expression);
+        JSRuntime.InvokeVoidAsync("copyText", uriToCopy);
+    }
+ }
