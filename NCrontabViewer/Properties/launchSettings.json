@@ -17,7 +17,7 @@
         "ASPNETCORE_ENVIRONMENT": "Development"
       }
     },
-    "NCrontabWebViewer": {
+    "NCrontabViewer": {
       "commandName": "Project",
       "dotnetRunMessages": true,
       "launchBrowser": true,
