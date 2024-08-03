@@ -2,46 +2,46 @@
 @using System.Globalization
 @using System.Text
 @using NCrontab;
+@using Microsoft.AspNetCore.WebUtilities
+@inject NavigationManager NavigationManager
+@inject IJSRuntime JSRuntime
+<div class="content px-4">
 
-<div class="main">
-    <div class="top-row px-4">
-        <h1>NCrontab</h1>
-        <a href="https://github.com/atifaziz/NCrontab" target="about-csmin" class="ml-md-auto">About</a>
-    </div>
-    <div class="content px-4">
+    <span>
+        <label>Start:</label>
+        <input type="date" @bind="StartTime"/>
+    </span>
 
-        <span>
-            <label>Start:</label>
-            <input type="date" @bind="StartTime"/>
-        </span>
+    <span>
+        <label>End:</label>
+        <input type="date" @bind="EndTime"/>
+    </span>
 
-        <span>
-            <label>End:</label>
-            <input type="date" @bind="EndTime"/>
-        </span>
+    <span>
+        <label>Expression:</label>
+        <input @bind-value="Expression" @bind-value:event="oninput"/>
+    </span>
 
-        <span>
-            <label>Expression:</label>
-            <input @bind-value="Expression" @bind-value:event="oninput"/>
-        </span>
+    <button @onclick="CopyLink" type="button" class="btn btn-light">Copy Link</button>
 
-        <h2>Occurrences (@_occurrences.Count@(_hasMoreOccurrences ? "+" : null))</h2>
+    <h2>Occurrences (@_occurrences.Count@(_hasMoreOccurrences ? "+" : null))</h2>
 
-        @if (_occurrences.Any())
-        {
-            <ol id="occurrences">
-                @foreach (var occurrence in _occurrences)
-                {
-                    <li><span class="occurrence">@occurrence</span></li>
-                }
-            </ol>
-        }
-        else if (_parseError is Exception e)
-        {
-            <p class="validation-message">@e.Message</p>
-        }
+    @if (_occurrences.Any())
+    {
+        <ol id="occurrences">
+            @foreach (var occurrence in _occurrences)
+            {
+                <li><span class="occurrence">@occurrence</span></li>
+            }
+        </ol>
+    }
+    else if (_parseError is Exception e)
+    {
+        <div class="alert alert-danger" role="alert">
+            @e.Message
+        </div>
+    }
 
-    </div>
 </div>
 
 @code
@@ -91,7 +91,11 @@
 
     protected override Task OnInitializedAsync()
     {
-        _expression = "* * * * *";
+        var uri = new Uri(NavigationManager.Uri);
+        var query = QueryHelpers.ParseQuery(uri.Query);
+        _expression = query.TryGetValue("expression", out var vs) && vs.First() is { } queryExpression
+                    ? queryExpression
+                    : "* * * * *";
         var today = DateTime.Today;
         _startTime = today;
         _endTime = today.AddDays(1);
@@ -192,4 +196,13 @@
             return index + length;
         }
     }
-}
+
+    void CopyLink()
+    {
+        var uri = new Uri(NavigationManager.Uri);
+        var query = QueryHelpers.ParseQuery(uri.Query);
+        query["expression"] = new Microsoft.Extensions.Primitives.StringValues(_expression);
+        var uriToCopy = QueryHelpers.AddQueryString(uri.GetComponents(UriComponents.SchemeAndServer | UriComponents.Path, UriFormat.UriEscaped), "expression", _expression);
+        JSRuntime.InvokeVoidAsync("copyText", uriToCopy);
+    }
+ }

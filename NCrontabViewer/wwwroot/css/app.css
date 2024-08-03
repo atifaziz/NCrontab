@@ -105,3 +105,13 @@ code {
 .occurrence {
     font-family: Monaco, "Lucida Console", monospace;
 }
+
+#copy-input {
+    height: 1px;
+    width: 1px;
+    padding: 0;
+    border: 0;
+    position: absolute;
+    color: rgba(255, 255, 255, 0);
+    background: rgba(255, 255, 255, 0);
+}
