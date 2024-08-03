@@ -1,0 +1,128 @@
+@using NCrontab
+@using Microsoft.Extensions.Logging
+@using Microsoft.AspNetCore.WebUtilities
+@inject ILogger<Index> Logger
+@inject NavigationManager NavigationManager
+@inject IJSRuntime JSRuntime
+<label for="crontab-expression">NCrontab Expression:</label>
+<div class="input-group mb-3">
+    <input @onkeyup="SetExpression"
+           @bind="cronExpression"
+           @bind:event="oninput"
+           placeholder="Cron Expression"
+           class="form-control"
+           id="crontab-expression" />
+    <div class="input-group-append">
+        <button 
+            @onclick="PrintOccurrences" 
+            type="button" 
+            class="btn btn-primary" 
+            disabled="@(!isExpressionValid)">
+            Print More
+        </button>
+        <button @onclick="CopyLink" type="button" class="btn btn-light">Copy Link</button>
+    </div>
+</div>
+<label>Occurrences Output:</label>
+@if (!string.IsNullOrEmpty(errorMessage))
+{
+    <div class="alert alert-danger" role="alert">
+        @errorMessage
+    </div>
+}
+@if (!isExpression6PartFormat)
+{
+    <div class="alert alert-warning" role="alert">
+        You are using the classic five-part CRON format. Services such as
+        Azure Functions and Azure WebJobs require the six-part format.
+    </div>
+}
+<ul class="occurrences-list">
+    @foreach (var occurence in occurrences)
+    {
+        <li>
+            @occurence.ToString("yyyy-MM-dd HH:mm:ss")
+        </li>
+    }
+</ul>
+
+@code {
+    private DateTime startDate = DateTime.Today;
+    private string cronExpression = "0 0 12 * */2 Mon";
+    private CrontabSchedule cronSchedule;
+    private List<DateTime> occurrences = new List<DateTime>();
+    private string errorMessage = string.Empty;
+    private List<Action> actionsToRunAfterRender = new List<Action>();
+    private bool isExpression6PartFormat = true;
+    private bool isExpressionValid = true;
+
+    protected override Task OnInitializedAsync()
+    {
+        var uri = new Uri(NavigationManager.Uri);
+        var queryPairs = QueryHelpers.ParseQuery(uri.Query);
+        if (queryPairs.ContainsKey("expression"))
+        {
+            cronExpression = queryPairs["expression"].First();
+        }
+
+        SetExpression();
+
+        return Task.CompletedTask;
+    }
+
+    protected override Task OnAfterRenderAsync(bool firstRender)
+    {
+        foreach (var actionToRun in actionsToRunAfterRender)
+        {
+            actionToRun();
+        }
+        actionsToRunAfterRender.Clear();
+        return base.OnAfterRenderAsync(firstRender);
+    }
+
+    private void PrintOccurrences()
+    {
+        var mostRecentDate = occurrences.Count == 0 ? startDate : occurrences.Last();
+        for (int i = 0; i < 10; i++)
+        {
+            mostRecentDate = cronSchedule.GetNextOccurrence(mostRecentDate);
+            occurrences.Add(mostRecentDate);
+        }
+
+        actionsToRunAfterRender.Add(() => JSRuntime.InvokeVoidAsync("scrollToOccurrence", occurrences.Count - 1));
+    }
+
+    private void SetExpression()
+    {
+        occurrences.Clear();
+        isExpression6PartFormat = cronExpression
+            .Trim()
+            .Replace(@"\t", " ")
+            .Split(' ', StringSplitOptions.RemoveEmptyEntries)
+            .Count() == 6;
+
+        try
+        {
+            cronSchedule = CrontabSchedule.Parse(cronExpression, new CrontabSchedule.ParseOptions { IncludingSeconds = isExpression6PartFormat });
+            errorMessage = string.Empty;
+            isExpressionValid = true;
+            PrintOccurrences();
+        }
+        catch (CrontabException exception)
+        {
+            Logger.LogError(exception, exception.Message);
+            errorMessage = exception.Message;
+            isExpression6PartFormat = true;
+            isExpressionValid = false;
+        }
+    }
+
+    private void CopyLink()
+    {
+        var uri = new Uri(NavigationManager.Uri);
+        var queryPairs = QueryHelpers.ParseQuery(uri.Query);
+        queryPairs["expression"] = new Microsoft.Extensions.Primitives.StringValues(cronExpression);
+        var uriToCopy = QueryHelpers.AddQueryString(uri.GetComponents(UriComponents.SchemeAndServer | UriComponents.Path, UriFormat.UriEscaped), "expression", cronExpression);
+        JSRuntime.InvokeVoidAsync("copyText", uriToCopy);
+    }
+}
