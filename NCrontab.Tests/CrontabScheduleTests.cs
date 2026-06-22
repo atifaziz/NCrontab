@@ -65,7 +65,8 @@ namespace NCrontab.Tests
         public void TryParseEmptyString()
         {
             Assert.That(CrontabSchedule.TryParse(string.Empty), Is.Null);
-            Assert.False(CrontabSchedule.TryParse(string.Empty, out var _));
+            Assert.That(CrontabSchedule.TryParse(string.Empty, out var result), Is.False);
+            Assert.That(result, Is.Null);
         }
 
         [Test]
