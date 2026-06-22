@@ -350,10 +350,10 @@ namespace NCrontab.Tests
             {
                 IncludingSeconds = includingSeconds
             }), Is.Null);
-            Assert.False(CrontabSchedule.TryParse(expression, new ParseOptions
+            Assert.That(CrontabSchedule.TryParse(expression, new ParseOptions
             {
                 IncludingSeconds = includingSeconds
-            }, out var _));
+            }, out _), Is.False);
         }
 
         [TestCase("bad * * * * *", false)]
