@@ -100,8 +100,8 @@ namespace NCrontab
 
         public static CrontabSchedule? TryParse(string expression) => TryParse(expression, null);
 
-        public static bool TryParse(string expression, out CrontabSchedule? schedule)
-            => (schedule = TryParse(expression, null))!=null;
+        public static bool TryParse(string expression, out CrontabSchedule? schedule) =>
+            (schedule = TryParse(expression, null)) != null;
 
         public static bool TryParse(string expression, ParseOptions? options, out CrontabSchedule? schedule) =>
             (schedule = TryParse(expression, options)) != null;
