@@ -54,6 +54,8 @@ public sealed partial class CrontabField : ICrontabField
     {
         if (valueSelector == null) throw new ArgumentNullException(nameof(valueSelector));
         if (errorSelector == null) throw new ArgumentNullException(nameof(errorSelector));
+        if (expression == null)
+            return errorSelector(() => new ArgumentNullException(nameof(expression)));
 
         var field = new CrontabField(CrontabFieldImpl.FromKind(kind));
         var error = field.impl.TryParse(expression, field.Accumulate, null, static e => e);

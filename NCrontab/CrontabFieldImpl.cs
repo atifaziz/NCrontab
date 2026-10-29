@@ -166,9 +166,6 @@ sealed partial class CrontabFieldImpl
     {
         if (acc == null) throw new ArgumentNullException(nameof(acc));
 
-        if (string.IsNullOrEmpty(str))
-            return success;
-
         try
         {
             return InternalParse(str, acc, success, errorSelector);
